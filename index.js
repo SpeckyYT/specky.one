@@ -17,7 +17,7 @@ for(const [key,file] of Object.entries(match)){
 app.use(express.static('public'));
 
 app.all('*', (req, res) => {
-    res.render('404.pug')
+    res.status(404).render('404.pug')
 })
 
 app.listen(80)
