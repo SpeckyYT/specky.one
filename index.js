@@ -7,6 +7,7 @@ const match = {
 const app = express();
 
 app.set('view engine','pug');
+app.use(express.static('public'));
 
 for(const [key,file] of Object.entries(match)){
     app.get(key, (req, res) => {
@@ -14,7 +15,7 @@ for(const [key,file] of Object.entries(match)){
     })
 }
 
-app.use(express.static('public'));
+app.use('/admin', require('./routes/admin'))
 
 app.all('*', (req, res) => {
     res.status(404).render('404.pug')
