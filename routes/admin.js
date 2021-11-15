@@ -4,7 +4,6 @@ const { exec } = require('child_process');
 
 const run = (command) => {
     const child = exec(command);
-
     return new Promise((res,rej) => {
         child.on('close', (code) => code ? rej(code) : res(code))
     })
