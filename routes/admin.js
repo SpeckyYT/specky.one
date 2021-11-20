@@ -31,4 +31,8 @@ router.all('/update', async (req, res) => {
     }
 })
 
+router.all('/reboot', (req, res) => {
+    process.exit(0)
+})
+
 module.exports = router;
