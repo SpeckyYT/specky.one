@@ -15,6 +15,7 @@ for(const [key,file] of Object.entries(match)){
     })
 }
 
+app.use('/us', require('./routes/us'))
 app.use('/admin', require('./routes/admin'))
 
 app.all('*', (req, res) => {
