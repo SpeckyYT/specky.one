@@ -4,29 +4,32 @@ const sigi = require('sigidb');
 
 const db = sigi('url_shortener.sqlite');
 
-const DOT_REPLACER = '\uFFFF'
-const DOT = '.'
+const getDB = () => db.all().map(v => v.value)
 
 const randomString = () => {
     const getChar = () => '0123456789abcdef'[Math.floor(Math.random() * 16)]
-
-    const links = db.all().map(v => v.value.shorten);
-
+    const links = getDB().map(v => v.shorten);
     let current = ''
-
-    while(!current || links.includes(current)){
+    while(!current || links.includes(current))
         current = Array(8).fill().map(() => getChar()).join('');
-    }
-
     return current
 }
 
 router.all('/shorten', (req, res) => {
     if(!req.query.url) return res.status(400).json({ error: 'No URL provided' })
     
-    const url = req.query.url.replaceAll(DOT, DOT_REPLACER);
+    const url = req.query.url;
 
-    if(!db.has(url)){
+    try {
+        new URL(url)
+    } catch (err) {
+        console.log(err)
+        return res.status(400).json({ error: 'invalid URL' })
+    }
+
+    const existing = getDB().find(v => v.url == url)
+
+    if(!existing){
         const content = {
             ip: req.ip, // sorry 💀
             shorten: randomString(),
@@ -38,7 +41,7 @@ router.all('/shorten', (req, res) => {
 
         res.json({ error: false, url: `/us/${content.shorten}` })
     } else {
-        res.json({ error: false, url: `/us/${db.get(url).shorten}` })
+        res.json({ error: false, url: `/us/${existing.shorten}` })
     }
 })
 
@@ -47,7 +50,7 @@ router.all('*', (req, res) => {
 
     if(url){
         if(db.has(url)){
-            return res.redirect(db.get(url).url.replaceAll(DOT_REPLACER, DOT))
+            return res.redirect(db.get(url).url)
         }else{
             return res.status(404).json({ error: 'URL not found' })
         }
