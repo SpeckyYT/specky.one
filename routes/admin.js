@@ -10,8 +10,13 @@ const run = (command) => {
 }
 
 router.use((req, res, next) => {
-    // idk how to make a login page
-    res.json({ authorized: false }) // 😂🤣😂🤣
+    const allowed = req.query.code == process.env.ADMIN_PASSCODE;
+
+    if(allowed){
+        next()
+    } else {
+        res.json({ authorized: false }) // 😂🤣😂🤣
+    }
 })
 
 router.all('/update', async (req, res) => {
