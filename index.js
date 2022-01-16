@@ -12,7 +12,10 @@ app.use(express.static('public'));
 
 for(const [key,file] of Object.entries(match)){
     app.get(key, (req, res) => {
-        res.render(file)
+        res.render(file, {
+            req,
+            res,
+        })
     })
 }
 
@@ -20,7 +23,12 @@ app.use('/us', require('./routes/us'))
 app.use('/admin', require('./routes/admin'))
 
 app.all('*', (req, res) => {
-    res.status(404).render('404.pug')
+    res
+    .status(404)
+    .render('404.pug', {
+        req,
+        res,
+    })
 })
 
 app.listen(80)
