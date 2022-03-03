@@ -15,7 +15,7 @@ router.use((req, res, next) => {
     if(allowed){
         next()
     } else {
-        res.json({ authorized: false }) // 😂🤣😂🤣
+        res.status(403).json({ authorized: false }) // 😂🤣😂🤣
     }
 })
 
@@ -27,7 +27,7 @@ router.all('/update', async (req, res) => {
         await run('npm i')
         res.json({ success: true });
     }catch(err){
-        res.json({ success: false, error: `${err}` });
+        res.status(500).json({ success: false, error: `${err}` });
     }
 })
 
