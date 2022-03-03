@@ -1,4 +1,5 @@
-require('dotenv').config()
+require('coffeescript');
+require('dotenv').config();
 const express = require('express');
 
 const match = {
