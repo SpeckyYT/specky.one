@@ -1,0 +1,179 @@
+// entirely inspired by https://we-are-jammin.xyz/
+
+head
+    title Summertime
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="icon" type="image/png" size="64" href="assets/icon.png")
+    script.
+        window.onload = async () => {
+            const video = document.getElementById('video');
+            const loading = document.getElementById('loading');
+            const data = document.getElementById('data');
+
+            const error = message => {
+                loading.innerText = message;
+                throw message
+            }
+            
+            try {
+                const memes = []
+                const push = (tit,con,add) => memes.push(`${tit}: ${con}${add||''}`)
+
+                let step = 0
+
+                let fontSize = Math.min(window.innerHeight / 10, window.innerWidth / 10);
+                data.style.fontSize = `${fontSize}px`;
+
+                let my_ip = await (await fetch("https://wtfismyip.com/json").catch(error)).json().catch(error)
+                let ip_data = await (await fetch(`http://ip-api.com/json/${my_ip.YourFuckingIPAddress}`).catch(error)).json().catch(error) // replace with #{req.ip} later
+
+                const videoData = await fetch('videos/summertime.mp4').catch(error);
+                video.src = URL.createObjectURL(await videoData.blob());
+                video.load();
+
+                video.oncanplaythrough = async () => {
+                    loading.style.display = 'none'
+                    start.style.display = 'flex'
+
+                    push('IP Address', ip_data.query)
+                    push('Hostname', my_ip.YourFuckingHostname)
+                    push('Country', `${ip_data.country} (${ip_data.countryCode})`)
+                    push('Region', `${ip_data.regionName} (${ip_data.region})`)
+                    push('City', ip_data.city)
+                    push('Latitude', ip_data.lat)
+                    push('Longitude', ip_data.lon)
+                    push('ISP', my_ip.YourFuckingISP)
+                    push('Autonomous System', ip_data.as)
+                    push('User Agent', navigator.userAgent)
+                    push('Connection Method', "#{req.method}")
+                    push('Secure Connection', #{req.secure} ? 'Yes' : 'No')
+                    push('Window Width', window.innerWidth, 'px')
+                    push('Window Height', window.innerHeight, 'px')
+                    push('Window Ratio', `${window.innerWidth / window.innerHeight}/1`)
+                    push('Window Properies', Object.keys(window).length)
+                    push('Screen Width', window.screen.availWidth, 'px')
+                    push('Screen Height', window.screen.availHeight, 'px')
+                    push('Screen Ratio', `${window.screen.availWidth / window.screen.availHeight}/1`)
+                    push('Screen Pixel Ratio', window.devicePixelRatio, '/1')
+                    push('Screen DPI', window.devicePixelRatio)
+                    push('Screen Color Depth', window.screen.colorDepth)
+                    push('Screen Orientation', `${window.screen.orientation.type} (${window.screen.orientation.angle}°)`)
+                    push('Screen Rotation', window.screen.orientation.angle)
+                    push('OS', `${navigator.platform}`)
+                    push('Available Browser Memory', typeof window.performance.memory != 'undefined' ? Math.round(window.performance.memory.jsHeapSizeLimit / 1024 / 1024) : null, 'MB');
+                    push('CPU Threads', `${navigator.hardwareConcurrency}`)
+                    const canvas = document.createElement('canvas');
+                    let gl;
+                    let debugInfo;
+                    try {
+                        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                        debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                    } catch (e) { }
+                    if (gl && debugInfo) {
+                        push('GPU Vendor', gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL));
+                        push('GPU Info', gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL));
+                    }
+                    push('Device Memory', `${navigator.deviceMemory}`)
+                    push('System Languages', navigator.languages.join(', '))
+                    push('Language', `${navigator.language}`)
+                    push('Current Time', `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`)
+                    push('Timezone', ip_data.timezone)
+                    push('Timezone Offset', new Date().getTimezoneOffset() / 60, ' hours')
+                    push('Year', new Date().getFullYear())
+                    push('Month', new Date().getMonth()+1)
+                    push('Day', new Date().getDate())
+                    push('Hour', new Date().getHours())
+                    push('Minute', new Date().getMinutes())
+                    push('Second', new Date().getSeconds())
+                    push('Millisecond', new Date().getMilliseconds())
+                    push('Hacked', 'Yes')
+                    push('Hacked By', '#{req.hostname}')
+                }
+
+                start.onclick = async () => {
+                    start.style.display = "none"
+                    video.play();
+
+                    const interval = setInterval(() => {
+                        const time = video.currentTime - 2.100 - step * 60/132; // 132 bpm moment
+                        if(step >= memes.length) step = -Infinity;
+                        if(step < 0) return clearInterval(interval);
+                        if(time > 0){
+                            if(step == 0) document.title = `[${my_ip.YourFuckingIPAddress}] You got summertime'd!`
+                            const el = document.createElement('span');
+                            el.textContent = `${memes[step]}`
+                            step++
+                            data.appendChild(el)
+                            const height = data.getBoundingClientRect().height
+                            if (height >= window.innerHeight) {
+                                fontSize *= 0.88
+                                data.style.fontSize = `${fontSize}px`
+                            }
+                        }
+                    }, 5)
+                }
+
+                video.onended = () => {
+                    video.style.display = 'none';
+                    step = -Infinity;
+                }
+            } catch (e) {
+                error(`${e.message}`)
+            }
+        }
+    style.
+        * {
+            background: white,
+            color: black,
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        body,
+        #loading,
+        #start,
+        #data {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #loading,
+        #start,
+        #video {
+            height: 100vh;
+            width: 100vw;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #loading {
+            z-index: 3;
+            font-size: 36px;
+        }
+        #start {
+            flex-direction: column;
+            z-index: 2;
+            font-size: 36px;
+        }
+        #data {
+            flex-direction: column;
+            text-align: center;
+        }
+        #data span {
+            z-index: 1;
+            background: transparent !important;
+        }
+        @media only screen and (min-aspect-ratio: 1/1) {
+            #video {
+                object-fit: cover;
+            }
+        }
+
+body
+    div#loading Loading...
+    div#start(style="display: none") Click to Start!
+    div#data
+    video#video(playingline style="pointer-events: none")
