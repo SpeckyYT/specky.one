@@ -1,0 +1,172 @@
+head
+    title Lonely Place
+    link(rel="icon" type="image/png" size="64" href="assets/icon.png")
+    script.
+        let currentColor = "";
+        const setColor = c => currentColor = c;
+        let isSocketConnected = false
+        let currentGrid = [[]];
+        let defaultInfo = "Click a color and click on the canvas to place a pixel";
+        let hackedBy = "You were hacked by #{req.hostname}";
+        let current_timeout = 0;
+
+        window.onload = async () => {    
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
+
+            function drawPixel(x, y, color) {
+                ctx.fillStyle = color;
+                ctx.fillRect(
+                    x * canvas.width / #{width},
+                    y * canvas.height / #{height},
+                    canvas.width / #{width},
+                    canvas.height / #{height},
+                );
+            }
+            function drawGridLines() {
+                ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                ctx.lineWidth = 1;
+                for (let x = 0; x <= #{width}; x++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x * canvas.width / #{width}, 0);
+                    ctx.lineTo(x * canvas.width / #{width}, canvas.height);
+                    ctx.stroke();
+                }
+                for (let y = 0; y <= #{height}; y++) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y * canvas.height / #{height});
+                    ctx.lineTo(canvas.width, y * canvas.height / #{height});
+                    ctx.stroke();
+                }
+            }
+            function updateCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let x = 0; x < currentGrid.length; x++) {
+                    for (let y = 0; y < currentGrid[x].length; y++) {
+                        drawPixel(y, x, currentGrid[x][y]); // no idea why I have to suddenly flip x and y
+                    }
+                }
+                drawGridLines()
+            }
+
+            // get body/h2.infos
+            const infos = document.getElementsByClassName("infos")[0];
+
+            setInterval(() => {
+                if (!isSocketConnected) {
+                    infos.innerHTML = "Not connected to the server<br>Refresh the page if this message persists";
+                } else if (current_timeout > Date.now()) {
+                    infos.innerHTML = "You can place another pixel in " + Math.round((current_timeout - Date.now()) / 1000) + " seconds";
+                } else if (infos.innerHTML == "") {
+                    infos.innerHTML = defaultInfo;
+                } else if (![defaultInfo, hackedBy].includes(infos.innerHTML)) {
+                    if (Math.random() < 0.01) {
+                        infos.innerHTML = hackedBy;
+                    } else {
+                        infos.innerHTML = defaultInfo;
+                    }
+                }
+            }, 100)
+
+            // event on click on canvas
+            canvas.addEventListener("click", (e) => {
+                const x = e.offsetX;
+                const y = e.offsetY;
+                const pixel = Math.floor(x * #{width} / canvas.width);
+                const line = Math.floor(y * #{height} / canvas.height);
+                if (currentColor && isSocketConnected) {
+                    socket.send(JSON.stringify({
+                        x: line,
+                        y: pixel,
+                        color: currentColor
+                    }));
+                }
+            });
+      
+            const socket = new WebSocket("ws://#{req.hostname}:#{port}/lonely/ws");
+
+            socket.addEventListener("open", async (event) => {
+                isSocketConnected = true
+            });
+            socket.addEventListener("message", async (event) => {
+                try {
+                    const {
+                        grid, colors, // initial values
+                        success, reason, // placing values
+                        x, y, color, // updating values
+                        timeout, // timeout
+                    } = JSON.parse(event.data);
+                    
+                    if (grid) {
+                        currentGrid = grid;
+                        updateCanvas()
+                    }
+
+                    if (colors) {
+                        // get body/div.color-buttons
+                        const colorButtons = document.getElementsByClassName("color-buttons");
+                        // clear all children
+                        while (colorButtons[0].firstChild) {
+                            colorButtons[0].removeChild(colorButtons[0].firstChild);
+                        }
+                        // add a new button for each color
+                        for (let i = 0; i < colors.length; i++) {
+                            const button = document.createElement("button");
+                            button.className = "color-button";
+                            button.style.backgroundColor = colors[i];
+                            button.addEventListener("click", () => setColor(colors[i]));
+                            colorButtons[0].appendChild(button);
+                        }
+                    }
+
+                    if (color) {
+                        currentGrid[x][y] = color;
+                        updateCanvas();
+                    }
+
+                    if (timeout) {
+                        current_timeout = timeout
+                    }
+                } catch (err) {
+                    console.error(err)
+                }
+            });
+            socket.addEventListener("close", async (event) => {
+                // TODO: CONNECTION CLOSED
+                isSocketConnected = false
+            });
+        }
+    body
+        // title
+        h1 Lonely Place
+        canvas#canvas(width="640", height="640")
+        // add color buttons
+        div.color-buttons
+        h2.infos
+    style.
+        body {
+            background-color: #333;
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+        .color-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20 auto;
+            width: 640px;
+            height: 50px;
+        }
+        .infos {
+            display: block;
+            margin: 0 auto;
+            text-align: center;
+            color: #fff;
+            font-family: "Comic Sans MS", cursive, sans-serif;
+        }

@@ -23,6 +23,7 @@ for(const [key,file] of Object.entries(match)){
 
 app.use('/us', require('./routes/us'))
 app.use('/admin', require('./routes/admin'))
+app.use('/lonely', require('./routes/lonely'))
 
 app.all('*', (req, res) => {
     res

@@ -12,8 +12,10 @@
     "coffeescript": "^2.6.1",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "node-cron": "^3.0.0",
     "pug": "^3.0.2",
-    "sigidb": "^1.0.7"
+    "sigidb": "^1.0.7",
+    "ws": "^8.5.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.14"
