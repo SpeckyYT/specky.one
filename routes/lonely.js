@@ -8,24 +8,32 @@ const db = sigi('lonely.sqlite');
 
 // Lonely Place informations
 const grid = db.get('grid') || [];
-const WIDTH = 32;
-const HEIGHT = 32;
+
+// if you are reading this, resulution won't be set to something bigger than 64
+// since the front-end canvas doesn't implement a zoom feature to zoom in in a pretty way
+//
+// If you want to upgrade the resolution, you should implement a zoom feature to the front-end
+const WIDTH = 64;
+const HEIGHT = 64;
+
+// Literally copy and pasted from r/place 🤣🤣🤣🤣
 const ALLOWED_COLORS = [
     '#ffffff',
-    '#7f7f7f',
-    '#000000',
-    '#ff0000',
-    '#ff7f00',
-    '#ffff00',
-    '#7fff00',
-    '#00ff00',
-    '#00ff7f',
-    '#00ffff',
-    '#007fff',
-    '#0000ff',
-    '#7f00ff',
-    '#ff00ff',
-    '#ff007f',
+    '#e4e4e4',
+    '#888888',
+    '#222222',
+    '#e50000',
+    '#e59500',
+    '#a06a42',
+    '#e5d900',
+    '#94e044',
+    '#02be01',
+    '#00d3dd',
+    '#0083c7',
+    '#0000ea',
+    '#820080',
+    '#cf6ee4',
+    '#ffa7d1',
 ]
 
 for (let w = 0; w < WIDTH; w++) {
@@ -72,9 +80,11 @@ function increaseActivity() {
     setTimeout(() => stats.activity--, 5*60*1000);
 }
 
-function updateListeners(data, /* ignore */) {
+function updateListeners(data, ignore) {
     for (const id in listeners) {
-        listeners[id].send(JSON.stringify(data));
+        if (id != ignore) {
+            listeners[id].send(JSON.stringify(data));
+        }
     }
 }
 
@@ -104,12 +114,21 @@ server.on('connection', async (sock, req) => {
                 color,
             } = JSON.parse(data.toString("utf-8"));
             
-            if (grid[x] && grid[x][y] && ALLOWED_COLORS.includes(color.toLowerCase())) {
+            if (
+                grid[x]
+                && x < grid.length
+                && grid[x][y]
+                && y < grid[x].length
+                && ALLOWED_COLORS.includes(color.toLowerCase())
+            ) {
                 if(grid[x][y] != color){
                     grid[x][y] = color;
                     increaseActivity();
                     timeout[id] = Date.now() + giveTimeout() * 1000;
                     sendJSON({
+                        x: x,
+                        y: y,
+                        color: color,
                         success: true,
                         reason: null,
                         timeout: timeout[id],
