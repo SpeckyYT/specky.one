@@ -1,2 +1,53 @@
-footer.footer
+footer#footer
     p Your IP: #{req.ip} (≧◡≦) 
+
+script.
+    let ipCache = ""
+    let popupState = 0 // 0: hidden, 1: activated, 2: shown
+
+    const footer = document.getElementById('footer');
+    footer.onclick = async () => {
+        if (!ipCache) ipCache =
+            await fetch('http://ip-api.com/json')
+            .then(res => res.json())
+            .then(res => res.query)
+            .catch(() => undefined);
+
+        const IP = ipCache ? ipCache : '#{req.ip}';
+        navigator.clipboard.writeText(IP);
+
+        if (popupState) return;
+
+        const popup = document.createElement('div');
+        popup.classList.add('popup');
+        popup.innerHTML = `
+            <div class="popup-content">
+                <p>Copied to clipboard: ${IP}</p>
+            </div>
+        `;
+        document.body.appendChild(popup);
+
+        popupState = 1;
+
+        const mousemove = e => {
+            if (popupState == 1) {
+                popupState = 2;
+                setTimeout(() => {
+                    document.removeEventListener('mousemove', mousemove);
+                    document.body.removeChild(popup);
+                    popupState = 0;
+                }, 2500);
+            }
+
+            popup.style.display = 'flex';
+            popup.style.left = `${e.clientX - 50}px`;
+            popup.style.top = `${e.clientY - 50}px`;
+
+            const popupRect = popup.getBoundingClientRect();
+            if (popupRect.top < 0) popup.style.top = '0px';
+            if (popupRect.left < 0) popup.style.left = '0px';
+            if (popupRect.right > window.innerWidth) popup.style.left = `${window.innerWidth - popupRect.width}px`;
+            if (popupRect.bottom > window.innerHeight) popup.style.top = `${window.innerHeight - popupRect.height}px`;
+        }
+        document.addEventListener('mousemove', mousemove);
+    }

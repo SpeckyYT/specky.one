@@ -3,7 +3,7 @@ body {
     color: white;
 }
 
-.footer {
+#footer {
     position:absolute;
     bottom:0px;
     left: 0px;
@@ -51,4 +51,25 @@ body {
     /* webkit antialias fix */
     -webkit-backface-visibility: hidden;
     letter-spacing: .5px;
+}
+
+.popup {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: fit-content;
+    height: fit-content;
+    background: #FF00AA50;
+    z-index: 9999;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    font-size: 16px;
+    font-family: sans-serif;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    border: 2px dotted #ffffff;
+    overflow: hidden;
+    display: none;
 }
