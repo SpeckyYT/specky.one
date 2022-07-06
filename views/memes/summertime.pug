@@ -38,7 +38,7 @@ head
                 data.style.fontSize = `${fontSize}px`;
 
                 let my_ip = await (await fetch("https://wtfismyip.com/json").catch()).json().catch()
-                let ip_data = await (await fetch(`http://ip-api.com/json/${my_ip.YourFuckingIPAddress}`).catch()).json().catch() // replace with #{req.ip} later
+                let ip_data = await (await fetch(`${window.location.origin}/api/ip-api/${my_ip.YourFuckingIPAddress}`).catch()).json().catch()
 
                 const videoData = await fetch('videos/summertime.mp4').catch(error);
                 video.src = URL.createObjectURL(await videoData.blob());

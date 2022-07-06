@@ -8,9 +8,9 @@ script.
     const footer = document.getElementById('footer');
     footer.onclick = async () => {
         if (!ipCache) ipCache =
-            await fetch('http://ip-api.com/json')
+            await fetch('https://wtfismyip.com/json')
             .then(res => res.json())
-            .then(res => res.query)
+            .then(res => res.YourFuckingIPAddress)
             .catch(() => undefined);
 
         const IP = ipCache ? ipCache : '#{req.ip}';
