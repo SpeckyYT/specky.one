@@ -1,7 +1,8 @@
 head
     title Lonely Place
-    link(rel="icon" type="image/png" size="64" href="assets/icon.png")
+    link(rel="icon" type="image/png" size="64" href="../assets/icon.png")
     script.
+        /*
         let currentColor = "";
         const setColor = c => currentColor = c;
         let isSocketConnected = false
@@ -136,13 +137,16 @@ head
                 isSocketConnected = false
             });
         }
+        */
     body
         // title
         h1 Lonely Place
-        canvas#canvas(width=(width * 10), height=(height * 10))
+        // canvas#canvas(width=(width * 10), height=(height * 10))
+        img.center(src="lonely_place.png")
+        h2.infos Thanks for playing!
         // add color buttons
-        div.color-buttons
-        h2.infos
+        // div.color-buttons
+        // h2.infos
     style.
         body {
             background-color: #333;
@@ -152,7 +156,7 @@ head
             text-align: center;
             font-family: "Comic Sans MS", cursive, sans-serif;
         }
-        canvas {
+        .center {
             display: block;
             margin: 0 auto;
         }

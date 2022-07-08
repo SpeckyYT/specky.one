@@ -1,5 +1,7 @@
 const { Router } = require('express');
 const router = Router();
+
+/*
 const ws = require('ws');
 const cron = require('node-cron');
 const sigi = require('sigidb');
@@ -170,13 +172,15 @@ cron.schedule("0 * * * * *", (date) => {
     db.set('grid', grid)
 })
 
+*/
+
 router.get('/', async (req, res) => {
     res.render('games/lonely.pug', {
         req,
         res,
-        port: PORT,
-        width: WIDTH,
-        height: HEIGHT,
+        // port: PORT,
+        // width: WIDTH,
+        // height: HEIGHT,
     })
 })
 
