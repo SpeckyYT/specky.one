@@ -11,6 +11,10 @@ body {
     height:64px;
     background:#ff00aa;
     text-align: center;
+    line-height: 64px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
 }
 
 .center {
