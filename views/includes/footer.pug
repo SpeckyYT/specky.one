@@ -31,13 +31,9 @@ script.
 
             if (popupState) return;
 
-            const popup = document.createElement('div');
+            const popup = document.createElement('p');
             popup.classList.add('popup');
-            popup.innerHTML = `
-                <div class="popup-content">
-                    <p>Copied to clipboard: ${IP}</p>
-                </div>
-            `;
+            popup.innerHTML = `Copied to clipboard: ${IP}`;
             document.body.appendChild(popup);
 
             popupState = 1;
