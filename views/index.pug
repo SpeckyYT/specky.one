@@ -52,9 +52,43 @@ html(lang="en")
                         if thing.description
                             p.grid-description #{ thing.description }
                         if thing.url
-                            a(href=thing.url) Link
+                            a(href=thing.url)
 
     include includes/footer.pug
+
+script.
+    function getHref(gridItem) {
+        try {
+            return gridItem.getElementsByTagName("a")[0].href
+        } catch (err) {
+            return null
+        }
+    }
+
+    for (const gridItem of document.getElementsByClassName("grid-item")) {
+        // play an animation when hovering over a grid item
+        gridItem.addEventListener("mouseenter", () => {
+            if (getHref(gridItem)) {
+                gridItem.classList.add("hover")
+            } else {
+                gridItem.classList.add("hover-no-link")
+            }
+        })
+        gridItem.addEventListener("mouseleave", () => {
+            if (getHref(gridItem)) {
+                gridItem.classList.remove("hover")
+            } else {
+                gridItem.classList.remove("hover-no-link")
+            }
+        })
+
+        gridItem.addEventListener("click", () => {
+            // if the grid item has a link, open the link in a new tab
+            if (getHref(gridItem)) {
+                window.open(getHref(gridItem), "_blank")
+            }
+        })
+    }
 
 style.
     h1 {
@@ -95,3 +129,34 @@ style.
         width: 100%;
         height: auto;
     }
+    @keyframes hover {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    .hover {
+        animation: hover 0.5s ease-in-out;
+        cursor: pointer;
+    }
+    @keyframes hover-no-link {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    .hover-no-link {
+        animation: hover-no-link 0.5s ease-in-out;
+        cursor: not-allowed;
+    }
+
