@@ -19,6 +19,7 @@ body {
     font-size: 24px;
     font-weight: bold;
     color: white;
+    z-index: 999;
 }
 
 .center {
@@ -59,6 +60,7 @@ body {
     /* webkit antialias fix */
     -webkit-backface-visibility: hidden;
     letter-spacing: .5px;
+    z-index: 999;
 }
 
 .popup {
