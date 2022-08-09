@@ -1,9 +1,97 @@
 doctype html
 
+-
+    const things = [
+        {
+            name: "Lonely Place",
+            description: "A discontinued r/place clone (revival in the future??? 😳)",
+            image: "lonely/lonely_place.png",
+            url: "/lonely",
+        },
+        {
+            name: "Summertime",
+            description: 'A little ""IP-grabber"" meme.',
+            image: "https://i.ytimg.com/vi/xIUKVAtW1Fc/maxresdefault.jpg",
+            url: "/summertime",
+        },
+        {
+            name: "URL Shortener",
+            description: "A poopy URL shortener (Good luck discovering where it is and knowing how to use it 🤣)",
+        },
+        {
+            name: "Discord Server",
+            description: "A place to jump into and help out developing or just to chill around.",
+            image: "https://cdn.discordapp.com/icons/538028973058424832/96021aa98c4e6e3f120af4a9985bb88b.png?size=2048",
+            url: "https://discord.gg/4EecFku",
+        },
+        {
+            name: "GitHub",
+            description: "Specky's GitHub account containing lots of epic projects 😎",
+            image: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            url: "https://github.com/SpeckyYT",
+        },
+    ]
+
 html(lang="en")
     include includes/embed.pug 
     include includes/meta.pug
     include includes/ribbon.pug
-    body
+    body#page
         img.center(src="assets/speckycart.png")
+
+        // create a grid of squares with images and text
+        h1 Projects, websites and other stuff
+        div.grid
+            for thing of things
+                if Object.keys(thing).length > 0
+                    div.grid-item
+                        if thing.image
+                            img.flex-image(src=thing.image)
+                        if thing.name
+                            h2.grid-title #{ thing.name }
+                        if thing.description
+                            p.grid-description #{ thing.description }
+                        if thing.url
+                            a(href=thing.url) Link
+
     include includes/footer.pug
+
+style.
+    h1 {
+        color: #fff;
+        text-align: center;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+    .grid-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #fff;
+        border: 5px solid #777;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .grid-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #333;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+    }
+    .grid-description {
+        font-size: 1em;
+        color: #000;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+    }
+    .flex-image {
+        width: 100%;
+        height: auto;
+    }
