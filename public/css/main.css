@@ -20,6 +20,7 @@ body {
     font-weight: bold;
     color: white;
     z-index: 999;
+    cursor: pointer;
 }
 
 .center {

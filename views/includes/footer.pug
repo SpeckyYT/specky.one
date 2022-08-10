@@ -42,22 +42,24 @@ script.
                 if (popupState == 1) {
                     popupState = 2;
                     setTimeout(() => {
-                        document.removeEventListener('mousemove', mousemove);
+                        window.removeEventListener('mousemove', mousemove);
+                        window.removeEventListener('scroll', mousemove);
                         document.body.removeChild(popup);
                         popupState = 0;
                     }, 2500);
                 }
 
                 popup.style.display = 'flex';
-                popup.style.left = `${e.clientX - 50}px`;
-                popup.style.top = `${e.clientY - 50}px`;
+                popup.style.left = `${e.clientX - 50 + window.pageXOffset}px`;
+                popup.style.top = `${e.clientY - 50 + window.pageYOffset}px`;
 
                 const popupRect = popup.getBoundingClientRect();
                 if (popupRect.top < 0) popup.style.top = '0px';
                 if (popupRect.left < 0) popup.style.left = '0px';
-                if (popupRect.right > window.innerWidth) popup.style.left = `${window.innerWidth - popupRect.width}px`;
-                if (popupRect.bottom > window.innerHeight) popup.style.top = `${window.innerHeight - popupRect.height}px`;
+                if (popupRect.right > window.innerWidth) popup.style.left = `${window.innerWidth - popupRect.width + window.pageXOffset - 15}px`;
+                if (popupRect.bottom > window.innerHeight) popup.style.top = `${window.innerHeight - popupRect.height + window.pageYOffset - 15}px`;
             }
-            document.addEventListener('mousemove', mousemove);
+            window.addEventListener('mousemove', mousemove);
+            window.addEventListener('scroll', mousemove); // seems to not be working
         }
     })();
