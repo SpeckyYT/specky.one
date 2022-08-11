@@ -1,22 +1,26 @@
 doctype html
+
 head
-  title URL shortener
-h1  URL shortener 
-input(placeholder='URL here')
-br
-br
-button#s  Shorten 
-a.url(style='display: none;')
+    title URL shortener
+
+body
+    h1 URL shortener 
+    input(placeholder='URL here')
+    button#s Shorten 
+    a.url(style='display: none;')
+
 script.
-  document.querySelector('#s').onclick = async () => {
-  var o = await fetch('../us/shorten?url=' + document.querySelector('input').value);
-  o = await o.json();
-  if (!o.error) {
-  document.querySelector('.url').href = o.url;
-  document.querySelector('.url').innerText = o.url;
-  document.querySelector('.url').style.display = "block";
-  } else {
-  document.querySelector('.url').innerText = 'Error: ' + o.error;
-  document.querySelector('.url').style.display = "block";
-  }
-  }
+    document.querySelector('#s').onclick = async () => {
+        const o = await fetch('../us/shorten?url=' + document.querySelector('input').value)
+            .then(res => res.json())
+            .catch(err => ({ error: `${err}` }));
+
+        if (!o.error) {
+            document.querySelector('.url').href = o.url;
+            document.querySelector('.url').innerText = o.url;
+            document.querySelector('.url').style.display = "block";
+        } else {
+            document.querySelector('.url').innerText = 'Error: ' + o.error;
+            document.querySelector('.url').style.display = "block";
+        }
+    }
