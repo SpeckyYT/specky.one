@@ -11,7 +11,7 @@ button#s  Shorten
 a.url(style='display: none;')
 script.
   document.querySelector('#s').onclick = async () => {
-  var o = fetch('./shorten?url=' + document.querySelector('input').value);
+  var o = await fetch('../us/shorten?url=' + document.querySelector('input').value);
   o = await o.json();
   if (!o.error) {
   document.querySelector('.url').href = o.url;
