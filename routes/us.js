@@ -15,6 +15,13 @@ const randomString = () => {
     return current
 }
 
+router.all('/', (req, res) => {
+    res.render('other/us.pug', {
+        req,
+        res
+    });
+});
+
 router.all('/shorten', (req, res) => {
     if(!req.query.url) return res.status(400).json({ error: 'No URL provided' })
     
