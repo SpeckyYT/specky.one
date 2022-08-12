@@ -4,6 +4,7 @@ const express = require('express');
 
 const match = {
     '/': 'index.pug',
+    '/anmt': 'other/anmt.pug',
     '/summertime': 'memes/summertime.pug',
     '/bleak': 'games/bleak.pug',
 } 
