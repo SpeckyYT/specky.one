@@ -83,4 +83,5 @@ body {
     border: 2px dotted #ffffff;
     overflow: hidden;
     display: none;
+    pointer-events: none;
 }
