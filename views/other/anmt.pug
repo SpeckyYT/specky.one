@@ -1,37 +1,166 @@
 head
     title ANMT
-    meta(name="viewport" content="width=device-width, initial-scale=1.0")
-    link(rel="icon" type="image/png" size="64" href="assets/icon.png")
+    meta(name='viewport' content='width=device-width, initial-scale=1.0')
+    link(rel='icon' type='image/png' size='64' href='assets/icon.png')
+    link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')
 
 body
-    input#input-button(type="file")
-    br
-    canvas#anmt-canvas(width=0 height=0)
-    br
-    button#play-button(type="button") Play
-    button#pause-button(type="button") Pause
-    button#reverse-button(type="button") Reverse
-    br
-    div#current-state Not Playing
-    br
-    div#current-frame Frame: 0
+    div.upload(onclick="document.querySelector('#input-button').click();")
+        br
+        div.fa &#xF093;
+        p.no-interact(style='text-align: center; font-size:28px') Load ANMT file
+        br
+        div.lds-dual-ring.lds-center(style='display: none;')
+        div.lds-percent.lds-center(style='display: none;')
+            div#percent-bar(style='display: none;')
+        input#input-button(type='file' accept='.anmt')
+
+    div#hid(style='display: none;position: absolute;transform: translate(-50%, -50%);top: 50%;left: 50%;')
+        canvas#anmt-canvas(width='0' height='0')
+        p#frames() Frame: 0
+        button#play-button(type='button')
+            img(src='https://img.icons8.com/ios-glyphs/30/000000/play--v1.png' style='filter: invert(100%);')
+        button#pause-button(type='button')
+            img(src='https://img.icons8.com/ios-glyphs/30/000000/pause--v1.png' style='filter: invert(100%);')
+        button#rev-button(type='button')
+            img(src='https://img.icons8.com/ios-glyphs/30/000000/rewind--v1.png' style='filter: invert(100%);')
 
 style.
+    body {
+        background: grey;
+        font-family: Arial, sans-serif;
+    }
+    .lds-center {
+        position: relative;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .no-interact {
+        pointer-events: none;
+    }
+    .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+    }
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #fff;
+        border-color: #fff transparent #fff transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+    @keyframes lds-dual-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    .lds-percent {
+        display: inline-block;
+        width: 90%;
+        height: 20px;
+        background: #000;
+    }
+    .fa {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        font-size:24px;
+        text-align: center;
+        font-size: 48px;
+        color: white;
+    }
+    .upload {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        top: 50%;
+        left: 50%;
+        border-style: dotted;
+        border-color: white;
+        color: white;
+        border-radius: 12px;
+        width: 50%;
+        cursor: pointer;
+    }
     #input-button {
+        display: none;
         background-color: #fff;
         z-index: 1;
         cursor: pointer;
     }
+    #percent-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background: #FF00AA;
+        color: #fff;
+    }
     #anmt-canvas {
-        background-color: #fff;
+        background: black;
         image-rendering: -moz-crisp-edges;
         image-rendering: -webkit-crisp-edges;
         image-rendering: pixelated;
         image-rendering: crisp-edges;
     }
+    #frames {
+        height: auto;
+        background: rgba(0,0,0,0.5);
+        text-align: center;
+        width: 10%;
+        border: none;
+        color: white;
+        position: absolute;
+        top: 0.35%;
+        left: 0%;
+    }
+    #play-button {
+        border-radius:50%;
+        height: 6.5%;
+        background: rgba(0,0,0,0.5);
+        border: none;
+        color: white;
+        position: absolute;
+        top: 85%;
+        left: 45%;
+        cursor: pointer;
+    }
+    #pause-button {
+        border-radius: 50%;
+        height: 6.5%;
+        background: rgba(0,0,0,0.5);
+        border: none;
+        color: white;
+        position: absolute;
+        top: 85%;
+        left: 50%;
+        cursor: pointer;
+    }
+    #rev-button {
+        border-radius:50%;
+        height: 6.5%;
+        background: rgba(0,0,0,0.5);
+        border: none;
+        color: white;
+        position: absolute;
+        top: 85%;
+        left: 55%;
+        cursor: pointer;
+    }
 
 script.
-    let playingState = -1; // -1: not playing, 0: playing, 1: paused, 2: reversed
+    const canvas = document.querySelector('canvas');
+    let playingState = 0; // 0: playing, 1: paused, 2: reversed
     let currentFrame = 0; // frame index
 
     const videoData = {
@@ -46,14 +175,19 @@ script.
     // get #input-button element
     document.getElementById('input-button')
     .addEventListener('change', function(e) {
+        document.querySelector('.fa').style.display = "none";
+        document.querySelector('.lds-dual-ring').style.display = "block";
+        document.querySelector('.lds-percent').style.display = "block";
+        document.querySelector('#percent-bar').style.display = "block";
+
         // get the file from the input
         const file = e.target.files[0]
-        
+
         // read the bytes of the file
         const reader = new FileReader()
         reader.readAsArrayBuffer(file)
 
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const bytes = Array.from(new Uint8Array(e.target.result))
             videoData.data = bytes
 
@@ -72,57 +206,65 @@ script.
             ctx.fillRect(0, 0, videoData.width, videoData.height)
 
             // set canvas height to the height of the page
-            canvas.style.height = window.innerHeight * 0.7 + 'px'
+            canvas.style.height = window.innerHeight * 0.9 + 'px'
             canvas.style.width = "auto"
 
             videoData.frameIndexes = [];
-            let currentIndex = 0;
+            let currentIndex = 4;
+            let lastPercent = 0;
 
-            // [ 0, x, y, r, g, b, x, y, r, g, b, ... ]
             while (true) {
                 if (currentIndex >= bytes.length) break
                 if (bytes[currentIndex] == 0) {
+                    const currentPercent = Math.round(currentIndex / bytes.length * 100)
+                    if (currentPercent > lastPercent) {
+                        lastPercent = currentPercent
+                        document.querySelector('#percent-bar').style.width = `${lastPercent}%`
+                        await new Promise(r => setTimeout(r, 0))
+                    }
                     videoData.frameIndexes.push(currentIndex)
                     currentIndex++
                 } else {
                     currentIndex += 5
                 }
             }
+            document.querySelector('.upload').style.display = "none";
+            document.querySelector('#hid').style.display = "block";
         }
     })
 
     // on play button click, play the animation
     document.getElementById('play-button')
     .addEventListener('click', function(e) {
-        document.getElementById('current-state').innerHTML = 'Playing'
         play()
     })
 
     // on pause button click, pause the animation
     document.getElementById('pause-button')
     .addEventListener('click', function(e) {
-        document.getElementById('current-state').innerHTML = 'Paused'
         playingState = 1
     })
 
     // on reverse button click, reverse the animation
-    document.getElementById('reverse-button')
+    document.getElementById('rev-button')
     .addEventListener('click', function(e) {
-        document.getElementById('current-state').innerHTML = 'Reversed'
-        playingState = 2
+        reverse()
     })
 
     // on play, start the animation
     function play() {
-        if (playingState == 0) {
-            currentFrame = 0
-        }
+        if (playingState == 0) currentFrame = 0
         playingState = 0
+    }
+
+    // on reverse, reverse the animation
+    function reverse() {
+        if (playingState == 2) currentFrame = videoData.frameIndexes.length - 1
+        playingState = 2
     }
 
     (async function() {
         let currentTime = new Date().getTime()
-        const divCurrentFrame = document.getElementById('current-frame')
 
         while (true) {
             await new Promise(res => setTimeout(res, 0))
@@ -132,7 +274,7 @@ script.
             // check if current time is greater than the time of the next frame
             if (new Date().getTime() - currentTime >= 1000 / videoData.fps) {
                 currentTime = new Date().getTime()
-                divCurrentFrame.innerHTML = 'Frame: ' + currentFrame
+                document.querySelector('#frames').innerHTML = 'Frame: ' + currentFrame
             } else {
                 continue
             }
