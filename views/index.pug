@@ -1,40 +1,54 @@
 doctype html
 
 -
-    const things = [
+    const categories = [
         {
-            name: "Lonely Place",
-            description: "A discontinued r/place clone (revival in the future??? 😳)",
-            image: "lonely/lonely_place.png",
-            url: "/lonely",
+            name: "Projects and websites",
+            description: "Here are some cool projects and websites",
+            contents: [
+                {
+                    name: "Lonely Place",
+                    description: "A discontinued r/place clone (revival in the future??? 😳)",
+                    image: "lonely/lonely_place.png",
+                    url: "/lonely",
+                },
+                {
+                    name: "Summertime",
+                    description: 'A little ""IP-grabber"" meme.',
+                    image: "https://i.ytimg.com/vi/xIUKVAtW1Fc/maxresdefault.jpg",
+                    url: "/summertime",
+                },
+                {
+                    name: "URL Shortener",
+                    description: "A poopy URL shortener",
+                    image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUD-UTMb1WN3V-UfUCueYtvucQUuDXs1jvBA&usqp=CAU",
+                    url: "/us",
+                },
+                {
+                    name: "ANMT video player",
+                    description: "A video player for ANMT files",
+                    image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAbAQMAAAAu4r+jAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURf///wAAAFXC034AAAAJcEhZcwAADsMAAA7DAcdvqGQAAABVSURBVBjTY8AGPoAIxr8gkvk/Osn+D0Ey/0GQjD+AhARYrxz7H2YGhnr2f/wMDP/P/7dvYPgPBAcYjn////8BA4P7nw6gKvY/DAVo5vxAN5P5DwMDAH04JMNHSB5QAAAAAElFTkSuQmCC",
+                    url: "/anmt",
+                },
+            ],
         },
         {
-            name: "Summertime",
-            description: 'A little ""IP-grabber"" meme.',
-            image: "https://i.ytimg.com/vi/xIUKVAtW1Fc/maxresdefault.jpg",
-            url: "/summertime",
-        },
-        {
-            name: "URL Shortener",
-            description: "A poopy URL shortener",
-            url: "/us",
-        },
-        {
-            name: "ANMT video player",
-            description: "A video player for ANMT files",
-            url: "/anmt",
-        },
-        {
-            name: "Discord Server",
-            description: "A place to jump into and help out developing or just to chill around.",
-            image: "https://cdn.discordapp.com/icons/538028973058424832/96021aa98c4e6e3f120af4a9985bb88b.png?size=2048",
-            url: "https://discord.gg/4EecFku",
-        },
-        {
-            name: "GitHub",
-            description: "Specky's GitHub account containing lots of epic projects 😎",
-            image: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            url: "https://github.com/SpeckyYT",
+            name: "Social stuff",
+            description: "Here you can find ways to stalk Specky",
+            contents: [
+                {
+                    name: "Discord Server",
+                    description: "A place to jump into and help out developing or just to chill around.",
+                    image: "https://cdn.discordapp.com/icons/538028973058424832/96021aa98c4e6e3f120af4a9985bb88b.png?size=2048",
+                    url: "https://discord.gg/4EecFku",
+                },
+                {
+                    name: "GitHub",
+                    description: "Specky's GitHub account containing lots of epic projects 😎",
+                    image: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                    url: "https://github.com/SpeckyYT",
+                },
+            ],
         },
     ]
 
@@ -46,19 +60,23 @@ html(lang="en")
         img.center(src="assets/speckycart.png")
 
         // create a grid of squares with images and text
-        h1 Projects, websites and other stuff
-        div.grid
-            for thing of things
-                if Object.keys(thing).length > 0
-                    div.grid-item
-                        if thing.image
-                            img.flex-image(src=thing.image)
-                        if thing.name
-                            h2.grid-title #{ thing.name }
-                        if thing.description
-                            p.grid-description #{ thing.description }
-                        if thing.url
-                            a(href=thing.url)
+        for category of categories
+            h1 #{category.name}
+            if category.description
+                p #{category.description}
+            div.grid
+                for content of category.contents
+                    if Object.keys(content).length > 0
+                        div.grid-item
+                            if content.image
+                                img.flex-image(src=content.image)
+                            if content.name
+                                h2.grid-title #{ content.name }
+                            if content.description
+                                p.grid-description #{ content.description }
+                            if content.url
+                                a(href=content.url)
+        
 
     include includes/footer.pug
 
@@ -102,6 +120,11 @@ style.
         text-align: center;
         font-family: "Comic Sans MS", cursive, sans-serif;
     }
+    p {
+        color: #fff;
+        text-align: center;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+    }
     .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -134,6 +157,10 @@ style.
     .flex-image {
         width: 100%;
         height: auto;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
     }
     @keyframes hover {
         0% {
