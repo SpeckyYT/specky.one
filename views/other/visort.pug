@@ -1,0 +1,87 @@
+doctype html
+
+head
+    title Visort
+
+body 
+    h1 Visort
+    p idk, I thought joining the words "Visualizer" and "Sort" was funny
+    br
+    canvas#canvas()
+    br
+    input(type="button", value="Shuffle")
+    br
+    input(type="range", min="1", max="100", value="50")
+
+script.
+    // get canvas
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    
+    // get inputs
+    const shuffleButton = document.querySelector('input[type="button"]');
+    const speedSlider = document.querySelector('input[type="range"]');
+
+    const array = [];
+    const arraySize = 100;
+    let speed = speedSlider.value;
+
+    // generate array
+    for (let i = 1; i <= 100; i++) array.push(i);
+
+    // shuffle array
+    function shuffleArray() {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    // draw array
+    function drawArray() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < array.length; i++) {
+            ctx.fillStyle = "#000";
+            ctx.fillRect(
+                i * canvas.width / arraySize,
+                canvas.height - array[i] * canvas.height / arraySize,
+                canvas.width / arraySize,
+                array[i] * canvas.height / arraySize,
+            );
+        }
+    }
+
+    drawArray();
+
+    // sleep function
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // sort array
+    (async function() {
+        while(true) {
+            let swapped = false;
+
+            for (let i = 0; i < array.length - 1; i++) {
+                if (array[i] > array[i + 1]) {
+                    [array[i], array[i + 1]] = [array[i + 1], array[i]];
+                    swapped = true;
+                }
+            }
+
+            await sleep(speed);
+            drawArray();
+        }
+    })()
+
+    // shuffle button
+    shuffleButton.onclick = () => {
+        shuffleArray();
+        drawArray();
+    }
+
+    // speed slider
+    speedSlider.oninput = () => {
+        speed = speedSlider.value;
+    }

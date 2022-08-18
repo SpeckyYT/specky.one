@@ -6,7 +6,7 @@ const match = {
     '/': 'index.pug',
     '/anmt': 'other/anmt.pug',
     '/summertime': 'memes/summertime.pug',
-    '/bleak': 'games/bleak.pug',
+    '/sort': 'other/visort.pug',
 } 
 
 const app = express();
