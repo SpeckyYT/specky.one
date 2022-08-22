@@ -40,7 +40,7 @@ doctype html
         },
         {
             name: "Affiliated projects",
-            description: "Projects that people close to me know made",
+            description: "Projects that people close to me made",
             contents: [
                 {
                     name: "NicsiRadio",
@@ -82,8 +82,11 @@ doctype html
         },
     ]
 
+include includes/embed.pug 
+
 html(lang="en")
-    include includes/embed.pug 
+    +embed
+
     include includes/meta.pug
     include includes/ribbon.pug
     body#page

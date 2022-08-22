@@ -1,5 +1,22 @@
-meta(content="specky.one" property="og:title")
-meta(content="Specky Website" property="og:description")
-meta(content="http://specky.one" property="og:url")
-meta(content="https://raw.githubusercontent.com/SpeckyYT/specky.one/master/public/assets/speckycart.png" property="og:image")
-meta(content="#FF00AA" data-react-helmet="true" name="theme-color")
+mixin embed(title = "specky.one", description = "Specky's epic website", url = "https://specky.one", image = "https://raw.githubusercontent.com/SpeckyYT/specky.one/master/public/assets/speckycart.png", color = "#FF00AA")
+    meta(
+        property="og:title"
+        content=title
+    )
+    meta(
+        property="og:description"
+        content=description
+    )
+    meta(
+        property="og:url"
+        content=url
+    )
+    meta(
+        property="og:image"
+        content=image
+    )
+    meta(
+        name="theme-color"
+        data-react-helmet="true"
+        content=color
+    )

@@ -2,10 +2,21 @@
 
 doctype html
 
+include ../includes/embed.pug 
+
 head
     title Summertime
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(rel="icon" type="image/png" size="64" href="assets/icon.png")
+
+    +embed(
+        "Summertime",
+        "Kasumi dancing with amogus",
+        "https://specky.one/summertime",
+        "https://i.ytimg.com/vi/xIUKVAtW1Fc/maxresdefault.jpg",
+        "#FF00AA",
+    )
+
     script.
         window.onload = async () => {
             const video = document.getElementById('video');

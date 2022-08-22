@@ -1,7 +1,16 @@
 doctype html
 
+include ../includes/embed.pug 
+
 head
     title URL shortener
+    +embed(
+        "URL Shortener",
+        "An URL shortener that works sometimes",
+        "https://specky.one/us",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUD-UTMb1WN3V-UfUCueYtvucQUuDXs1jvBA&usqp=CAU",
+        "#FF00AA"
+    )
 
 body
     h1 URL shortener 
