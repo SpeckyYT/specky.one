@@ -83,13 +83,13 @@ doctype html
     ]
 
 include includes/embed.pug 
+include includes/style.pug
 
 html(lang="en")
     +embed
 
-    include includes/meta.pug
     include includes/ribbon.pug
-    body#page
+    body
         img.center(src="assets/speckycart.png")
 
         // create a grid of squares with images and text
@@ -109,9 +109,8 @@ html(lang="en")
                                 p.grid-description #{ content.description }
                             if content.url
                                 a(href=content.url)
-        
 
-    include includes/footer.pug
+include includes/footer.pug
 
 script.
     function getHref(gridItem) {
@@ -148,16 +147,6 @@ script.
     }
 
 style.
-    h1 {
-        color: #fff;
-        text-align: center;
-        font-family: "Comic Sans MS", cursive, sans-serif;
-    }
-    p {
-        color: #fff;
-        text-align: center;
-        font-family: "Comic Sans MS", cursive, sans-serif;
-    }
     .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -180,12 +169,10 @@ style.
         font-size: 1.5em;
         font-weight: bold;
         color: #333;
-        font-family: "Comic Sans MS", cursive, sans-serif;
     }
     .grid-description {
         font-size: 1em;
         color: #000;
-        font-family: "Comic Sans MS", cursive, sans-serif;
     }
     .flex-image {
         width: 100%;

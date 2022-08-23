@@ -1,6 +1,7 @@
 doctype html
 
 include ../includes/embed.pug 
+include ../includes/style.pug
 
 head
     title URL shortener
@@ -16,7 +17,7 @@ body
     h1 URL shortener 
     input(placeholder='URL here')
     button#s Shorten 
-    a.url(style='display: none;')
+    a#url(style='display: none;')
 
 script.
     document.querySelector('#s').onclick = async () => {
@@ -25,11 +26,16 @@ script.
             .catch(err => ({ error: `${err}` }));
 
         if (!o.error) {
-            document.querySelector('.url').href = o.url;
-            document.querySelector('.url').innerText = o.url;
-            document.querySelector('.url').style.display = "block";
+            document.querySelector('#url').href = o.url;
+            document.querySelector('#url').innerText = o.url;
+            document.querySelector('#url').style.display = "block";
         } else {
-            document.querySelector('.url').innerText = 'Error: ' + o.error;
-            document.querySelector('.url').style.display = "block";
+            document.querySelector('#url').innerText = 'Error: ' + o.error;
+            document.querySelector('#url').style.display = "block";
         }
+    }
+
+// style.
+    #url {
+        color: green;
     }

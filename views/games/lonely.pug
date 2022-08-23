@@ -1,5 +1,7 @@
 doctype html
 
+include ../includes/style.pug
+
 head
     title Lonely Place
     link(rel="icon" type="image/png" size="64" href="../assets/icon.png")
@@ -140,39 +142,33 @@ head
             });
         }
         */
-    body
-        // title
-        h1 Lonely Place
-        // canvas#canvas(width=(width * 10), height=(height * 10))
-        img.center(src="lonely_place.png")
-        h2.infos Thanks for playing!
-        // add color buttons
-        // div.color-buttons
-        // h2.infos
-    style.
-        body {
-            background-color: #333;
-        }
-        h1 {
-            color: #fff;
-            text-align: center;
-            font-family: "Comic Sans MS", cursive, sans-serif;
-        }
-        .center {
-            display: block;
-            margin: 0 auto;
-        }
-        .color-buttons {
-            display: flex;
-            justify-content: center;
-            margin: 20 auto;
-            width: 640px;
-            height: 50px;
-        }
-        .infos {
-            display: block;
-            margin: 0 auto;
-            text-align: center;
-            color: #fff;
-            font-family: "Comic Sans MS", cursive, sans-serif;
-        }
+
+body
+    // title
+    h1 Lonely Place
+    // canvas#canvas(width=(width * 10), height=(height * 10))
+    img.center(src="lonely_place.png")
+    h2.infos Thanks for playing!
+    // add color buttons
+    // div.color-buttons
+    // h2.infos
+
+style.
+    body {
+        background-color: #333;
+    }
+    .center {
+        display: block;
+        margin: 0 auto;
+    }
+    .color-buttons {
+        display: flex;
+        justify-content: center;
+        margin: 20 auto;
+        width: 640px;
+        height: 50px;
+    }
+    .infos {
+        display: block;
+        margin: 0 auto;
+    }
