@@ -7,15 +7,21 @@ head
     link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css')
 
 body
-    div.upload(onclick="document.querySelector('#input-button').click();")
-        br
-        div.fa &#xF093;
-        p.no-interact(style='text-align: center; font-size:28px') Load ANMT file
-        br
-        div.lds-dual-ring.lds-center(style='display: none;')
-        div.lds-percent.lds-center(style='display: none;')
-            div#percent-bar(style='display: none;')
-        input#input-button(type='file' accept='.anmt')
+    div#upload
+        div.clickable(onclick="document.querySelector('#input-button').click();")
+            br
+            div.fa &#xF093;
+            p.no-interact(style='text-align: center; font-size:28px') Load ANMT file
+            br
+            div.lds-dual-ring.lds-center(style='display: none;')
+            div.lds-percent.lds-center(style='display: none;')
+                div#percent-bar(style='display: none;')
+            input#input-button(type='file' accept='.anmt')
+        div.hide-on-load
+            h2 Examples
+            div.anmt-grid.hide-on-load
+                each file in files
+                    div.clickable.anmt-grid-item= file
 
     div#hid(style='display: none;position: absolute;transform: translate(-50%, -50%);top: 50%;left: 50%;')
         canvas#anmt-canvas(width='0' height='0')
@@ -31,6 +37,28 @@ style.
     body {
         background: grey;
         font-family: Arial, sans-serif;
+        text-align: center; 
+    }
+    .clickable {
+        cursor: pointer;
+    }
+    .anmt-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+    .anmt-grid-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #000;
+        background-color: #fff;
+        border: 5px solid #777;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     .lds-center {
         position: relative;
@@ -77,11 +105,10 @@ style.
         width: 100%;
         height: 100%;
         font-size:24px;
-        text-align: center;
         font-size: 48px;
         color: white;
     }
-    .upload {
+    #upload {
         position: absolute;
         transform: translate(-50%, -50%);
         top: 50%;
@@ -91,7 +118,6 @@ style.
         color: white;
         border-radius: 12px;
         width: 50%;
-        cursor: pointer;
     }
     #input-button {
         display: none;
@@ -118,7 +144,6 @@ style.
     #frames {
         height: auto;
         background: rgba(0,0,0,0.5);
-        text-align: center;
         width: 10%;
         border: none;
         color: white;
@@ -161,6 +186,8 @@ style.
     }
 
 script.
+    let loaded = false; // utility thing to make stuff not load twice
+
     const canvas = document.querySelector('canvas');
     let playingState = 0; // 0: playing, 1: paused, 2: reversed
     let currentFrame = 0; // frame index
@@ -173,17 +200,14 @@ script.
         frameIndexes: [],
     }
 
-    // on input change, read the file and display the preview
-    // get #input-button element
-    document.getElementById('input-button')
-    .addEventListener('change', function(e) {
+    function load(file) {
+        loaded = true
+
         document.querySelector('.fa').style.display = "none";
+        document.querySelector('.hide-on-load').style.display = "none";
         document.querySelector('.lds-dual-ring').style.display = "block";
         document.querySelector('.lds-percent').style.display = "block";
         document.querySelector('#percent-bar').style.display = "block";
-
-        // get the file from the input
-        const file = e.target.files[0]
 
         // read the bytes of the file
         const reader = new FileReader()
@@ -230,10 +254,27 @@ script.
                     currentIndex += 5
                 }
             }
-            document.querySelector('.upload').style.display = "none";
+            document.querySelector('#upload').style.display = "none";
             document.querySelector('#hid').style.display = "block";
         }
+    }
+
+    // on input change, read the file and display the preview
+    // get #input-button element
+    document.getElementById('input-button')
+    .addEventListener('change', function(e) {
+        if (!loaded) load(e.target.files[0])
     })
+
+    for (const gridItem of document.getElementsByClassName("anmt-grid-item")) {
+        gridItem.addEventListener("click", async () => {
+            if (!loaded)
+                fetch(gridItem.innerHTML)
+                .then(anmt => anmt.blob())
+                .then(anmt => load(anmt))
+                .catch(err => {});
+        })
+    }
 
     // on play button click, play the animation
     document.getElementById('play-button')

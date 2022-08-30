@@ -4,7 +4,6 @@ const express = require('express');
 
 const match = {
     '/': 'index.pug',
-    '/anmt': 'other/anmt.pug',
     '/summertime': 'memes/summertime.pug',
     '/sort': 'other/visort.pug',
 } 
@@ -27,6 +26,7 @@ app.use('/us', require('./routes/us'))
 app.use('/admin', require('./routes/admin'))
 app.use('/lonely', require('./routes/lonely'))
 app.use('/api', require('./routes/api'))
+app.use('/anmt', require('./routes/anmt'))
 
 app.all('*', (req, res) => {
     res

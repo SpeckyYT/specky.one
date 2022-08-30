@@ -1,3 +1,5 @@
+public/anmt
+
 node_modules/
 .env
 *.sqlite
