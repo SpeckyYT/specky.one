@@ -1,22 +1,52 @@
+mixin field(name, content)
+    field(name=name)= content
+
 mixin number_shadow(number = 1)
     shadow(type="math_number")
-        field(name="NUM")= 1
+        +field("NUM", number)
 
 body
     div#blocklyDiv
 
     xml#toolbox(xmlns="https://developers.google.com/blockly/xml")
+        category(name="Control flow")
+            block(type="controls_for")
+                value(name="FROM")
+                    block(type="math_number")
+                        +field("NUM", 1)
+                value(name="TO")
+                    block(type="math_number")
+                        +field("NUM", 10)
+                value(name="BY")
+                    block(type="math_number")
+                        +field("NUM", 1)
+
+        category(name="Logics", colour="%{BKY_LOGIC_HUE}")
+            block(type="logic_boolean")
+
         category(name="Math", colour="%{BKY_MATH_HUE}")
             block(type="math_number")
-                field(name="NUM")= 123
+                field(name="NUM")= 1
             block(type="math_arithmetic")
                 value(name="A")
                     +number_shadow
                 value(name="B")
                     +number_shadow
 
+        sep
+
+        category(name="Variables", custom="VARIABLE")
+
+        category(name="Macros", custom="PROCEDURE")
+
+style.
+    #toolbox {
+        display: none;
+    }
+
 script(src="https://unpkg.com/blockly/blockly.min.js")
 
+// Blockly setup
 script.
     var blocklyArea = document.getElementById('blocklyArea');
     var blocklyDiv = document.getElementById('blocklyDiv');
@@ -24,18 +54,34 @@ script.
         blocklyDiv,
         {
             toolbox: document.getElementById('toolbox'),
+            grid: {
+                spacing: 20,
+                length: 3,
+                colour: "#ccc",
+                snap: true,
+                trashcan: true,
+            },
+            move: {
+                scrollbars: {
+                    horizontal: true,
+                    vertical: true,
+                },
+                drag: true,
+                wheel: true,
+            }
         }
     );
+    /*
     var onresize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
         var element = blocklyArea;
         var x = 0;
         var y = 0;
-        while (element) {
+        do {
             x += element.offsetLeft;
             y += element.offsetTop;
             element = element.offsetParent;
-        }
+        } while (element);
         // Position blocklyDiv over blocklyArea.
         blocklyDiv.style.left = x + 'px';
         blocklyDiv.style.top = y + 'px';
@@ -46,3 +92,11 @@ script.
     window.addEventListener('resize', onresize, false);
     onresize();
     Blockly.svgResize(workspace);
+    */
+
+// Blocks to SPWN generator
+script.
+    const codelabGenerator = new Blockly.Generator('SPWN');
+    
+    // console.log(workspace)
+    // workspace.addGenerator('Codelab', codelabGenerator)
