@@ -2,6 +2,8 @@ require('coffeescript');
 require('dotenv').config();
 const express = require('express');
 
+console.log('WHY ARE YOU IN THE CONSOLE???!!!!');
+
 const match = {
     '/': 'index.pug',
     '/summertime': 'memes/summertime.pug',
