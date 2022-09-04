@@ -6,6 +6,7 @@ mixin number_shadow(number = 1)
         +field("NUM", number)
 
 body
+    div#workspace
     div#blocklyDiv
 
     xml#toolbox(xmlns="https://developers.google.com/blockly/xml")
@@ -48,9 +49,9 @@ script(src="https://unpkg.com/blockly/blockly.min.js")
 
 // Blockly setup
 script.
-    var blocklyArea = document.getElementById('blocklyArea');
-    var blocklyDiv = document.getElementById('blocklyDiv');
-    var workspace = Blockly.inject(
+    const blocklyArea = document.getElementById('blocklyArea');
+    const blocklyDiv = document.getElementById('blocklyDiv');
+    const workspace = Blockly.inject(
         blocklyDiv,
         {
             toolbox: document.getElementById('toolbox'),
@@ -71,6 +72,10 @@ script.
             }
         }
     );
+
+    const workspace_div = document.getElementById("workspace");
+    Blockly.Xml.domToWorkspace(workspace, workspace_div);
+
     /*
     var onresize = function(e) {
         // Compute the absolute coordinates and dimensions of blocklyArea.
@@ -96,7 +101,10 @@ script.
 
 // Blocks to SPWN generator
 script.
-    const codelabGenerator = new Blockly.Generator('SPWN');
+    const SPWNGenerator = new Blockly.Generator('SPWN');
     
-    // console.log(workspace)
-    // workspace.addGenerator('Codelab', codelabGenerator)
+    SPWNGenerator['block'] = (block) => {
+        return "h"
+    }
+
+    SPWNGenerator.workspaceToCode(workspace)
