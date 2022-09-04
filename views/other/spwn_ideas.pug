@@ -1,0 +1,99 @@
+head
+
+body
+    aside.sidebar
+        h1 Ideas
+            each file in files
+                a(href=`#${file.base}`)= file.name.replace(/(^\d+|[_\-]+)/g, " ").trim()
+    
+    object#idea(type="text/html", data = "")
+
+
+style.
+    body {
+        margin-top: 0;
+        margin-right: 0;
+        margin-bottom: 0;
+        margin-left: 0;
+    }
+
+    .sidebar {
+        display: block;
+        height: 100%;
+        width: 160px;
+        position: fixed;
+        z-index: 10;
+        top: 0;
+        left: 0;
+        background-color: #111;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+
+    .sidebar a {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        padding: 6px 8px 6px 16px;
+        text-decoration: none;
+        font-size: 25px;
+        color: #818181;
+        display: flex;
+    }
+
+    .sidebar h1 {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        padding: 6px 8px 6px 16px;
+        color: #FFFFFF
+    }
+
+    .sidebar a:hover {
+        color: #f1f1f1;
+    }
+
+    #idea {
+        position: absolute;
+        left: 160px;
+        width: calc(100% - 160px);
+        height: 100%;
+        pad: 0px
+        z-index: 1;
+    }
+
+    #idea img {
+        width: 100%;
+        height: auto;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+
+script.
+    let lastHash = getHash() || "#{files[0].base}";
+    updateObject();
+
+    (async function() {
+        while(true) {
+            await new Promise(res => setTimeout(res, 10))
+            if(getHash().length > 0 && getHash() != lastHash) {
+                lastHash = getHash()
+                updateObject()
+            }
+        }
+    })()
+
+    function updateObject() {
+        console.log(lastHash.length)
+        document.querySelector("#idea").data = `/spwnideas/${lastHash.length > 0 ? lastHash : ""}`
+    }
+
+    function getHash() {
+        return location.hash.slice(1)
+    }

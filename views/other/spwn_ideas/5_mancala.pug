@@ -1,0 +1,55 @@
+include includes/spwn_highlight.pug
+include includes/youtube.pug
+
+-
+    const pocket_length = 6
+    const default_seeds = 4
+    const pockets = 2*pocket_length
+    const max_seeds = pockets*default_seeds
+    const field_counters = pockets + 2
+    const field_bits = Math.ceil(Math.log2(max_seeds))
+    const field_index_bits = Math.ceil(Math.log2(field_counters))
+    const counter = (def = 0, bits = 0) => `counter(${def != 0 ? `${def}, ` : ''}bits = ${bits || field_bits})`
+
+h1 Mancala
+
++youtube("https://youtube.com/embed/aLQX1TQjUbw")
+
+h2 Definitions
+
+ul
+    li "Seeds" are the tokens of this game, each pocket starts off with #{default_seeds} seeds.
+    li "Pockets" are the slots selectable by the players to move the seeds around.
+        | (we'll assume there are #{pocket_length} per player)
+    li "Stores" are the ending slots, seeds can't be taken out of them.
+
+p When picking up seeds, they will be dropped one-by-one in a counter-clockwise direction
+
+h2 Coding
+
+p Mancala's playfield needs #{field_counters} counters (2 * #{pocket_length} + 2).
+p The max value a pocket or store can reach is #{max_seeds}, so #{field_bits} bits are enough.
+p Let's also join all pockets and stores into an array, so it will be easier to access them later
+
++spwn.
+    left_store = #{counter()}
+    right_store = #{counter()}
+    top_pockets = [#{counter(default_seeds)} for _ in #{pocket_length}]
+    bottom_pockets = [#{counter(default_seeds)} for _ in #{pocket_length}]
+
+    fields = bottom_pockets + right_store + top_pockets + left_store
+
+p Other useful states are
+ul
+    li the player turn
+    li the player select index
+    li the hand's position
+    li the "seeds in-hand"
+
++spwn.
+    player_turn = counter(false) // false is player 1, true is player 2
+    player_index = #{counter(0, field_index_bits)}
+    hand_index = #{counter()}
+    hand_quantity = #{counter()}
+
+include includes/incomplete.pug

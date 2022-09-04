@@ -1,0 +1,22 @@
+include includes/spwn_highlight.pug
+include includes/youtube.pug
+
+h1 Undertale Multicolor Tile Puzzle
+
++youtube("https://youtube.com/embed/ncr8pWRpqo8")
+
+h2 In a nutshell
+
+p If you step on a dangerous tile, you'll step automatically back again
+
+ul
+    li Pink Tile: does nothing
+    li Green Tile: spawns a monster (actually does nothing)
+    li Red Tile: lava (dangerous)
+    li Yellow Tile: electricity (dangerous)
+    li Orange Tile: you'll smell like oranges (affects Blue Tile)
+    li Blue Tile: dangerous if you smell like oranges or if it's adjacent to a Yellow Tile (otherwise it's save)
+    li Purple Tile: you'll slide forward and you will no longer smell like oranges
+    li (Optional) Goal Time: you'll win when stepping on it
+
+include includes/incomplete.pug

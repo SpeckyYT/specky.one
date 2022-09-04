@@ -1,0 +1,30 @@
+br
+div#incomplete-sign
+    div#incomplete-text
+        h1 This is idea tutorial is incomplete!
+        h2
+            | Be sure to contribute
+            |
+            a(href="https://github.com/SpeckyYT/specky.one") here
+            | .
+
+
+// https://richardscannell.wordpress.com/2015/03/05/css-to-build-a-black-yellow-stripey-maintenance-border-for-eg-app_offline-htm/
+style.
+    #incomplete-sign {
+        background: repeating-linear-gradient(45deg, black, black 35px, yellow 35px, yellow 70px);
+        border-style:solid;
+        border-width:thin;
+        border-color:black;
+    }
+
+    #incomplete-text {
+        background: #222;
+        color: white;
+        padding: 0.1px;
+        margin: 50px;
+        text-align: center;
+        border-style: solid;
+        border-width: thin;
+        border-color: black;
+    }
