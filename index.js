@@ -27,6 +27,7 @@ app.use('/admin', require('./routes/admin'))
 app.use('/lonely', require('./routes/lonely'))
 app.use('/api', require('./routes/api'))
 app.use('/anmt', require('./routes/anmt'))
+app.use('/spwnideas', require('./routes/spwn_ideas'))
 
 app.all('*', (req, res) => {
     res
