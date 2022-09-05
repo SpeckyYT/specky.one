@@ -3,6 +3,20 @@ doctype html
 include ../includes/embed.pug 
 include ../includes/style.pug
 
+style.
+    a:link {
+        color: green;
+    }
+    a:visited {
+        color: green;
+    }
+    a:hover {
+        color: pink;
+    }
+    a:active {
+        color: red;
+    }
+
 head
     title URL shortener
     +embed(
@@ -33,9 +47,4 @@ script.
             document.querySelector('#url').innerText = 'Error: ' + o.error;
             document.querySelector('#url').style.display = "block";
         }
-    }
-
-// style.
-    #url {
-        color: green;
     }
