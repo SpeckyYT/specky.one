@@ -8,7 +8,7 @@ head
 
 body
     div#upload
-        div.clickable(onclick="document.querySelector('#input-button').click();")
+        div.clickable(onclick="if (!loaded) document.querySelector('#input-button').click();")
             br
             div.fa &#xF093;
             p.no-interact(style='text-align: center; font-size:28px') Load ANMT file
@@ -201,8 +201,6 @@ script.
     }
 
     function load(file) {
-        loaded = true
-
         document.querySelector('.fa').style.display = "none";
         document.querySelector('.hide-on-load').style.display = "none";
         document.querySelector('.lds-dual-ring').style.display = "block";
@@ -257,6 +255,8 @@ script.
             document.querySelector('#upload').style.display = "none";
             document.querySelector('#hid').style.display = "block";
         }
+
+        loaded = true
     }
 
     // on input change, read the file and display the preview
@@ -268,11 +268,13 @@ script.
 
     for (const gridItem of document.getElementsByClassName("anmt-grid-item")) {
         gridItem.addEventListener("click", async () => {
-            if (!loaded)
+            if (!loaded) {
+                loaded = true // temporary, not really loaded yet (check out line ${current_line + 4}) 
                 fetch(gridItem.innerHTML)
                 .then(anmt => anmt.blob())
                 .then(anmt => load(anmt))
-                .catch(err => {});
+                .catch(err => (loaded = false));
+            }
         })
     }
 
