@@ -1,0 +1,66 @@
+-
+    const initialBalance = 25;
+    const losePercentage = 80/100;
+    const jackpotPercentage = 99/100;
+    if (jackPot < jackpotPercentage)
+        throw "Invalid JackPot Rate"
+
+h1 Sugo
+p Gamble away your earnings!
+
+div#game
+    input#stop-button(type="button", value="Play!")
+    p#balance You have #{initialBalance} coins!
+    p#result Click the button!
+div#lose
+    p You lost 🤣🤣🤣😂😂🤣🤣😂😂
+
+style.
+    #game {
+        display: inline-block;
+        width: 100%;
+        height: auto;
+    }
+
+    #lose {
+        display: none;
+    }
+
+script.
+    const stopButton = document.querySelector("#stop-button");
+    const balance = document.querySelector("#balance");
+    const result = document.querySelector("#result");
+
+    let money = #{initialBalance};
+    let initialLuck = 2;
+
+    stopButton.onclick = async () => {
+        const rng = Math.random();
+        let winnings = 0;
+        let message = "";
+        
+        const coins = () => `coin${winnings == 1 ? "" : "s"}`
+
+        if (rng > #{jackpotPercentage} || (money < 5 && initialLuck > 0)) {
+            winnings += Math.round(Math.random() * 50 + 50);
+            message = `You won the jackpot! ${winnings} ${coins()} were added to your balance!`
+            initialLuck -= 1
+        } else if (rng > #{losePercentage}) {
+            winnings += Math.round(Math.random() * 5 + 5);
+            message = `You won an gained ${winnings} ${coins()}!`
+        } else {
+            winnings -= Math.ceil(Math.random() * 4);
+            message = `You lost ${Math.abs(winnings)} ${coins()}`;
+        }
+
+        money += Math.round(winnings) // safety
+        money = Math.round(money) // even more safety
+
+        result.innerHTML = message;
+        balance.innerHTML = `You have ${money} coins!`;
+
+        if (money <= 0) {
+            document.querySelector("#game").style.display = "none";
+            document.querySelector("#lose").style.display = "block";
+        }
+    }
