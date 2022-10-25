@@ -1,15 +1,15 @@
 include includes/spwn_highlight.pug
 include includes/youtube.pug
 
--
-    const pocket_length = 6
-    const default_seeds = 4
-    const pockets = 2*pocket_length
-    const max_seeds = pockets*default_seeds
-    const field_counters = pockets + 2
-    const field_bits = Math.ceil(Math.log2(max_seeds))
-    const field_index_bits = Math.ceil(Math.log2(field_counters))
-    const counter = (def = 0, bits = 0) => `counter(${def != 0 ? `${def}, ` : ''}bits = ${bits || field_bits})`
+    -
+        const pocket_length = 6
+        const default_seeds = 4
+        const pockets = 2*pocket_length
+        const max_seeds = pockets*default_seeds
+        const field_counters = pockets + 2
+        const field_bits = Math.ceil(Math.log2(max_seeds))
+        const field_index_bits = Math.ceil(Math.log2(field_counters))
+        const counter = (def = 0, bits = 0) => `counter(${def != 0 ? `${def}, ` : ''}bits = ${bits || field_bits})`
 
 h1 Mancala
 
