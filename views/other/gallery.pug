@@ -1,0 +1,167 @@
+include ../includes/embed.pug 
+include ../includes/style.pug
+
+- const license = "https://creativecommons.org/licenses/by-nc-nd/4.0/";
+
+html(lang="en")
+    +embed(
+        "Specky Gallery",
+        "An art epic gallery",
+        "https://specky.one/gallery",
+        "https://specky.one/gallery/water.png",
+        "#40FFFF"
+    )
+
+    #bg
+
+    h1#title Specky Gallery
+
+    #copyright_notice
+        p(style="white-space: pre-line").
+            These images were all made by Specky.
+            The #[a(href=license) CC BY-NC-ND 4.0] license applies to all of these images.
+            
+            In a nutshell: 
+            #[li if you share this art, provide credit (also the link to this website)]
+            #[li do not use this art for commercial purposes]
+            #[li do not modify this art]
+        a(href=license)
+            img(src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-nd.svg")
+
+    div.grid
+        for art in arts
+            div.art(
+                filename = art.filename,
+                name = art.name,
+                description = art.description,
+                context = art.context,
+                year = art.year,
+            )
+                img.undraggable(src=art.filename)
+    
+    for art in arts
+        article(id=art.filename, tabindex="0")
+            h1 #{art.name}
+            h2 Description
+            p #{art.description}
+            h2 Context
+            p #{art.context}
+            p Made in #{art.year || new Date().getFullYear()}#{art.year ? "" : " (year not confirmed)"}
+            img.undraggable(src=art.filename)
+
+script.
+    for (const art of document.getElementsByClassName("art")) {
+        const article = document.getElementById(art.getAttribute("filename"));
+        article.setAttribute("visible", "false")
+
+        art.addEventListener("click", event => {
+            article.setAttribute("visible", "true")
+            article.focus()
+        })
+        article.addEventListener("blur", event => {
+            article.setAttribute("visible", "false")
+        })
+    }
+
+style.
+    #bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        border: 0;
+        z-index: -10;
+        background-color: #40FFFF;      
+        background-image: linear-gradient(145deg, #FF00AA 0%, #40FFFF 50%, #00FFAA 100%);
+    }
+
+    #title {
+        color: #000;
+    }
+
+    #copyright_notice {
+        display: block;
+        font-family: Arial;
+        color: #000;
+        left: 50%;
+        width: fit-content;
+        padding: 0px 10px 10px 10px;
+        padding-color: #fff;
+        margin: auto auto 15px auto;
+        background: linear-gradient(275deg, #ffaaff, #ffffaa);
+        border-style:solid;
+        border-width:2px;
+        border-color:black;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        grid-gap: 2.5%;
+        margin: 0 auto;
+        padding: 0;
+        max-width: 90%;
+    }
+    .art {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: #521;
+        border: 5px solid #FD0;
+        padding: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+    .art img {
+        width: 100%;
+        height: auto;
+    }
+
+    .undraggable {
+        /* https://stackoverflow.com/questions/12906789/preventing-an-image-from-being-draggable-or-selectable-without-using-js */
+        user-drag: none;
+        -webkit-user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+
+    .info h1 {
+        font-family: "Georgia"; /* currently expernimenting */
+    }
+
+    article {
+        position: fixed;
+        width: 50vw;
+        height: 100vh;
+        top: 0;
+        left: -50vw;
+        opacity: 0;
+        font-family: 'Helvetica', sans-serif;
+        color: #CCBBAA;
+        background-color: #112233;
+        transition: transform 500ms ease, opacity 750ms ease;
+        z-index: 10;
+        overflow-x: hidden;
+    }
+
+    article[visible="true"] {
+        transform: translateX(100%);
+        opacity: 1;
+    }
+    article[visible="false"] {
+        transform: translateX(0%);
+    }
+
+    article img {
+        max-width: 70%;
+        padding: 1% 1% 1% 1%;
+        margin-bottom: 50px;
+        background-color: #000;
+        border: 5px solid #FFF;
+    }

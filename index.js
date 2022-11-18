@@ -1,4 +1,4 @@
-require('coffeescript');
+require('coffeescript').register();
 require('dotenv').config();
 const express = require('express');
 
@@ -29,6 +29,7 @@ app.use('/lonely', require('./routes/lonely'))
 app.use('/api', require('./routes/api'))
 app.use('/anmt', require('./routes/anmt'))
 app.use('/spwnideas', require('./routes/spwn_ideas'))
+app.use('/gallery', require('./routes/gallery'))
 
 app.all('*', (req, res) => {
     res
