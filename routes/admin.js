@@ -35,4 +35,7 @@ router.all('/reboot', (req, res) => {
     process.exit(0)
 })
 
-module.exports = router;
+module.exports = {
+    route: "/admin",
+    router: router,
+}

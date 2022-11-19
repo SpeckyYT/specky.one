@@ -11,4 +11,7 @@ router.all('/ip-api/:ip', async (req, res) => {
     res.json(info);
 });
 
-module.exports = router;
+module.exports = {
+    route: "/api",
+    router: router,
+}

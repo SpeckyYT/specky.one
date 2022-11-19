@@ -1,6 +1,10 @@
+const path = require('path');
+
 require('coffeescript').register();
 require('dotenv').config();
 const express = require('express');
+const filehound = require('filehound');
+const colors = require('colors/safe');
 
 const match = {
     '/': 'index.pug',
@@ -23,13 +27,46 @@ for(const [key,file] of Object.entries(match)){
     })
 }
 
-app.use('/us', require('./routes/us'))
-app.use('/admin', require('./routes/admin'))
-app.use('/lonely', require('./routes/lonely'))
-app.use('/api', require('./routes/api'))
-app.use('/anmt', require('./routes/anmt'))
-app.use('/spwnideas', require('./routes/spwn_ideas'))
-app.use('/gallery', require('./routes/gallery'))
+const routes = filehound.create()
+    .path("./routes")
+    .ext([".coffee",".js"])
+    .depth(0)
+    .findSync();
+
+const longestRoute = routes.map(v => v.length).reduce((p, c) => p > c ? p : c);
+
+const log = (
+    routePath = "",
+    details = "done",
+    color = colors.green,
+    startTime = Date.now(),
+    error = false,
+) => {
+    const stream = error ? console.error : console.log;
+
+    const rout = routePath.padEnd(longestRoute);
+    const tim = `${Date.now() - startTime}ms`.padStart(7) // "99999ms" before overflowing
+
+    stream(color(`${rout} | ${tim} | ${details}`))
+}
+
+for(const routePath of routes) {
+    const startTime = Date.now();
+
+    try {
+        const route = require(path.resolve(routePath));
+
+        if(typeof route != "object" || route == null) throw `no valid output, got ${typeof route}`;
+        if(!route.route) throw `no route provided`;
+        if(!route.router) throw `no router provided`;
+
+        app.use(route.route, route.router);
+
+        log(routePath, "loaded", colors.green, startTime);
+    } catch (err) {
+        log(routePath, `${err}`, colors.red, startTime);
+    }
+}
 
 app.all('*', (req, res) => {
     res

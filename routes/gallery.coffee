@@ -24,4 +24,6 @@ router.get "/", (req, res) =>
         res: res,
         arts: filtered_art,
 
-module.exports = router
+module.exports =
+    route: "/gallery"
+    router: router
