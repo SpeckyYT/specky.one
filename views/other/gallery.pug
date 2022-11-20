@@ -26,7 +26,10 @@ html(lang="en")
             #[li do not use this art for commercial purposes]
             #[li do not modify this art]
         a(href=license)
-            img(src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-nd.svg")
+            img.undraggable(
+                src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-nd.svg",
+                style="width: 50%;"
+            )
 
     div.grid
         for art in arts
@@ -37,29 +40,66 @@ html(lang="en")
                 context = art.context,
                 year = art.year,
             )
-                img.undraggable(src=art.filename)
-    
-    for art in arts
-        article(id=art.filename, tabindex="0")
-            h1 #{art.name}
-            h2 Description
-            p #{art.description}
-            h2 Context
-            p #{art.context}
-            p Made in #{art.year || new Date().getFullYear()}#{art.year ? "" : " (year not confirmed)"}
-            img.undraggable(src=art.filename)
+                img.undraggable(src=art.filename, loading="lazy")
 
 script.
-    for (const art of document.getElementsByClassName("art")) {
-        const article = document.getElementById(art.getAttribute("filename"));
+    function createCustomElement(tag = "p", text) {
+        const doc = document.createElement(tag)
+        if(text) doc.appendChild(document.createTextNode(text))
+        return doc
+    }
+
+    function summonArticle(art) {
+        const filename = art.getAttribute("filename");
+        const name = art.getAttribute("name");
+        const description = art.getAttribute("description");
+        const context = art.getAttribute("context");
+        const year = art.getAttribute("year");
+
+        if(document.getElementById(filename)) return document.getElementById(filename);
+
+        const article = document.createElement("article");
+        article.setAttribute("id", filename)
+        article.setAttribute("tabindex", "0")
         article.setAttribute("visible", "false")
 
-        art.addEventListener("click", event => {
-            article.setAttribute("visible", "true")
-            article.focus()
-        })
+        const children = [
+            createCustomElement("h1", name),
+            createCustomElement("h2", "Description"),
+            createCustomElement("p", description),
+            createCustomElement("h2", "Context"),
+            createCustomElement("p", context),
+            createCustomElement("p", `Made in ${year || new Date().getFullYear()}${year ? "" : " (year not confirmed)"}`),
+            (()=>{
+                const img = document.createElement("img");
+                img.classList.add("undraggable");
+                img.setAttribute("src", filename);
+                return img
+            })(),
+        ]
+
+        for(const child of children) article.appendChild(child)
+
         article.addEventListener("blur", event => {
             article.setAttribute("visible", "false")
+        })
+
+        document.body.appendChild(article)
+
+        return article
+    }
+
+    for (const art of document.getElementsByClassName("art")) {
+        art.addEventListener("click", async (event) => {
+            const article = summonArticle(art);
+
+            // this is for not setting the visibility to "true" instantaneously
+            // if that happens, it would appear without a clean transition
+            article.setAttribute("visible", "false")
+            await new Promise(res => setTimeout(res, 0))
+            
+            article.setAttribute("visible", "true")
+            article.focus()
         })
     }
 
@@ -68,8 +108,8 @@ style.
         position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
+        width: 100%;
+        height: 100%;
         margin: 0;
         border: 0;
         z-index: -10;
@@ -99,20 +139,26 @@ style.
     .grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        grid-gap: 2.5%;
+        grid-gap: 5vh;
         margin: 0 auto;
         padding: 0;
         max-width: 90%;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
     }
     .art {
         display: flex;
+        height: fit-content;
+        min-width: 1fr;
+        aspect-ratio: 1 / 1;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         text-align: center;
-        background-color: #521;
-        border: 5px solid #FD0;
-        padding: 10px;
+        border: 10px solid #521;
+        outline: 5px solid #FD0;
+        padding-top: 100%
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         cursor: pointer;
     }
@@ -129,10 +175,6 @@ style.
         -moz-user-select: none;
         -webkit-user-select: none;
         -ms-user-select: none;
-    }
-
-    .info h1 {
-        font-family: "Georgia"; /* currently expernimenting */
     }
 
     article {
