@@ -47,6 +47,6 @@ router.get("/:page", async (req, res) => {
 })
 
 module.exports = {
-    route: "/spwn_ideas",
+    route: "/spwnideas",
     router: router,
 }
