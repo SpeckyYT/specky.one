@@ -16,7 +16,10 @@ const match = {
 const app = express();
 
 app.set('view engine','pug');
-app.use(express.static('public'));
+app.use(express.static('public', {
+    etag: false,
+    maxAge: 7 * 24 * 60 * 60 * 1000, // a week seems alright
+}));
 
 for(const [key,file] of Object.entries(match)){
     app.get(key, (req, res) => {
