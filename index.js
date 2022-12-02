@@ -40,18 +40,24 @@ const longestRoute = routes.map(v => v.length).reduce((p, c) => p > c ? p : c);
 
 const log = (
     routePath = "",
-    details = "done",
+    details = "",
     color = colors.green,
     startTime = Date.now(),
     error = false,
 ) => {
     const stream = error ? console.error : console.log;
 
-    const rout = routePath.padEnd(longestRoute);
-    const tim = `${Date.now() - startTime}ms`.padStart(7) // "99999ms" before overflowing
+    const array = [
+        routePath.padEnd(longestRoute),
+        `${Date.now() - startTime}ms`.padStart(7) // "99999ms" before overflowing
+    ]
 
-    stream(color(`${rout} | ${tim} | ${details}`))
+    if (details) array.push(details)
+
+    stream(color(array.join(" | ")))
 }
+
+const totalTime = Date.now();
 
 for(const routePath of routes) {
     const startTime = Date.now();
@@ -70,6 +76,8 @@ for(const routePath of routes) {
         log(routePath, `${err}`, colors.red, startTime);
     }
 }
+
+log("TOTAL", "", colors.bgGreen, totalTime)
 
 app.all('*', (req, res) => {
     res
