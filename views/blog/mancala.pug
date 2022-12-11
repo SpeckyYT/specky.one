@@ -1,0 +1,140 @@
+include includes/footer.pug
+include includes/return.pug
+include ../includes/embed.pug
+link(rel="stylesheet" href="/blog/blog.css")
+
+-
+    const date = new Date(Date.parse("December 10, 2022"));
+    const writers = [
+        "Specky",
+    ];
+
+    const calculatePercentage = (partial, total) => Number(100_00n * partial / total) / 100;
+
+    const redditMancalaGames = 6n ** 20n;
+    const totalGames48 = 19836470448856257280n;
+    const totalGamesPlusFlipped48 = totalGames48 * 2n;
+    const firstWins48 = 9051489445278008834n;
+    const firstPercent48 = calculatePercentage(firstWins48, totalGames48);
+    const secondWins48 = 8971659732539005146n;
+    const secondPercent48 = calculatePercentage(secondWins48, totalGames48);
+    const ties48 = 1813321271039243300n;
+    const tiesPercent48 = calculatePercentage(ties48, totalGames48);
+
+    const stats = [
+        "pieces per slot | unique games         | first wins          | second wins         | ties",
+        "1               | 1060                 | 560                 | 500                 | 0   ",
+        "2               | 16988464             | 6835542             | 9172100             | 980822",
+        "3               | 1508385906874        | 717687745003        | 710485191934        | 80212969937",
+        "4               | 19836470448856257280 | 9051489445278008834 | 8971659732539005146 | 1813321271039243300",
+        "5               | ?                    | ?                   | ?                   | ?",
+    ].map(string => string.split("|").map(str => str.trim()));
+
+head
+    title How Many Mancala Games?
+    meta(name="description" content="I have no idea")
+    +embed()
+
++return
+
+article
+    h1 Mancala
+
+    p.info Note: in this entire blog, the only Mancala board that is considered is the classic board with 6 slots per side and 2 banks.
+
+    p.
+        Some years ago I started playing #[a(href="https://en.wikipedia.org/wiki/Clubhouse_Games:_51_Worldwide_Classics") Clubhouse Games] on the Nintendo Switch, and I discovered this game named "Mancala".
+        After learning how to play it I got some questions...
+        #[code.inline "How many possible games are there?"]
+        #[code.inline "Do I win more often if I'm first or if I go as second"]
+        #[code.inline "How often do you tie?"].
+        So being the programmer that I am, I started working on an answer to all of these questions.
+    
+    h2 Research
+
+    p.
+        Mancala is a game that is more than 2000 years old (sources differ drastically), but despite that, I haven't found anyone who reported any statistics about this game.
+        The closest information that I actually found was a #[a(href="https://reddit.com/r/math/comments/miqos/") reddit post] with a comment saying that the rough estimate of possible games being "6^20" (#{redditMancalaGames}).
+        I also found some integer sequences on #[a(href="https://oeis.org/search?q=mancala") OEIS], but they only got sequences about a solitaire version of Mancala.
+
+        The street leading to the answers I'm looking doesn't exist, so I'll have to create one myself.
+    
+    h2 Coding
+
+    p.
+        Since computing approximately 6^20 games would require great performance, I obviously used #[a(href="https://rust-lang.org/") Rust].
+    p.info Rust is an high-level programming language that compiles to an executable that is as fast as C/C++.
+    p.
+        Before starting coding, I checked out #[a(href="https://crates.io/") crates.io] (rust's libraries) and I found what I was looking for, the library #[a(href="https://crates.io/crates/mancala_board") mancala_board].
+        I instantly started #[a(href="https://github.com/theswerd/mancala/pull/1") contributing] to the library, improving it and making it faster.
+        After that, I started writing my "Mancala Calculator" and I discovered the followig things:
+
+    ul
+        li Mancala is a HUGE game
+            p Already a "simple" game of 24 pieces (2 per slot) has more than 15 million possible games 
+        li Caching is POWERFUL
+            p.info Caching stores the input and the output into memory, so if you give it the same input, it will retrieve the output from memory instead of computing it once again.
+            p Despite consuming up a lot of RAM, it's really worth it
+        li Multithreading is actually slower in this scenario
+            p If you use caching with multithreading, all threads will need to access the cached data, and each one needs to wait until the previous one is done reading and writing for it to be safe.
+        li Making the computer play as humans play it, is slow
+            p.
+                In the worst case scenario, the computer would need to do 3 round trips around the entire board to place all pieces in the right spots.
+                This "multiple round trips procedure" can be saved by dividing the pieces in the hand by how many slots there are (actually, minus one, since you don't want to place your pieces in the opponent's bank), so you can drop multiple pieces in a slot at once and therefore only doing one round trip. 
+
+    .answers
+        h2 Results
+
+        p.
+            After letting it run for around a minute, it used up 4GB of RAM and it finally gave the result I was waiting for.
+
+        h3 How many unique games of 48 piece Mancala are there?
+        p.
+            There are #{totalGames48} distinct Mancala games.
+            Taking the 6th logarithm of #{totalGames48}, results into ~24.8, which is the average game length counted in moves.
+            If you also wanted to consider the flipped board state (since our board is rotationally symmetric, it doesn't change anything, except multiplying the total games by two) which results into #{totalGamesPlusFlipped48} games.
+        
+        h3 Is it better to play as first or as second in Mancala?
+        p.
+            It's slightly beneficial to play as first, but only by around #{String(firstPercent48 - secondPercent48).slice(0,4)}%.
+            Out of all possible games, #{firstWins48} are won by the first player and the second player won #{secondWins48} games.
+            First player: #{firstPercent48}% of games won.
+            Second player: #{secondPercent48}% of games won.
+        
+        h3 How often do you tie in Mancala?
+        p.
+            Tying happens in #{tiesPercent48}% of the games.
+
+        h3 What about games with different quantities of pieces per slot?
+        p Here's a table with ""everything"" I found
+
+        .stats
+            for row in stats
+                for cell in row
+                    p.stats-item= cell
+
+    // show parts of code
+
+    // https://reddit.com/r/math/comments/miqos/how_many_distinct_games_of_48_piece_mancala_are/
+    // bruh
+
+    // conclude
+
++footer(date, writers)
+
+style.
+    .stats {
+        display: grid;
+        background-color: #555;
+        padding: 1rem;
+        grid-template-columns: repeat(5, calc(100%/5));
+    }
+
+    .stats-item {
+        background-color: #222;
+        color: #f2f2f2;
+        border: 4px solid rgb(0, 0, 0);
+        margin: 0px;
+        padding: 0.5rem;
+        word-wrap: break-word;
+    }

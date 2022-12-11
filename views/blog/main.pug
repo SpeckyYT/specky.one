@@ -1,0 +1,17 @@
+include includes/footer.pug
+include includes/return.pug
+include ../includes/embed.pug
+link(rel="stylesheet" href="/blog/blog.css")
+
++embed(
+    "Specky Blog",
+    'Specky\'s Blog where he posts his ""discoveries"".',
+    'https://specky.one/blog',
+    "https://upload.wikimedia.org/wikipedia/commons/4/42/Blog_%281%29.jpg",
+    "#555555",
+)
+
+h1 Blogs
+
+for blog in blogs
+    a(href=`./${blog.path}`)= blog.name

@@ -1,0 +1,9 @@
+- const toStyledDate = (date) => Intl.DateTimeFormat('it-IT').format(date)
+
+mixin footer(date, writers)
+    footer#footer
+        p.
+            Blog made on #{toStyledDate(date)}
+        p.
+            Writers:
+                #{writers.join(", ")}
