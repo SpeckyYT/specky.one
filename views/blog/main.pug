@@ -11,7 +11,9 @@ link(rel="stylesheet" href="/blog/blog.css")
     "#555555",
 )
 
-h1 Blogs
+article
+    h1 Blogs
 
-for blog in blogs
-    a(href=`./${blog.path}`)= blog.name
+    for blog in blogs
+        a(href=`./${blog.path}`)= blog.title || blog.path
+        br

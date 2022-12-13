@@ -1,9 +1,15 @@
-- const toStyledDate = (date) => Intl.DateTimeFormat('it-IT').format(date)
+-
+    const toStyledDate = d => Intl.DateTimeFormat('it-IT').format(d);
+    const footerInfos = blog ? [
+        blog.date && `Blog made on ${toStyledDate(blog.date)}`,
+        blog.writers && `Writers:\n${blog.writers.join(", ")}`,
+        blog.tags && `Tags:\n${blog.tags.join(" ")}`,
+    ].filter(s => s) : [];
 
-mixin footer(date, writers)
+mixin footer()
     footer#footer
-        p.
-            Blog made on #{toStyledDate(date)}
-        p.
-            Writers:
-                #{writers.join(", ")}
+        for footerInfo in footerInfos
+            p= footerInfo
+
+        if footerInfos.length == 0
+            p If you see this, then it means that someone fucked up something.

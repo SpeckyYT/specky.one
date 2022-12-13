@@ -4,11 +4,6 @@ include ../includes/embed.pug
 link(rel="stylesheet" href="/blog/blog.css")
 
 -
-    const date = new Date(Date.parse("December 10, 2022"));
-    const writers = [
-        "Specky",
-    ];
-
     const calculatePercentage = (partial, total) => Number(100_00n * partial / total) / 100;
 
     const redditMancalaGames = 6n ** 20n;
