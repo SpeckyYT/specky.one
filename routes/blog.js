@@ -17,21 +17,20 @@ const blogs = [
         writers: [
             'Specky',
         ],
-        tags: ["mancala", "games", "computation", "math"],
+        tags: ["mancala", "game", "computation", "math"],
     },
 ]
 .filter(blog => fs.existsSync(path.join(process.cwd(), "views", "blog", blog.filename)));
 
-const tags = [];
+let tags = new Set();
 for(const blog of blogs) {
     if(Array.isArray(blog.tags)) {
         for(const tag of blog.tags) {
-            if(!tags.includes(tag)) {
-                tags.push(tag);
-            }
+            tags.add(tag);
         }
     }
 }
+tags = Array(...tags);
 
 router.get('/', async (req, res) => {
     res.render(blogPath("main.pug"), {
@@ -54,13 +53,6 @@ router.get("/:blog", async (req, res, next) => {
         res,
         blog,
     });
-})
-
-router.get("*", async (req, res) => {
-    res.render("404.pug", {
-        req,
-        res,
-    })
 })
 
 module.exports = {
