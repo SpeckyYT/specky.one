@@ -1,0 +1,10 @@
+include ../../includes/embed.pug
+
+if blog.embed
+    +embed(
+        blog.embed.title,
+        blog.embed.description,
+        blog.embed.url,
+        blog.embed.image,
+        blog.embed.color,
+    )
