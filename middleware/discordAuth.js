@@ -146,9 +146,9 @@ module.exports.default  = async function (req, res, next) {
                     req.session.authenticated = true;
 
                     await req.discord.refreshUser();
-                    return req.session.discord;
+                    return true;
                 } catch (error) {
-                    return error;
+                    return false;
                 }
             }
         }
