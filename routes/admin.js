@@ -47,8 +47,11 @@ router.all('/reboot', (req, res) => {
 */
 
 router.get('/login', (req, res) => {
-
-})
+    if (!req.session.authenticated) {
+        res.redirect(discord_redirect_uri);
+    } else {
+    }
+});
 
 router.post('/login', (req, res) => {
     fetch.default('https://discord.com/api/users/@me', {
@@ -73,11 +76,14 @@ router.post('/login', (req, res) => {
 })
 
 router.all("/", (req, res) => {
-    if(!req.session.authenticated) return res.redirect("/login");
+    // maybe move this to /login?
+    // this will redirect the user to begin authorization with discord.
+    if(!req.session.authenticated) return res.redirect("/discord");
 
     res.render("admin/main.pug", {
         req,
         res,
+        discord: req.session.discord
     })
 })
 
