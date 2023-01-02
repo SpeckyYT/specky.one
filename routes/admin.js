@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { exec } = require('child_process');
 const { appendFile } = require('fs');
-const Util = require('util');
 let fetch = import("node-fetch");
 fetch.then(f => fetch = f);
 
@@ -77,6 +76,8 @@ router.post('/login', (req, res) => {
 })
 
 router.all("/", (req, res) => {
+    // maybe move this to /login?
+    // this will redirect the user to begin authorization with discord.
     if(!req.session.authenticated) return res.redirect("/discord");
 
     res.render("admin/main.pug", {
