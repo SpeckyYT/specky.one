@@ -40,7 +40,7 @@ html(lang="en")
                 context = art.context,
                 year = art.year,
             )
-                img.undraggable(src=art.filename, loading="lazy")
+                img.undraggable(src=`/preview?image=gallery/${art.filename}`, loading="lazy")
 
 script.
     function createCustomElement(tag = "p", text) {
