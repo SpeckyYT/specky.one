@@ -15,7 +15,7 @@ const publicFolder = path.join(process.cwd(), "/public/");
 router.get("/", async (req, res) => {
 
     if(!req.query.image) return res.status(400).send();
-    
+
     const localPublic = path.join(publicFolder, req.query.image);
 
     if(!localPublic.startsWith(publicFolder))
@@ -62,15 +62,15 @@ function scaleDimensions(width, height) {
     } else if(aspectRatio > 1) {
         // width is larger than height
         const newWidth = PIXELS;
-        const newHeight = Math.round(height * PIXELS / width);
+        const newHeight = Math.max(Math.round(height * PIXELS / width), 1);
         return [newWidth, newHeight];
     } else {
         // height is larger than width
         const newHeight = PIXELS;
-        const newWidth = Math.round(width * PIXELS / height);
+        const newWidth = Math.max(Math.round(width * PIXELS / height), 1);
         return [newWidth, newHeight];
     }
-}  
+}
 
 module.exports = {
     route: "/preview",
