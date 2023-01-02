@@ -1,0 +1,12 @@
+doctype html
+
+include includes/style.pug
+
+html(lang="en")
+    head
+        title Login Failed
+    body
+        h1 #{code || 400} - #{title}
+        p(style="color: red") #{error}
+        a(href="./") How about you go back
+    include includes/footer.pug

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { exec } = require('child_process');
 const { appendFile } = require('fs');
+const Util = require('util');
 let fetch = import("node-fetch");
 fetch.then(f => fetch = f);
 
@@ -47,8 +48,11 @@ router.all('/reboot', (req, res) => {
 */
 
 router.get('/login', (req, res) => {
-
-})
+    if (!req.session.authenticated) {
+        res.redirect(discord_redirect_uri);
+    } else {
+    }
+});
 
 router.post('/login', (req, res) => {
     fetch.default('https://discord.com/api/users/@me', {
@@ -73,11 +77,12 @@ router.post('/login', (req, res) => {
 })
 
 router.all("/", (req, res) => {
-    if(!req.session.authenticated) return res.redirect("/login");
+    if(!req.session.authenticated) return res.redirect("/discord");
 
     res.render("admin/main.pug", {
         req,
         res,
+        discord: req.session.discord
     })
 })
 
