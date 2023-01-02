@@ -65,6 +65,8 @@ module.exports.default  = async function (req, res, next) {
                 }
             }
         }
+
+        return req.session.discord.user;
     }
 
     req.discord.logout = async () => {
@@ -210,6 +212,10 @@ module.exports.default  = async function (req, res, next) {
                 return res.redirect(REDIRECT_URI);
             }
         }
+    }
+
+    if (req.session.authenticated && req.session.discord) {
+        await req.discord.refreshUser();
     }
 
     next();
