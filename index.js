@@ -5,13 +5,24 @@ require('dotenv').config();
 const express = require('express');
 const filehound = require('filehound');
 const colors = require('colors/safe');
+const session = require('express-session');
+const discordAuth = require('./middleware/discordAuth').default;
+
+global.sessionMemoryStore = new session.MemoryStore();
+global.sessionMiddleware = session({
+    secret: Array(32).fill("").map(() => `${(Math.floor(36 * Math.random())).toString(36)}`).join(""),
+    cookie: { maxAge: 15 * 60 * 1000 },
+    saveUninitialized: false,
+    resave: true,
+    store: sessionMemoryStore,
+})
 
 const match = {
     '/': 'index.pug',
     '/summertime': 'memes/summertime.pug',
     '/sort': 'other/visort.pug',
     '/sugo': 'games/sugo.pug',
-} 
+}
 
 const app = express();
 
@@ -20,6 +31,10 @@ app.use(express.static('public', {
     etag: false,
     maxAge: 7 * 24 * 60 * 60 * 1000, // a week seems alright
 }));
+
+// We need this here so it's applied to all routes, even the discord middleware.
+app.use(sessionMiddleware);
+app.use(discordAuth);
 
 for(const [key,file] of Object.entries(match)){
     app.get(key, (req, res) => {
