@@ -2,6 +2,8 @@ default_description = "No description provided" # TODO: hire a writer (i suck at
 default_context = "Nobody knows anything about this"
 # default_year = "#{new Date().getFullYear()}"
 
+listened_to_song = (song) -> """I was listening to "#{song}" while making this."""
+
 all_art = [
     filename: "10000ms.png"
     name: "10000ms"
@@ -62,6 +64,7 @@ all_art = [
 ,
     filename: "daidai.png"
     name: "DaiDai"
+    context: listened_to_song "Daidai Genome - Tsunamaru ft. nami"
     year: 2021
 ,
     filename: "desync.png"
@@ -98,6 +101,7 @@ all_art = [
 ,
     filename: "fantascene.png"
     name: "Fantascene"
+    context: listened_to_song "Fantascene Falls - Super Monkey Ball [DS] Touch & Roll"
     year: 2021
 ,
     filename: "first-studio.png"
@@ -114,10 +118,12 @@ all_art = [
 ,
     filename: "galaxy collapsed.png"
     name: "Galaxy Collapsed"
+    context: listened_to_song "Galaxy Collapse - 黒皇帝"
     year: 2020
 ,
     filename: "giddy-up.png"
     name: "Giddy Up"
+    context: listened_to_song "Giddy-Up! - Spore Soundtrack"
     year: 2021
 ,
     filename: "golira.png"
@@ -182,10 +188,15 @@ all_art = [
 ,
     filename: "mayday.png"
     name: "Mayday"
+    description: """
+        Can you hear my voice coming trought the void?
+    """
+    context: listened_to_song "MAYDAY - TheFatRat feat. Laura Brehm"
     year: 2021
 ,
     filename: "mayhem.png"
     name: "Mayhem"
+    context: listened_to_song "Meteorite Mayhem - Super Monkey Ball [DS] Touch & Roll"
     year: 2021
 ,
     filename: "maze.png"
@@ -282,6 +293,11 @@ all_art = [
 ,
     filename: "shelter.png"
     name: "Shelter"
+    description: """
+        Trust me, it's a long way forward,
+        I'll protect them just like you did to me.
+    """
+    context: listened_to_song "Shelter - Porter Robinson & Madeon"
     year: 2021
 ,
     filename: "shift.png"
@@ -326,6 +342,11 @@ all_art = [
 ,
     filename: "sunglow.png"
     name: "Sunglow"
+    description: """
+        The world is changing and I miss you.
+        I've been waiting for you guys.
+    """
+    context: listened_to_song "Sunglow - Yamajet feat. ひうらまさこ (Masako Hiura)"
     year: 2020
 ,
     filename: "TheMiddle.png"
@@ -362,6 +383,9 @@ all_art = [
 ,
     filename: "water.png"
     name: "Water"
+    context: """
+        This is a personal favourite of mine.
+    """
     year: 2020
 ,
     filename: "Wolle.png"
@@ -374,6 +398,7 @@ all_art = [
 ,
     filename: "wszystkim.png"
     name: "Wszystkim"
+    context: listened_to_song "Byłaś Dla Mnie Wszystkim - Poparzeni Kawa Trzy"
     year: 2020
 ]
 .map (art) ->
