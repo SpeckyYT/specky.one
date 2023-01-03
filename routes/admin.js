@@ -3,7 +3,7 @@ const router = express.Router();
 const { exec } = require('child_process');
 const { appendFile } = require('fs');
 
-const APIRouter = require('./admin/api.coffee');
+// const APIRouter = require('./admin/api.coffee');
 
 const run = (command) => {
     const child = exec(command);
@@ -24,7 +24,7 @@ router.all("/", (req, res) => {
     })
 })
 
-router.use("/api", APIRouter);
+// router.use("/api", APIRouter);
 
 module.exports = {
     route: "/admin",
