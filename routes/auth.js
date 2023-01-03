@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const router = Router();
+const { default: axios } = require('axios');
 
 router.get('/', async (req, res) => {
     if (req.session.authenticated) {
@@ -38,6 +39,7 @@ router.get('/', async (req, res) => {
             await req.discord.refreshUser();
             return res.redirect('/admin');
         } catch (error) {
+        if(DEBUG) console.log(error);
             let msg =
                 error.response ?
                     (error.response.data && error.response.data.error_description)

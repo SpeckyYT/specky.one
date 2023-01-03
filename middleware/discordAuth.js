@@ -1,6 +1,7 @@
 const { default: axios, AxiosError } = require('axios');
-const Util = require('util');
 
+// TODO: moves this to an env manager module
+global.DEBUG = process.env.DEBUG == "true";
 global.REDIRECT_URI = process.env.REDIRECT_URI || false;
 global.REDIRECT_URI_CALLBACK = process.env.REDIRECT_URI_CALLBACK || false;
 global.CLIENT_ID = process.env.CLIENT_ID || false;
