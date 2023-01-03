@@ -38,9 +38,12 @@ router.get('/', async (req, res) => {
             await req.discord.refreshUser();
             return res.redirect('/admin');
         } catch (error) {
-            let msg = (error.response.data && error.response.data.error_description)
-                ? error.response.data.error_description
-                : error.response.data?.error || "Unknown Error"
+            let msg =
+                error.response ?
+                    (error.response.data && error.response.data.error_description)
+                        ? error.response.data.error_description
+                        : error.response.data?.error || "Unknown Error"
+                    : "Unknown Error";
             return res.render('error.pug', { req, error: msg });
         }
     } else {
