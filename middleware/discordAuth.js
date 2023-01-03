@@ -1,10 +1,12 @@
 const { default: axios, AxiosError } = require('axios');
 const Util = require('util');
 
-const REDIRECT_URI = process.env.REDIRECT_URI || false;
-const REDIRECT_URI_CALLBACK = process.env.REDIRECT_URI_CALLBACK || false;
-const CLIENT_ID = process.env.CLIENT_ID || false;
-const CLIENT_SECRET = process.env.CLIENT_SECRET || false;
+global.REDIRECT_URI = process.env.REDIRECT_URI || false;
+global.REDIRECT_URI_CALLBACK = process.env.REDIRECT_URI_CALLBACK || false;
+global.CLIENT_ID = process.env.CLIENT_ID || false;
+global.CLIENT_SECRET = process.env.CLIENT_SECRET || false;
+global.ADMINS = process.env.ADMINS || '';
+
 // In seconds
 const REFRESH_INTERVAL = 60 * 3;
 
@@ -19,7 +21,6 @@ module.exports.default  = async function (req, res, next) {
     if (req.session.discord === undefined) {
         req.session.authenticated = false;
         req.session.discord = {
-            isAdmin: false,
             authenticated: false,
             user: null,
             tokenData: null,
@@ -55,7 +56,6 @@ module.exports.default  = async function (req, res, next) {
                         // if there's an error, invalidate the session
                         req.session.authenticated = false;
                         req.session.discord = {
-                            isAdmin: false,
                             authenticated: false,
                             user: null,
                             token: null,
@@ -161,7 +161,8 @@ module.exports.default  = async function (req, res, next) {
     req.discord.isAdmin = () => {
         if (isDisabled) return false;
         if (!req.session.authenticated || !req.session.discord) return false;
-        return process.env.ADMINS.split(" ").includes(req.session.discord.user.id)
+        if (!req.session.discord?.user?.id) return false;
+        return ADMINS.split(" ").includes(req.session.discord.user.id);
     }
 
     if (req.session.authenticated && req.session.discord) {
