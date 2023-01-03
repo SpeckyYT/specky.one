@@ -2,12 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { exec } = require('child_process');
 const { appendFile } = require('fs');
-let fetch = import("node-fetch");
-fetch.then(f => fetch = f);
 
-const admins = [
-    "334361254435225602",
-];
+const APIRouter = require('./admin/api.coffee');
 
 const run = (command) => {
     const child = exec(command);
@@ -16,69 +12,10 @@ const run = (command) => {
     })
 }
 
-router.use(sessionMiddleware)
-
-/*
-router.use((req, res, next) => {
-    const allowed = req.query.code == process.env.ADMIN_PASSCODE;
-
-    if(allowed){
-        next()
-    } else {
-        res.status(403).json({ authorized: false }) // 😂🤣😂🤣
-    }
-})
-
-router.all('/update', async (req, res) => {
-    try {
-        await run('git reset --hard')
-        await run('git fetch --all')
-        await run('git pull origin')
-        await run('npm i')
-        res.json({ success: true });
-    }catch(err){
-        res.status(500).json({ success: false, error: `${err}` });
-    }
-})
-
-router.all('/reboot', (req, res) => {
-    process.exit(0)
-})
-*/
-
-router.get('/login', (req, res) => {
-    if (!req.session.authenticated) {
-        res.redirect(discord_redirect_uri);
-    } else {
-    }
-});
-
-router.post('/login', (req, res) => {
-    fetch.default('https://discord.com/api/users/@me', {
-        headers: {
-            authorization: `${req.headers.DISCORD_TOKEN_TYPE} ${req.headers.DISCORD_TOKEN}`,
-        },
-    })
-    .then(val => {
-        if(val.ok) return val.json();
-        throw ''
-    })
-    .then(val => {
-        res.session.authenticated = true
-        res.session.tokenData = {
-            type: req.headers.DISCORD_TOKEN_TYPE,
-            token: req.headers.DISCORD_TOKEN,
-        }
-        res.session.discordData = val
-        res.json(req.session)
-    })
-    .catch(() => res.status(401).send({ authorized: false }))
-})
-
 router.all("/", (req, res) => {
     // maybe move this to /login?
     // this will redirect the user to begin authorization with discord.
-    if(!req.session.authenticated) return res.redirect("/discord");
+    if(!req.session.authenticated) return res.redirect("/auth");
 
     res.render("admin/main.pug", {
         req,
@@ -86,6 +23,8 @@ router.all("/", (req, res) => {
         discord: req.session.discord
     })
 })
+
+router.use(APIRouter);
 
 module.exports = {
     route: "/admin",
