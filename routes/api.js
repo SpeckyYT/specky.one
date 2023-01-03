@@ -43,10 +43,8 @@ function recursive(routes, depth = 0) {
         const routePath = deepRoute[0];
         const routesPath = deepRoute[1];
 
-        const startTime = Date.now();
-
         const recursionRoute = recursive(routesPath, depth + 1);
-        currentRoute.use(routePath, recursionRoute); // this should be impossible to fail
+        currentRoute.use(`/${routePath}`, recursionRoute); // this should be impossible to fail
     }
 
     return currentRoute
