@@ -7,6 +7,7 @@ const filehound = require('filehound');
 const colors = require('colors/safe');
 const session = require('express-session');
 const discordAuth = require('./middleware/discordAuth').default;
+const log = require('./util/log');
 
 global.sessionMemoryStore = new session.MemoryStore();
 global.sessionMiddleware = session({
@@ -57,27 +58,6 @@ const routes = filehound.create()
     .ext([".coffee",".js"])
     .depth(0)
     .findSync();
-
-const longestRoute = routes.map(v => v.length).reduce((p, c) => p > c ? p : c);
-
-const log = (
-    routePath = "",
-    details = "",
-    color = colors.green,
-    startTime = Date.now(),
-    error = false,
-) => {
-    const stream = error ? console.error : console.log;
-
-    const array = [
-        routePath.padEnd(longestRoute),
-        `${Date.now() - startTime}ms`.padStart(7) // "99999ms" before overflowing
-    ]
-
-    if (details) array.push(details)
-
-    stream(color(array.join(" | ")))
-}
 
 const totalTime = Date.now();
 
