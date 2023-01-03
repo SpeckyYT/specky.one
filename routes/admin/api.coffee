@@ -9,3 +9,5 @@ router.use (req, res, next) =>
 
 router.get "/", (req, res) =>
     res.send "Welcome to the API page! (you shouldn't be here btw)"
+
+module.exports = router

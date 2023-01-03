@@ -24,7 +24,7 @@ router.all("/", (req, res) => {
     })
 })
 
-router.use(APIRouter);
+router.use("/api", APIRouter);
 
 module.exports = {
     route: "/admin",
