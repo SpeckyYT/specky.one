@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { exec } = require('child_process');
-const { appendFile } = require('fs');
+const osu = require('node-os-utils');
 
 const run = (command) => {
     const child = exec(command);
@@ -13,12 +13,17 @@ const run = (command) => {
 router.all("/", (req, res) => {
     // maybe move this to /login?
     // this will redirect the user to begin authorization with discord.
-    if(!req.session.authenticated) return res.redirect("/auth");
+    // if(!req.session.authenticated) return res.redirect("/auth");
 
     res.render("admin/main.pug", {
         req,
         res,
-        discord: req.session.discord
+        discord: req.session.discord,
+        powerLevel: req.discord.powerLevel(),
+        require,
+
+        // modules
+        osu,
     })
 })
 

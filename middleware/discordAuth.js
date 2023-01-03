@@ -158,6 +158,13 @@ module.exports.default  = async function (req, res, next) {
         return ADMINS.split(" ").includes(req.session.discord.user.id);
     }
 
+    req.discord.powerLevel = () => {
+        if (isDisabled) return 0;
+        if(req.discord.isAdmin()) return 2;
+        if(req.session.authenticated) return 1;
+        return 0;
+    }
+
     if (req.session.authenticated && req.session.discord) {
         await req.discord.refreshUser();
     }

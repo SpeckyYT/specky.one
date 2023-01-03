@@ -3,7 +3,7 @@
 express = require 'express'
 router = express.Router()
 
-router.get "/", (req, res) =>
-    res.send("Welcome to the APIs!")
+router.get "/mypower", (req, res) =>
+    res.json req.discord.powerLevel()
 
 module.exports = router

@@ -1,4 +1,25 @@
 include ../includes/style.pug
-h1(style="color: #63f2bd") Login Successful!
-p(style="color: white") Welcome to the admin panel, #{discord.user.username}!
-a(href="/auth/logout", style="color: red") Logout?
+
+h1(style="color: #63f2bd") Welcome to the admin panel, #{powerLevel > 0 ? discord.user.username : "random person"}!
+
+if powerLevel == 0
+    h2 here's an image of a jerboa
+    img(src="https://www.science.org/do/10.1126/science.acx9719/abs/_20211123_on_jerboa.jpg")
+
+if powerLevel > 1
+    p CPU count: #{osu.cpu.count()}
+
+if powerLevel > 2
+    br
+
+    -
+        const commands = [
+            "git fetch --all",
+            "git reset --hard origin/master",
+            "git pull",
+            "npm i",
+            "pm2 restart specky.one",
+        ];
+    
+    for command in commands
+        a()= command

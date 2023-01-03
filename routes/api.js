@@ -1,6 +1,4 @@
 const express = require('express');
-const router = express.Router();
-const axios = require('axios').default;
 const filehound = require('filehound');
 const path = require('path');
 const colors = require('colors/safe');
@@ -19,7 +17,7 @@ function recursive(routes, depth = 0) {
     const deepRoutes = {}
     const currentRoute = express.Router()
 
-    for(const route of routes) {
+    for(const route of routes.sort()) { // the sort is REALLY important
         if(route.length - depth == 1) {
             const startTime = Date.now();
             try {
@@ -50,7 +48,9 @@ function recursive(routes, depth = 0) {
     return currentRoute
 }
 
+const allAPIRoutes = recursive(routes);
+
 module.exports = {
     route: "/api",
-    router: recursive(routes),
+    router: allAPIRoutes,
 }
