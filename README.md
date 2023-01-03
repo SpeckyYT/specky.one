@@ -3,6 +3,11 @@
 ## .env structure
 
 ```py
+## UTILS
+
+# prints some more stuff that may be useful
+DEBUG = true
+
 ## DISCORD LOGIN RELATED
 
 # discord client ID

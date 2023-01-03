@@ -32,6 +32,13 @@ app.use(express.static('public', {
     maxAge: 7 * 24 * 60 * 60 * 1000, // a week seems alright
 }));
 
+app.use((req, res, next) => {
+    if(process.env.DEBUG == "true") {
+        console.log(`${new Date()} ${req.ip}`);
+    }
+    next()
+})
+
 // We need this here so it's applied to all routes, even the discord middleware.
 app.use(sessionMiddleware);
 app.use(discordAuth);
