@@ -51,12 +51,11 @@ router.get('/', async (req, res) => {
     } else {
         // we don't have any valid authorization
         if (!req.session.authenticated || req.session.discord.tokenData.expiresAt < Date.now()) {
-            // we redirect to discord.
-            return res.render('admin/login.pug', { req, res });
-            // return res.redirect(REDIRECT_URI);
+            // we redirect to the login page.
+            return res.redirect('/login');
         }
     }
-    return res.send("🤨 what the fuck happened")
+    return res.redirect("/") // just for safety
 })
 
 router.get('/logout', async (req, res) => {

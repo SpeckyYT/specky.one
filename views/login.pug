@@ -1,0 +1,10 @@
+include includes/embed.pug 
+include includes/style.pug
+
+if req.discord.powerLevel() == 0
+    a(href = process.env.REDIRECT_URI).
+        How about you login with some discords
+else
+    h1 You're already logged in with power level #{req.discord.powerLevel()}
+    a(href = "/").
+        Click here to go to the main page
