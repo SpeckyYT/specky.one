@@ -7,6 +7,7 @@ global.REDIRECT_URI_CALLBACK = process.env.REDIRECT_URI_CALLBACK || false;
 global.CLIENT_ID = process.env.CLIENT_ID || false;
 global.CLIENT_SECRET = process.env.CLIENT_SECRET || false;
 global.ADMINS = process.env.ADMINS || '';
+global.TMDB_KEY = process.env.TMDB_KEY || '';
 
 global.LANGUAGES = ['.js', '.coffee']
 
