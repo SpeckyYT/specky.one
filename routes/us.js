@@ -64,7 +64,7 @@ router.all('*', (req, res) => {
     } else {
         return res
         .status(404)
-        .render('404', {
+        .render('error.pug', {
             req,
             res,
         })

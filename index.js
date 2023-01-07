@@ -17,6 +17,8 @@ const express = require('express');
 const filehound = require('filehound');
 const colors = require('colors/safe');
 const session = require('express-session');
+const { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode } = require('http-status-codes');
+
 const discordAuth = require('./middleware/discordAuth').default;
 const log = require('./util/log');
 
@@ -94,10 +96,13 @@ log("TOTAL", "", colors.bgGreen, totalTime)
 
 app.all('*', (req, res) => {
     res
-    .status(404)
-    .render('404.pug', {
+    .status(StatusCodes.NOT_FOUND)
+    .render('error.pug', {
         req,
         res,
+        code: StatusCodes.NOT_FOUND,
+        title: ReasonPhrases.NOT_FOUND,
+        error: "No idea how you got here.",
     })
 })
 
