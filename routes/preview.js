@@ -7,32 +7,37 @@ const path = require('path');
 const fs = require('fs');
 const jimp = require('jimp');
 const { MIME_JPEG } = require('jimp');
+const filehound = require('filehound');
+const { default: axios } = require('axios');
+const colors = require('colors/safe');
+
+const log = require('../util/log.js');
 
 const cache = new Map();
 
 const publicFolder = path.join(process.cwd(), "/public/");
 
-router.get("/", async (req, res) => {
+const bufferToBuffer = (buffer) => {
+    if(buffer.bitmap) return buffer.bitmap.data.data; // png
+    if(Buffer.isBuffer(buffer)) return buffer; // jpg
+    throw "Unable to get image buffer";
+}
 
+router.get("/", async (req, res) => {
     if(!req.query.image) return res.status(400).send();
 
     const localPublic = path.join(publicFolder, req.query.image);
+    const image = path.relative(publicFolder, localPublic);
 
     if(!localPublic.startsWith(publicFolder))
         return res.status(403).send();
 
-    if(cache.has(localPublic))
-        return res.send(cache.get(localPublic));
+    if(cache.has(image))
+        return res.send(cache.get(image));
 
     const saveAndSend = (buffer) => {
-        cache.set(localPublic, buffer);
+        cache.set(image, buffer);
         return res.send(buffer);
-    }
-
-    const bufferToBuffer = (buffer) => {
-        if(buffer.bitmap) return buffer.bitmap.data.data; // png
-        if(Buffer.isBuffer(buffer)) return buffer; // jpg
-        throw "Unable to get image buffer";
     }
 
     if(fs.existsSync(localPublic)) {
@@ -71,6 +76,53 @@ function scaleDimensions(width, height) {
         return [newWidth, newHeight];
     }
 }
+
+(async () => {
+    const images = filehound.create()
+        .path(path.join(process.cwd(), "public"))
+        .depth(Infinity)
+        .ext(['.png', '.jpeg', '.jpg', '.gif'])
+        .findSync();
+    
+    for(const imagePath of images) {
+        await wait(1000);
+
+        const startTime = Date.now();
+        const imageURI = path.relative(path.join(process.cwd(), "public"), imagePath);
+        const baseName = path.parse(imageURI).base.slice(0, 25);
+
+        const save = (buffer) => {
+            cache.set(imageURI, buffer);
+        }
+
+        try {
+            if(cache.has(imageURI)) {
+                log(`Image ${baseName}`, "already cached", colors.magenta, startTime);
+                continue
+            }
+
+            // todo: should be turned into a function or something
+            const image = await jimp.read(imagePath);
+            const width = image.getWidth();
+            const height = image.getHeight();
+
+            if(width <= PIXELS && height <= PIXELS) {
+                save(bufferToBuffer(await image.getBufferAsync(MIME_JPEG)));
+            } else {
+                const [ x, y ] = scaleDimensions(width, height);
+                save(bufferToBuffer(await image.resize(x, y).getBufferAsync(MIME_JPEG)));
+            }
+
+            if(DEBUG) {
+                log(`Image ${baseName}`, "cached", colors.magenta, startTime);
+            }
+        } catch(err) {
+            if(DEBUG) {
+                log(`Image ${baseName}`, `${err}`, colors.red, startTime, true);
+            }
+        }
+    }
+})();
 
 module.exports = {
     route: "/preview",

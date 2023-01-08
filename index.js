@@ -21,6 +21,7 @@ const { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode } = require('
 
 const discordAuth = require('./middleware/discordAuth').default;
 const log = require('./util/log');
+require('./util/global');
 
 global.sessionMemoryStore = new session.MemoryStore();
 global.sessionMiddleware = session({

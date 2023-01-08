@@ -15,25 +15,6 @@ const defaultImage = "https://as1.ftcdn.net/v2/jpg/02/43/62/78/1000_F_243627831_
 
 if(!TMDB_KEY) throw "TMDB_KEY in .env missing"
 
-const wait = ms => new Promise(res => setTimeout(res, ms));
-
-(async function() {
-    for(const movie of movies) {
-        await wait(5000);
-        const startTime = Date.now();
-        try {
-            await getMovieData(movie.id);
-            if(DEBUG) {
-                log(`Movie #${movie.id}`, "cached", colors.magenta, startTime);
-            }
-        } catch(err) {
-            if(DEBUG) {
-                log(`Movie #${movie.id}`, `${err}`, colors.red, startTime, true);
-            }
-        }
-    }
-})();
-
 router.get("/", async (req, res) => {
     try {
         res.render("movie/main.pug", {
@@ -137,6 +118,23 @@ async function originalImage(imageLink) {
         return defaultImage;
     }
 }
+
+(async function() {
+    for(const movie of movies) {
+        await wait(5000);
+        const startTime = Date.now();
+        try {
+            await getMovieData(movie.id);
+            if(DEBUG) {
+                log(`Movie #${movie.id}`, "cached", colors.magenta, startTime);
+            }
+        } catch(err) {
+            if(DEBUG) {
+                log(`Movie #${movie.id}`, `${err}`, colors.red, startTime, true);
+            }
+        }
+    }
+})();
 
 module.exports = {
     route: "/movie",
