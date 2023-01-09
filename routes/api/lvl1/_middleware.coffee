@@ -3,14 +3,14 @@ express = require 'express'
 router = express.Router()
 
 router.use (req, res, next) =>
-    if req.discord.powerLevel() >= 2
+    if req.discord.powerLevel() >= 1
         return next()
     else
-        return res.render "error.pug", {
+        return renderError(
             req,
             res,
-            code: 401,
-            error: "Unauthorized (requires discord login / level 1)"
-        }
+            401,
+            "Requires discord login / level 1",
+        )
 
 module.exports = router

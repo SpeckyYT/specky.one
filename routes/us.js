@@ -62,12 +62,7 @@ router.all('*', (req, res) => {
             return res.status(404).json({ error: 'URL not found' })
         }
     } else {
-        return res
-        .status(404)
-        .render('error.pug', {
-            req,
-            res,
-        })
+        return renderError(req, res, 404)
     }
 })
 

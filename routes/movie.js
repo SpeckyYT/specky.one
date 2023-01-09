@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
             .filter(f=>f),
         })
     } catch(err) {
-        res.render("error.pug", { req, res, error: `${err}` })
+        renderError(req, res, 400, `${err}`);
     }
 })
 

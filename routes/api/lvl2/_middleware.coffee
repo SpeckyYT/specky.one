@@ -6,11 +6,11 @@ router.use (req, res, next) =>
     if req.discord.powerLevel() >= 2
         return next()
     else
-        return res.render "error.pug", {
+        return renderError(
             req,
             res,
-            code: 401,
-            error: "Unauthorized (requires admin / level 2)"
-        }
+            401,
+            "Requires discord login / level 2",
+        )
 
 module.exports = router

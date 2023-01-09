@@ -4,7 +4,7 @@ const { default: axios } = require('axios');
 
 router.get('/', async (req, res) => {
     if (req.session.authenticated) {
-        return res.render('error.pug', { req, code: 400, title: "Already Authorizied", error: "Already authenticated with discord!" });
+        return renderError(req, res, 400, "Already authenticated with discord");
     }
     if (req.query.code) {
         // discord is giving us the code.
@@ -39,14 +39,14 @@ router.get('/', async (req, res) => {
             await req.discord.refreshUser();
             return res.redirect('/admin');
         } catch (error) {
-        if(DEBUG) console.log(error);
+            if(DEBUG) console.log(error);
             let msg =
                 error.response ?
                     (error.response.data && error.response.data.error_description)
                         ? error.response.data.error_description
                         : error.response.data?.error || "Unknown Error"
                     : "Unknown Error";
-            return res.render('error.pug', { req, error: msg });
+            return renderError(req, res, 400, msg);
         }
     } else {
         // we don't have any valid authorization

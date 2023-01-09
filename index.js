@@ -96,15 +96,7 @@ for(const routePath of routes) {
 log("TOTAL", "", colors.bgGreen, totalTime)
 
 app.all('*', (req, res) => {
-    res
-    .status(StatusCodes.NOT_FOUND)
-    .render('error.pug', {
-        req,
-        res,
-        code: StatusCodes.NOT_FOUND,
-        title: ReasonPhrases.NOT_FOUND,
-        error: "No idea how you got here.",
-    })
+    renderError(req, res, StatusCodes.NOT_FOUND, "No idea how you got here")
 })
 
 app.listen(80)
