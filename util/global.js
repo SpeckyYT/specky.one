@@ -1,4 +1,4 @@
-const { getReasonPhrase, StatusCodes } = require('http-status-codes');
+const { getReasonPhrase } = require('http-status-codes');
 
 global.wait = ms => new Promise(res => setTimeout(res, ms));
 

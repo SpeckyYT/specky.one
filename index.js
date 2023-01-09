@@ -17,7 +17,7 @@ const express = require('express');
 const filehound = require('filehound');
 const colors = require('colors/safe');
 const session = require('express-session');
-const { ReasonPhrases, StatusCodes, getReasonPhrase, getStatusCode } = require('http-status-codes');
+const { StatusCodes } = require('http-status-codes');
 
 const discordAuth = require('./middleware/discordAuth').default;
 const log = require('./util/log');
