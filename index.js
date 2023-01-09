@@ -32,13 +32,6 @@ global.sessionMiddleware = session({
     store: sessionMemoryStore,
 })
 
-const match = {
-    '/': 'index.pug',
-    '/summertime': 'memes/summertime.pug',
-    '/sort': 'other/visort.pug',
-    '/sugo': 'games/sugo.pug',
-}
-
 const app = express();
 
 app.set('view engine','pug');
@@ -57,15 +50,6 @@ app.use((req, res, next) => {
 // We need this here so it's applied to all routes, even the discord middleware.
 app.use(sessionMiddleware);
 app.use(discordAuth);
-
-for(const [key,file] of Object.entries(match)){
-    app.get(key, (req, res) => {
-        res.render(file, {
-            req,
-            res,
-        })
-    })
-}
 
 const routes = filehound.create()
     .path("./routes")
