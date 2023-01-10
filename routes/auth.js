@@ -58,15 +58,6 @@ router.get('/', async (req, res) => {
     return res.redirect("/") // just for safety
 })
 
-router.get('/logout', async (req, res) => {
-    if (req.session.authenticated && req.session.discord) {
-        await req.discord.logout();
-        return res.redirect('/');
-    } else {
-        return res.redirect('/');
-    }
-})
-
 module.exports = {
     route: "/auth",
     router: router,
