@@ -2,9 +2,19 @@ include includes/embed.pug
 include includes/style.pug
 
 if req.discord.powerLevel() == 0
+    h1 Login to specky.one via discord
+    
+    h2 Why?
+
+    p.
+        By logging in to specky.one you can access some hidden pages
+        and you can even have extra features and infos on public websites!
+
     a(href = process.env.REDIRECT_URI).
-        How about you login with some discords
+        Login with discord by clicking here!
+
 else
     h1 You're already logged in with power level #{req.discord.powerLevel()}
+
     a(href = "/").
         Click here to go to the main page
