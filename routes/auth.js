@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
 
             req.session.authenticated = true;
             await req.discord.refreshUser();
-            return res.redirect('/admin');
+            return res.redirect('/');
         } catch (error) {
             if(DEBUG) console.log(error);
             let msg =
