@@ -26,7 +26,7 @@ require('./util/global');
 global.sessionMemoryStore = new session.MemoryStore();
 global.sessionMiddleware = session({
     secret: Array(32).fill("").map(() => `${(Math.floor(36 * Math.random())).toString(36)}`).join(""),
-    cookie: { maxAge: 15 * 60 * 1000 },
+    cookie: { maxAge: 60 * 60 * 1000 },
     saveUninitialized: false,
     resave: true,
     store: sessionMemoryStore,

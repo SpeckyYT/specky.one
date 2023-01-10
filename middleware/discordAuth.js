@@ -3,6 +3,9 @@ const { default: axios, AxiosError } = require('axios');
 // In seconds
 const REFRESH_INTERVAL = 60 * 3;
 
+// in milliseconds
+const LOGIN_DURATION = 60 * 60 * 1000;
+
 const isDisabled = !REDIRECT_URI || !CLIENT_ID || !CLIENT_SECRET;
 
 if(isDisabled) {
@@ -110,7 +113,7 @@ module.exports.default  = async function (req, res, next) {
         if (isDisabled) return;
         if (!req.session.authenticated || !req.session.discord) return;
         if (req.session.discord && req.session.discord.tokenData) {
-            if (req.session.discord.tokenData.expiresAt >= (Date.now() - (60 * 60 * 1000))) {
+            if (req.session.discord.tokenData.expiresAt >= (Date.now() - LOGIN_DURATION)) {
                 // discord is giving us the code.
                 const GRANT_PATH_URI = 'https://discord.com/api/v10/oauth2/token';
                 const params = new URLSearchParams();
