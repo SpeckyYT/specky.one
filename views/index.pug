@@ -63,6 +63,32 @@ doctype html
             ],
         },
         {
+            name: "Currently in development",
+            description: "Here you can find pages that aren't finished yet",
+            level: 1,
+            contents: [
+                {
+                    name: "Movie",
+                    description: "Specky's hub where he and his brother suggest movies",
+                    image: "https://as1.ftcdn.net/v2/jpg/02/43/62/78/1000_F_243627831_mZP0TwkljMspNOW8zxMsSvWJhLi749ig.jpg",
+                    url: "/movie",
+                },
+            ],
+        },
+        {
+            name: "Admin pages",
+            description: "These are the EPIC pages that only Specky can check out",
+            level: 2,
+            contents: [
+                {
+                    name: "Admin Panel",
+                    description: "A shit website that currently does nothing",
+                    image: "https://cdn-icons-png.flaticon.com/512/6489/6489458.png",
+                    url: "/admin",
+                }
+            ],
+        },
+        {
             name: "Affiliated projects",
             description: "Projects that people close to me made",
             contents: [
@@ -105,6 +131,26 @@ doctype html
             ],
         },
     ]
+    .map(cat => {
+        const category = cat;
+
+        if(typeof category.level == "number") {
+            const powerLevel = req.discord.powerLevel();
+            if(powerLevel < category.level) return null;
+        }
+        if(!Array.isArray(category.contents)) return null;
+
+        category.contents = category.contents.filter(cont => {
+            if(typeof cont.level == "number") {
+                const powerLevel = req.discord.powerLevel();
+                if(powerLevel < cont.level) return false;
+            }
+            return true;
+        })
+
+        return category
+    })
+    .filter(cat => cat);
 
 include includes/embed.pug 
 include includes/style.pug
