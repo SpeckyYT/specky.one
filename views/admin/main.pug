@@ -22,4 +22,7 @@ if powerLevel >= 2
         ];
     
     for command in commands
-        a()= command
+        - const base64command = Buffer.from(command, "utf-8").toString("base64").replace(/\//g, "_");
+        a(href=`/api/lvl2/cmd/${base64command}`)= command
+        br
+        // idea: make a pseudo-cli or something, idk
