@@ -10,6 +10,7 @@ global.ADMINS = process.env.ADMINS || '';
 global.TMDB_KEY = process.env.TMDB_KEY || '';
 
 global.LANGUAGES = ['.js', '.coffee']
+global.uptime = Date.now();
 
 require('coffeescript').register();
 const path = require('path');
@@ -32,7 +33,7 @@ global.sessionMiddleware = session({
     store: sessionMemoryStore,
 })
 
-const app = express();
+global.app = express();
 
 app.set('view engine','pug');
 app.use(express.static('public', {
@@ -84,3 +85,5 @@ app.all('*', (req, res) => {
 })
 
 app.listen(80)
+
+app.uptime = Date.now()

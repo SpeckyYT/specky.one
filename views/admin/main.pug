@@ -8,6 +8,11 @@ if powerLevel == 0
 
 if powerLevel >= 1
     p CPU count: #{osu.cpu.count()}
+    p RAM used by specky.one: #{prettyBytes(Object.values(process.memoryUsage()).reduce((a,b) => a + b))}
+    p Total RAM used: #{prettyBytes(os.totalmem() - os.freemem())}
+    p Total RAM: #{prettyBytes(os.totalmem())}
+    p Process uptime: #{prettyMs(Date.now() - uptime)}
+    p Website uptime: #{prettyMs(Date.now() - app.uptime)}
 
 if powerLevel >= 2
     br
