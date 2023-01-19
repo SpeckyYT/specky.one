@@ -13,11 +13,10 @@ router.get("/song.mp3", async (req, res) => {
     if(cache) {
         return res.send(cache);
     } else {
-        return axios(songLink)
+        return axios(songLink, { responseType: "arraybuffer" })
         .then(v => {
-            cache = Buffer.from(v.data);
-
-            return res.send(cache)
+            cache = Buffer.from(v.data).toString('base64');
+            return res.send(cache);
         })
         .catch(() => {
             return renderError(req, res, 500, "Unable to load song");
