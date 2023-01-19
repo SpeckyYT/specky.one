@@ -1,0 +1,52 @@
+include ../includes/style.pug
+
+h1 Specky Radio
+
+p Click on the radio for some epic song
+
+div.center(style="max-width: 90vw; height: fit-content;")
+    img#start_music(
+        src="https://www.freepnglogos.com/uploads/radio-png/file-circle-icons-radio-svg-wikimedia-commons-0.png"
+        style="max-width: 100%;"
+    )
+
+script.
+    const SONG_URL = "./song.mp3";
+
+    const button = document.getElementById("start_music");
+    let isPlaying = false;
+
+    button.addEventListener("click", async () => {
+        if(isPlaying) return;
+
+        //- try {
+            const reader = await fetch(SONG_URL).then(res => res.body.getReader());
+            const data = [];
+
+            while(true) {
+                const { value, done } = await reader.read();
+                if(value) data.push(value);
+                if(done) break;
+            }
+
+            const songBuffer = new Uint8Array(data.reduce((sum, val) => sum + val.length, 0));
+
+            let index = 0;
+            for(const chunk of data) {
+                songBuffer.set(chunk, index);
+                index += chunk.length;
+            }
+
+            window.audio = new Audio();
+            audio.src = `data:audio/mp3;base64,${btoa(data)}`;
+            audio.loop = true;
+            audio.controls = false;
+            
+            document.body.appendChild(window.audio);
+            await window.audio.play().catch(console.error);
+
+            isPlaying = true;
+        //- } catch(err) {
+        //-     console.error(err)
+        //- }
+    });
