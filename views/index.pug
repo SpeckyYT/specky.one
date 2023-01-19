@@ -148,6 +148,8 @@ doctype html
             return true;
         })
 
+        if(!category.contents.length) return null;
+
         return category
     })
     .filter(cat => cat);

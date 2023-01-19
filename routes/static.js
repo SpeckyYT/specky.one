@@ -4,9 +4,9 @@ const router = Router();
 // add here pages that don't require any special routes
 const match = {
     '/': 'index.pug',
-    '/summertime': 'memes/summertime.pug',
     '/sort': 'other/visort.pug',
     '/sugo': 'games/sugo.pug',
+    '/summertime': 'memes/summertime.pug',
 }
 
 for(const [key,file] of Object.entries(match)){
