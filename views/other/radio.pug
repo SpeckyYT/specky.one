@@ -15,9 +15,12 @@ script.
 
     const button = document.getElementById("start_music");
     let isPlaying = false;
+    let isError = false;
 
     button.addEventListener("click", async () => {
-        if(isPlaying) return;
+        if(isPlaying || isError) return;
+
+        isPlaying = true; // doing this will stop multiple playing requests
 
         try {
             const reader = await fetch(SONG_URL).then(res => res.body.getReader());
@@ -48,8 +51,27 @@ script.
             document.body.appendChild(window.audio);
             await window.audio.play().catch(console.error);
 
+            (async () => {
+                const LOOP_BACK = 22.000; // it should actually be 21.999
+                const LOOP_START = 22.800;
+
+                while(isPlaying) {
+                    await new Promise(res => setTimeout(res, 10))
+
+                    if(audio.currentTime >= LOOP_START) {
+                        audio.currentTime -= LOOP_BACK;
+                    }
+                }
+            })();
+
             isPlaying = true;
         } catch(err) {
-            console.error(err)
+            isError = true;
+            isPlaying = false;
+
+            const errorElement = document.createElement('h1');
+            errorElement.innerHTML = `ERROR: ${err}`;
+            errorElement.style = `color: red`;
+            document.body.appendChild(errorElement);
         }
     });
