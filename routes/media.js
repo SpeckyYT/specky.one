@@ -1,0 +1,124 @@
+const { Router } = require('express');
+const router = Router();
+const bodyParser = require('body-parser');
+
+const fs = require('fs/promises');
+const fss = require('fs');
+const path = require('path');
+
+const maxSize = 2**25; // 33MB seem good
+const maxFiles = 30;
+
+const mediaFolder = path.join(process.cwd(), "public", "media");
+const jsonBodyParser = bodyParser.json({ limit: '100gb'});
+
+const getUserFolder = id => path.join(mediaFolder, id || "unknown");
+const getFilesOfUser = async id => {
+    const userFolder = getUserFolder(id);
+    return fs.readdir(userFolder);
+}
+
+if(!fss.existsSync(mediaFolder))
+    fss.mkdirSync(mediaFolder);
+
+router.get("/", (req, res) => {
+    res.render("other/media.pug", { req, res })
+})
+
+router.get("/:id/:file", (req, res) => {
+    const id = req.params.id;
+    const file = req.params.file;
+
+    const filePath = path.join(mediaFolder, id, file);
+
+    if(fss.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.status(404)
+    }
+})
+
+router.use("*", async (req, res, next) => {
+    if(req.discord.powerLevel() > 0) {
+        const userFolder = getUserFolder(req.session?.discord?.user?.id);
+
+        if(!fss.existsSync(userFolder))
+            await fs.mkdir(userFolder);
+
+        return next();
+    } else {
+        return res.send(401)
+    }
+})
+
+router.get("/files", async (req, res) => {
+    const content = await getFilesOfUser(req.session?.discord?.user?.id);
+    return res.json(content.map(f => `${req.session?.discord?.user?.id ?? "unknown"}/${path.parse(f).base}`));
+})
+
+// body: { filename, size, content }
+router.post("/files", jsonBodyParser, async (req, res) => {
+    try {
+        const userFolder = getUserFolder(req.session?.discord?.user?.id);
+
+        const { filename, size, content } = req.body;
+
+        if(!isValidFilename(filename)) {
+            return res.status(400).send(`Invalid filename`);
+        }
+
+        if(!req.discord.isAdmin()) {
+            if(size > maxSize) {
+                return res.status(413).send("File too large");
+            }
+
+            const currentFiles = await getFilesOfUser(req.session?.discord?.user?.id);
+            if(currentFiles >= maxFiles) {
+                return res.status(402).send(`Exceeded ${maxFiles} files.`)
+            }
+        }
+
+        await fs.writeFile(path.join(userFolder, filename), Buffer.from(content))
+
+        res.send("File saved")
+    } catch (err) {
+        res.status(500).send(`${err}`);
+    }
+})
+
+router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
+    const id = req.params.id;
+    const file = req.params.file;
+
+    console.log(id)
+    console.log(req.session?.discord?.user?.id || "unknown")
+
+    if(id != (req.session?.discord?.user?.id || "unknown")) return res.status(403).send()
+
+    const userFolder = getUserFolder(req.session?.discord?.user?.id);
+
+    const filePath = path.join(userFolder, file);
+
+    if(!fss.existsSync(filePath))
+        return res.status(404).send()
+
+    try {
+        await fs.rm(filePath)
+        res.send("File deleted")
+    } catch (err) {
+        res.status(500).send()
+    }
+})
+
+// https://stackoverflow.com/a/11101624
+function isValidFilename(filename) {
+    const rg1 = /^[^\\/:\*\?"<>\|]+$/; // forbidden characters \ / : * ? " < > |
+    const rg2 = /^\./; // cannot start with dot (.)
+    const rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(\.|$)/i; // forbidden file names
+    return rg1.test(filename) && !rg2.test(filename) && !rg3.test(filename);
+}
+
+module.exports = {
+    route: "/media",
+    router: router,
+}

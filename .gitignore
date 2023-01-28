@@ -1,5 +1,6 @@
 public/anmt
 public/gallery
+public/media
 
 node_modules/
 .env

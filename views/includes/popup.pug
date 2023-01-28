@@ -1,0 +1,63 @@
+body
+    #popup-container
+
+style.
+    #popup-container {
+        position: fixed;
+        display: flex;
+        flex-direction: column;
+        bottom: 0;
+        right: 0;
+        z-index: 1000;
+        animation-fill-mode: forwards;
+        overflow: hidden;
+    }
+
+    .popup-message {
+        background-color: #ff0000;
+        color: #fff;
+        padding: 10px;
+        margin: 10px;
+        width: 250px;
+        position: relative;
+        animation: popup-animation 5s;
+        top: 100%;
+        transition: top 0.5s ease-in;
+    }
+
+    @keyframes popup-animation {
+        0% {
+            top: 400px;
+        }
+        5% {
+            top: 0px;
+        }
+        95% {
+            right: 0%;
+        }
+        100% {
+            right: -300px;
+        }
+    }
+
+    @keyframes move-right {
+        from {
+            right: 0;
+        }
+        to {
+            right: -300px;
+        }
+    }
+
+script.
+    function popup(message) {
+        var container = document.getElementById("popup-container");
+        var popupMessage = document.createElement("div");
+        popupMessage.classList.add("popup-message");
+        popupMessage.innerHTML = message;
+        container.appendChild(popupMessage);
+
+        popupMessage.addEventListener("animationend", function() {
+            popupMessage.remove();
+        });
+    }

@@ -1,0 +1,277 @@
+include ../includes/style.pug
+include ../includes/popup.pug
+
+h1 Specky Media Hoster
+
+if req.discord.powerLevel() == 0
+    h2 You aren't logged in
+    p #[a(href="/") Go back] and login with Discord to use this service
+
+else
+    h2 Your files
+
+    div#file-grid
+    template#file-template
+        div#file-item
+            img#file-preview(src="" alt="File Preview")
+            div#file-overlay
+                p#file-name
+
+    div#context-menu.hidden
+        div#open.menu-item Open in browser
+        div#copy.menu-item Copy link
+        div#delete.menu-item.red-text Delete
+
+    h2 Upload
+
+    form#file-form(onsubmit="submitForm(event);")
+        input#file-input(type="file")
+        br
+        input#send(type="submit")
+
+style.
+    #file-grid {
+        background-color: #222;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        /* grid-auto-rows: 1fr; */
+        grid-gap: 20px;
+        padding: 20px;
+    }
+    #file-item {
+        background-color: #444;
+        position: relative;
+        overflow: hidden;
+        aspect-ratio : 1 / 1;
+        max-width: 300px;
+    }
+    #file-preview {
+        position: relative;
+        left: 0px;
+        top: 0px;
+        object-fit: cover;
+    }
+    #file-overlay {
+        height: fit-content;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgb(0, 0, 0);
+        opacity: 0.7;
+        padding: 5px;
+        font-size: 100%;
+        text-align: center;
+        transition: opacity 0.2s ease-out;
+    }
+    #file-item:hover #file-overlay {
+        opacity: 1;
+    }
+    #file-name {
+        margin: 2px;
+        word-wrap: break-word;
+        position: relative;
+        color: white;
+    }
+
+    /* right-click */
+    #context-menu {
+        position: absolute;
+        background-color: white;
+        padding: 10px;
+        border: 3px solid #333;
+        color: black;
+        z-index: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        transform: scale(1);
+        transition: transform 200ms ease-in-out;
+    }
+    #context-menu.hidden {
+        display: block;
+        transform: scale(0);
+    }
+    .menu-item {
+        padding: 5px;
+        cursor: pointer;
+        transition: 300ms;
+    }
+    .menu-item:hover {
+        background-color: #000;
+        color: #fff;
+    }
+    .red-text {
+        color: red;
+    }
+    .red-text:hover {
+        background-color: #F00;
+        color: #FFF;
+    }
+    .hidden {
+        display: none;
+    }
+
+script.
+    async function updateFiles() {
+        const files = await fetch('/media/files').then(res => res.json());
+
+        // Get the grid element and the file template
+        const grid = document.getElementById("file-grid");
+        const template = document.getElementById("file-template");
+
+        // Clear the current grid
+        grid.innerHTML = "";
+
+        // Iterate through the files array
+        for (const file of files) {
+            // Clone the template
+            let fileItem = template.content.cloneNode(true);
+            // Get the preview image and file name elements
+            let preview = fileItem.getElementById("file-preview");
+            let name = fileItem.getElementById("file-name");
+            // Set the preview image src and file name text
+            preview.src = `/media/${file}`; // TODO: update to preview
+            name.textContent = file;
+            // Append the file item to the grid
+            grid.appendChild(fileItem);
+        }
+
+        updateContextMenu()
+    }
+
+    updateFiles();
+
+    async function submitForm(event) {
+        event.preventDefault()
+
+        const fileInput = document.getElementById('file-input');
+
+        const file = fileInput.files[0];
+        const fileName = file.name;
+
+        await fetch('/media/files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({
+                filename: file.name,
+                size: file.size,
+                content: await (async () => {
+                    const reader = new FileReader()
+                    reader.readAsArrayBuffer(file)
+
+                    return new Promise(res => {
+                        reader.onload = async function(e) {
+                            const bytes = Array.from(new Uint8Array(e.target.result))
+                            res(bytes);
+                        }
+                    })
+                })()
+            }),
+        })
+        .then(response => {
+            if(response.ok) {
+                popup(`File "${file.name}" saved successfully!`)
+            } else {
+                if(response.status == 401)
+                    popup(`Unauthorized, login via Discord to use this service`)
+                else
+                    popup(`Unknown error: ${response.status}`)
+            }
+        })
+        .catch(error => {
+            popup(`${error}`)
+        });
+
+        await updateFiles()
+    }
+
+    // right-click
+    let currentTarget = undefined;
+    const contextMenu = document.querySelector("#context-menu");
+
+    contextMenu.addEventListener("contextmenu", (e) => {
+        e.preventDefault()
+    })
+
+    function updateContextMenu() {
+        const fileItems = document.querySelectorAll("#file-grid #file-item");
+
+        for (var i = 0; i < fileItems.length; i++) {
+            fileItems[i].addEventListener("contextmenu", async function(e) {
+                e.preventDefault();
+
+                contextMenu.classList.add("hidden");
+                await new Promise(res => setTimeout(res, 1));
+                contextMenu.classList.remove("hidden");
+                contextMenu.display = "block";
+                contextMenu.style.left = e.clientX + "px";
+                contextMenu.style.top = e.clientY + "px";
+
+                currentTarget = e.target.closest("#file-item");
+
+                // Check if context menu goes out of screen
+                let menuWidth = contextMenu.offsetWidth;
+                let menuHeight = contextMenu.offsetHeight;
+                let screenWidth = document.body.clientWidth;
+                let screenHeight = document.body.clientHeight;
+
+                if (e.clientX + menuWidth > screenWidth) {
+                    contextMenu.style.left = (screenWidth - menuWidth) + "px";
+                }
+                if (e.clientY + menuHeight > screenHeight) {
+                    contextMenu.style.top = (screenHeight - menuHeight) + "px";
+                }
+            });
+        }
+    }
+
+    document.addEventListener("click", function() {
+        contextMenu.classList.add("hidden");
+    });
+
+    document.querySelector("#open").addEventListener("click", function(event) {
+        if(!currentTarget) return;
+
+        window.open(currentTarget.querySelector('img').src, "_blank");
+
+        popup("Opened in new window!")
+    });
+
+    document.querySelector("#copy").addEventListener("click", function(event) {
+        if(!currentTarget) return;
+
+        return navigator.clipboard.writeText(currentTarget.querySelector('img').src)
+        .then(() => {
+            popup("Copied to clipboard!");
+        })
+        .catch(() => {
+            popup("Failed to load to clipboard.");
+        })
+    });
+
+    document.querySelector("#delete").addEventListener("click", function(event) {
+        if(!currentTarget) return;
+
+        const img = currentTarget.querySelector('img');
+        const url = new URL(img.src);
+        const pathname = url.pathname;
+
+        const actualPath = pathname.split(/\/|\\/g).slice(-2).join("/");
+
+        return fetch(`/media/${actualPath}`, { method: "DELETE", })
+        .then(async response => {
+            if(response.ok) {
+                popup(`"${actualPath}" deleted successfully!`);
+                await updateFiles();
+            } else {
+                popup(`Unknown error: ${response.status}`)
+            }
+        })
+        .catch(async err => {
+            popup(`${err}`);
+            await updateFiles();
+        })
+    });
