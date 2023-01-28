@@ -115,7 +115,8 @@ function isValidFilename(filename) {
     const rg1 = /^[^\\/:\*\?"<>\|]+$/; // forbidden characters \ / : * ? " < > |
     const rg2 = /^\./; // cannot start with dot (.)
     const rg3 = /^(nul|prn|con|lpt[0-9]|com[0-9])(\.|$)/i; // forbidden file names
-    return rg1.test(filename) && !rg2.test(filename) && !rg3.test(filename);
+    const rg4 = /^[a-zA-Z0-9-_.]+$/g;
+    return rg1.test(filename) && !rg2.test(filename) && !rg3.test(filename) && rg4.test(filename);
 }
 
 module.exports = {

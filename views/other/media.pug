@@ -147,16 +147,15 @@ script.
         const fileInput = document.getElementById('file-input');
 
         const file = fileInput.files[0];
-        const fileName = file.name;
+        const fileName = file.name.replace(/ /g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
 
         await fetch('/media/files', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-                // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({
-                filename: file.name,
+                filename: fileName,
                 size: file.size,
                 content: await (async () => {
                     const reader = new FileReader()
@@ -173,7 +172,7 @@ script.
         })
         .then(response => {
             if(response.ok) {
-                popup(`File "${file.name}" saved successfully!`)
+                popup(`File "${fileName}" saved successfully!`)
             } else {
                 if(response.status == 401)
                     popup(`Unauthorized, login via Discord to use this service`)
