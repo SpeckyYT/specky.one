@@ -147,7 +147,7 @@ script.
         const fileInput = document.getElementById('file-input');
 
         const file = fileInput.files[0];
-        const fileName = file.name.replace(/ /g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
+        const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
 
         await fetch('/media/files', {
             method: 'POST',
