@@ -225,6 +225,15 @@ script.
         "speckyiscool".split(""),
     )
 
+    let cheatsEnabled = false;
+    setupKonamiCode(
+        () => {
+            cheatsEnabled = !cheatsEnabled
+            popup(`Cheats ${cheatsEnabled ? "enabled" : "disabled"}`, "success");
+        },
+        false,
+    )
+
     function getHref(gridItem) {
         try {
             return gridItem.getElementsByTagName("a")[0].href

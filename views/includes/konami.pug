@@ -4,8 +4,7 @@ script.
         once = true,
         targetSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
     ) {
-        const numberCodes = targetSequence.filter(v => typeof v == "number").length > 0;
-        const sequence = Array(targetSequence.length).fill(0);
+        const sequence = Array(targetSequence.length).fill(null);
 
         const ignoreButtons = [
             "Escape",
@@ -24,22 +23,39 @@ script.
             "F7", "F8", "F9", "F10", "F11", "F12", 
         ].filter(c => !targetSequence.includes(c))
 
+        const properties = [
+            "code",
+            "charCode",
+            "key",
+            "keyCode",
+        ];
+
         let done = false;
 
         document.addEventListener('keydown', (e) => {
             if(done) return;
             if(ignoreButtons.includes(e.key)) return;
 
-            sequence.push(numberCodes ? e.keyCode : e.key)
-            
+            sequence.push(e)
             while (sequence.length > targetSequence.length) sequence.shift();
 
-            if(targetSequence.join(",") == sequence.join(",")) {
-                sequence.fill(0) // clears the sequence, so you need to retype it, just to make sure
+            if(isTargetSequence(sequence)) {
+                sequence.fill(null) // clears the sequence, so you need to retype it, just to make sure
 
                 if(once) done = true;
 
                 cb();
             }
         });
+
+        function isTargetSequence(sequence) {
+            for(const [ index, button ] of sequence.entries()) {
+                if(!button) return false;
+
+                if(properties.filter(v => button[v] == targetSequence[index]).length == 0) {
+                    return false
+                }
+            }
+            return true
+        }
     }
