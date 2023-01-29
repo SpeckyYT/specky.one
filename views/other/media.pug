@@ -214,7 +214,7 @@ script.
 
                     return new Promise(res => {
                         reader.onload = async function(e) {
-                            const bytes = Array.from(e.target.result)
+                            const bytes = Array.from(new Uint8Array(e.target.result))
                             res(bytes);
                         }
                     })
