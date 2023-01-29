@@ -16,6 +16,7 @@ style.
     .popup-message {
         background-color: #ff0000;
         color: #fff;
+        font-size: 1.5em;
         padding: 10px;
         margin: 10px;
         width: 250px;
@@ -23,6 +24,7 @@ style.
         animation: popup-animation 5s;
         top: 100%;
         transition: top 0.5s ease-in;
+        word-wrap: break-word;
     }
 
     @keyframes popup-animation {
@@ -50,11 +52,32 @@ style.
     }
 
 script.
-    function popup(message) {
+    function popup(message, background = "error", color) {
         var container = document.getElementById("popup-container");
         var popupMessage = document.createElement("div");
+        
         popupMessage.classList.add("popup-message");
         popupMessage.innerHTML = message;
+
+        const setColors = (background, color) => {
+            popupMessage.style["background-color"] = background;
+            popupMessage.style["color"] = color;
+        }
+
+        if(!background && !color)
+            setColors("blue", "black")
+        if(background && !color)
+            switch(background) {
+                case "info":
+                    setColors("blue", "white"); break;
+                case "success":
+                    setColors("green", "white"); break;
+                case "error":
+                default:
+                    setColors("red", "white"); break;
+            }
+        if(background && color) setColors(background, color);
+
         container.appendChild(popupMessage);
 
         popupMessage.addEventListener("animationend", function() {
