@@ -30,7 +30,7 @@ script.
             if(done) return;
             if(ignoreButtons.includes(e.key)) return;
 
-            sequence.push(numberCodes ? e.code : e.key)
+            sequence.push(numberCodes ? e.keyCode : e.key)
             
             while (sequence.length > targetSequence.length) sequence.shift();
 
