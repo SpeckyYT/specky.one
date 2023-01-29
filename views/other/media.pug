@@ -24,12 +24,43 @@ else
 
     h2 Upload
 
-    form#file-form(onsubmit="submitForm(event);")
-        input#file-input(type="file")
-        br
-        input#send(type="submit")
+    div#file-drop-area.center
+        div#file-drop-message.
+            Drag and drop a file here or #[a#file-input-label(style="") click to select a file]
+
+        input#file-input.hidden(type="file")
+    br
+    input#send(type="button" value="Save")
 
 style.
+    /* upload */
+    #file-drop-area {
+        width: 60vw;
+        height: 10vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #333;
+        border: 2px dashed #999;
+    }
+    #file-input-label {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    #file-drop-area.dragging {
+        background-color: #999;
+        animation: drop-area-pulse 0.5s linear infinite alternate;
+    }
+    @keyframes drop-area-pulse {
+        from {
+            box-shadow: 0 0 10px #fff;
+        }
+        to {
+            box-shadow: 0 0 20px #fff;
+        }
+    }
+
+    /* file grid */
     #file-grid {
         background-color: #222;
         display: grid;
@@ -112,6 +143,94 @@ style.
     }
 
 script.
+    // upload
+    const fileDropArea = document.querySelector('#file-drop-area');
+    const saveButton = document.querySelector('#send');
+    const fileInput = document.querySelector('#file-input');
+
+    fileDropArea.addEventListener("click", function(event) {
+        fileInput.click();
+    })
+
+    fileInput.addEventListener("change", function(event) {
+        popup(`File "${fileInput.files[0].name}" selected`, "info");
+    });
+
+    fileDropArea.addEventListener("dragover", function(event) {
+        event.preventDefault();
+        fileDropArea.classList.add("dragging");
+    });
+    fileDropArea.addEventListener("dragleave", function(event) {
+        event.preventDefault();
+        fileDropArea.classList.remove("dragging");
+    });
+    fileDropArea.addEventListener("drop", function(event) {
+        event.preventDefault();
+        fileDropArea.classList.remove("dragging");
+        fileInput.files = event.dataTransfer.files;
+        const changeEvent = new Event('change', { bubbles: true });
+        fileInput.dispatchEvent(changeEvent);
+    });
+
+    /* save */
+    saveButton.addEventListener("click", async (event) => {
+        event.preventDefault()
+
+        const file = fileInput.files[0];
+
+        if(!file) {
+            return popup("File not found")
+        }
+        if(file.size > 2**29) {
+            return popup("What the fuck are you doing? 🤨")
+        }
+
+        const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
+
+        popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
+
+        await fetch('/media/files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                filename: fileName,
+                size: file.size,
+                content: await (async () => {
+                    const reader = new FileReader()
+                    reader.readAsArrayBuffer(file)
+
+                    return new Promise(res => {
+                        reader.onload = async function(e) {
+                            const bytes = Array.from(e.target.result)
+                            res(bytes);
+                        }
+                    })
+                })()
+            }),
+        })
+        .then(response => {
+            if(response.ok) {
+                popup(`File "${getBasename(fileName)}" saved successfully!`, "success")
+            } else {
+                if(response.status == 401)
+                    popup(`Unauthorized, login via Discord to use this service`)
+                else
+                    popup(`Unknown error: ${response.status}`)
+            }
+        })
+        .catch(error => {
+            popup(`${error}`)
+        });
+
+        await updateFiles()
+    });
+
+    function getBasename(path) {
+        return path.split("/").slice(-1).join("/")
+    }
+
     async function updateFiles() {
         const files = await fetch('/media/files').then(res => res.json());
 
@@ -131,7 +250,7 @@ script.
             let name = fileItem.getElementById("file-name");
             // Set the preview image src and file name text
             preview.src = `/media/${file}`; // TODO: update to preview
-            name.textContent = file;
+            name.textContent = file.split("/").slice(-1);
             // Append the file item to the grid
             grid.appendChild(fileItem);
         }
@@ -140,52 +259,6 @@ script.
     }
 
     updateFiles();
-
-    async function submitForm(event) {
-        event.preventDefault()
-
-        const fileInput = document.getElementById('file-input');
-
-        const file = fileInput.files[0];
-        const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
-
-        await fetch('/media/files', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                filename: fileName,
-                size: file.size,
-                content: await (async () => {
-                    const reader = new FileReader()
-                    reader.readAsArrayBuffer(file)
-
-                    return new Promise(res => {
-                        reader.onload = async function(e) {
-                            const bytes = Array.from(new Uint8Array(e.target.result))
-                            res(bytes);
-                        }
-                    })
-                })()
-            }),
-        })
-        .then(response => {
-            if(response.ok) {
-                popup(`File "${fileName}" saved successfully!`)
-            } else {
-                if(response.status == 401)
-                    popup(`Unauthorized, login via Discord to use this service`)
-                else
-                    popup(`Unknown error: ${response.status}`)
-            }
-        })
-        .catch(error => {
-            popup(`${error}`)
-        });
-
-        await updateFiles()
-    }
 
     // right-click
     let currentTarget = undefined;
@@ -206,8 +279,8 @@ script.
                 await new Promise(res => setTimeout(res, 1));
                 contextMenu.classList.remove("hidden");
                 contextMenu.display = "block";
-                contextMenu.style.left = e.clientX + "px";
-                contextMenu.style.top = e.clientY + "px";
+                contextMenu.style.left = e.clientX + window.pageXOffset + "px";
+                contextMenu.style.top = e.clientY + window.pageYOffset + "px";
 
                 currentTarget = e.target.closest("#file-item");
 
@@ -218,10 +291,10 @@ script.
                 let screenHeight = document.body.clientHeight;
 
                 if (e.clientX + menuWidth > screenWidth) {
-                    contextMenu.style.left = (screenWidth - menuWidth) + "px";
+                    contextMenu.style.left = (screenWidth - menuWidth - 5) + "px";
                 }
                 if (e.clientY + menuHeight > screenHeight) {
-                    contextMenu.style.top = (screenHeight - menuHeight) + "px";
+                    contextMenu.style.top = (screenHeight - menuHeight - 5) + "px";
                 }
             });
         }
@@ -236,7 +309,7 @@ script.
 
         window.open(currentTarget.querySelector('img').src, "_blank");
 
-        popup("Opened in new window!")
+        popup("Opened in new window!", "info")
     });
 
     document.querySelector("#copy").addEventListener("click", function(event) {
@@ -244,7 +317,7 @@ script.
 
         return navigator.clipboard.writeText(currentTarget.querySelector('img').src)
         .then(() => {
-            popup("Copied to clipboard!");
+            popup("Copied to clipboard!", "info");
         })
         .catch(() => {
             popup("Failed to load to clipboard.");
@@ -263,7 +336,7 @@ script.
         return fetch(`/media/${actualPath}`, { method: "DELETE", })
         .then(async response => {
             if(response.ok) {
-                popup(`"${actualPath}" deleted successfully!`);
+                popup(`File "${getBasename(actualPath)}" deleted successfully!`);
                 await updateFiles();
             } else {
                 popup(`Unknown error: ${response.status}`)

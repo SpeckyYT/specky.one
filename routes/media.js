@@ -34,7 +34,7 @@ router.get("/:id/:file", (req, res) => {
     if(fss.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
-        res.status(404)
+        res.sendStatus(404)
     }
 })
 
@@ -47,7 +47,7 @@ router.use("*", async (req, res, next) => {
 
         return next();
     } else {
-        return res.send(401)
+        return res.sendStatus(401)
     }
 })
 
@@ -90,23 +90,20 @@ router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
     const id = req.params.id;
     const file = req.params.file;
 
-    console.log(id)
-    console.log(req.session?.discord?.user?.id || "unknown")
-
-    if(id != (req.session?.discord?.user?.id || "unknown")) return res.status(403).send()
+    if(id != (req.session?.discord?.user?.id || "unknown")) return res.sendStatus(403)
 
     const userFolder = getUserFolder(req.session?.discord?.user?.id);
 
     const filePath = path.join(userFolder, file);
 
     if(!fss.existsSync(filePath))
-        return res.status(404).send()
+        return res.sendStatus(404)
 
     try {
         await fs.rm(filePath)
         res.send("File deleted")
     } catch (err) {
-        res.status(500).send()
+        res.sendStatus(500)
     }
 })
 
