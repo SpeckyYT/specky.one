@@ -8,6 +8,7 @@ html(lang="en")
     body
         h1 #{code || 400} - #{title || "ERROR"}
         p(style="color: red") #{error || "Error"}
-        img(src="https://http.cat/#{code || 400}" alt="#{code}")
-        a(href="./") How about you go back
+        a(href="/") How about you go back
+        br
+        img(src=`https://http.cat/${code || 400}` alt=`${code}`)
     include includes/footer.pug

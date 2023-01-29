@@ -1,0 +1,22 @@
+include ../includes/style.pug
+include ../includes/popup.pug
+
+h1 Error Pages!
+
+input#code(type="number" value="200" min="100" max="600")
+br
+input#info(type="text" placeholder="Extra error info")
+br
+input#error(type="button" value="Send error")
+
+script.
+    const code = document.querySelector("#code");
+    const info = document.querySelector("#info");
+    const error = document.querySelector("#error");
+
+    error.addEventListener("click", (e) => {
+        if(!code.value)
+            return popup("No error code provided");
+
+        window.open(`/test/error/${code.value}/${encodeURIComponent(info.value)}`, "_blank");
+    })

@@ -6,6 +6,16 @@ router.get "/popup", (req, res) ->
         req: req,
         res: res,
 
+router.get "/error", (req, res) ->
+    res.render "test/error.pug",
+        req: req,
+        res: res,
+
+router.get "/error/:code/", (req, res) ->
+    renderError(req, res, req.params.code);
+router.get "/error/:code/:info", (req, res) ->
+    renderError(req, res, req.params.code, req.params.info);
+
 module.exports =
     route: "/test"
     router: router

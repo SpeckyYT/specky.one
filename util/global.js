@@ -4,8 +4,8 @@ global.wait = ms => new Promise(res => setTimeout(res, ms));
 
 global.renderError = (req, res, code = 400, extraInfo = "", depth = 0) => {
     try {
-        res
-        .status(code)
+        return res
+        .status(code < 200 ? 200 : code)
         .render(
             'error.pug',
             {
