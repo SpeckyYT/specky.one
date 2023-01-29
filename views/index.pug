@@ -181,6 +181,8 @@ doctype html
 
 include includes/embed.pug 
 include includes/style.pug
+include includes/popup.pug
+include includes/konami.pug
 
 html(lang="en")
     +embed
@@ -217,6 +219,12 @@ html(lang="en")
 include includes/footer.pug
 
 script.
+    setupKonamiCode(
+        () => popup("Everyone knows that Specky is cool 😎"),
+        false,
+        "speckyiscool".split(""),
+    )
+
     function getHref(gridItem) {
         try {
             return gridItem.getElementsByTagName("a")[0].href

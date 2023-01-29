@@ -1,5 +1,6 @@
 include ../includes/style.pug
 include ../includes/popup.pug
+include ../includes/konami.pug
 
 h1 Specky Media Hosting
 
@@ -172,18 +173,28 @@ script.
         fileInput.dispatchEvent(changeEvent);
     });
 
+    // konami code
+    let bypassSizeLimit = false;
+
+    const output = setupKonamiCode(() => {
+        popup("You enabled bigger file uploads (if you are a normal user, this won't do anything)", "success");
+        bypassSizeLimit = true;
+    })
+
     /* save */
     saveButton.addEventListener("click", async (event) => {
         event.preventDefault()
 
         const file = fileInput.files[0];
 
-        if(!file) {
+        if(!file)
             return popup("File not found")
-        }
-        if(file.size > 2**29) {
+    
+        if(!bypassSizeLimit && file.size > 2**25)
+            return popup("File is too big");
+        
+        if(file.size >= 2**32)
             return popup("What the fuck are you doing? 🤨")
-        }
 
         const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
 
