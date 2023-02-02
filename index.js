@@ -32,6 +32,7 @@ global.sessionMiddleware = session({
     resave: true,
     store: sessionMemoryStore,
 })
+global.isTest = process.argv.includes("TEST");
 
 global.app = express();
 
@@ -84,6 +85,10 @@ app.all('*', (req, res) => {
     renderError(req, res, StatusCodes.NOT_FOUND, "No idea how you got here")
 })
 
-app.listen(80)
+app.uptime = Date.now();
 
-app.uptime = Date.now()
+if(!global.isTest) {
+    app.listen(80);
+} else {
+    process.exit(0);
+}

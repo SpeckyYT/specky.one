@@ -12,9 +12,9 @@ router.get "/error", (req, res) ->
         res: res,
 
 router.get "/error/:code/", (req, res) ->
-    renderError(req, res, req.params.code);
+    renderError(req, res, req.params.code, "", -1);
 router.get "/error/:code/:info", (req, res) ->
-    renderError(req, res, req.params.code, req.params.info);
+    renderError(req, res, req.params.code, req.params.info, -1);
 
 module.exports =
     route: "/test"
