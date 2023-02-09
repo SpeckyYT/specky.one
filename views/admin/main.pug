@@ -25,9 +25,95 @@ if powerLevel >= 2
             "npm i",
             "pm2 restart specky.one",
         ];
-    
-    for command in commands
-        - const base64command = Buffer.from(command, "utf-8").toString("base64").replace(/\//g, "_");
-        a(href=`/api/lvl2/cmd/${base64command}`)= command
+
+    br
+
+    div.console.center
+        div(style="display: flex;")
+            select#pre-made-commands(name="suss")
+                for command in commands
+                    option(value=command)= command
+            input#pre-made-button(type="button" value="Run" style="width: 5vw;")
         br
-        // idea: make a pseudo-cli or something, idk
+        textarea#input.prompt(placeholder="Input your command here")
+        br
+        div#output
+
+    style.
+        .console {
+            width: 95%;
+        }
+        
+        .console * {
+            width: 100%;
+            font-family: monospace;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 1em;
+            line-height: 1.5;
+            background: #234;
+            color: #fff;
+        }
+
+        #output {
+            background: #123;
+            text-align: left;
+        }
+
+    script.
+        const input = document.querySelector("#input");
+        const output = document.querySelector("#output");
+
+        const preMadeOption = document.querySelector("#pre-made-commands");
+        const preMadeButton = document.querySelector("#pre-made-button");
+
+        function escapeHTML(string) {
+            return string
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;")
+        }
+
+        function appendOutput(string) {
+            output.innerHTML += `${escapeHTML(string)}\n`.replace(/\r?\n/g, "<br>");
+        }
+
+        function runCommand(command) {
+            appendOutput(`$ ${command}`);
+
+            const base64command = btoa(command).replace(/\//g, "_");
+            
+            return fetch(`/api/lvl2/cmd/${base64command}`)
+            .then(res => res.json())
+            .then(res => {
+                appendOutput(res.stdout);
+                appendOutput(res.stderr);
+            })
+            .catch(err => {
+                appendOutput(`${err}`);
+                console.error(err);
+            });
+        }
+
+        preMadeButton.addEventListener("click", async (event) => {
+            runCommand(preMadeOption.value);
+        })
+
+        input.addEventListener("keydown", async (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+
+                const command = input.value.trim();
+                input.value = "";
+
+                runCommand(command);
+            }
+        })
