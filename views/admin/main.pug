@@ -30,7 +30,7 @@ if powerLevel >= 2
 
     div.console.center
         div(style="display: flex;")
-            select#pre-made-commands(name="suss")
+            select#pre-made-commands
                 for command in commands
                     option(value=command)= command
             input#pre-made-button(type="button" value="Run" style="width: 5vw;")
@@ -94,8 +94,9 @@ if powerLevel >= 2
             return fetch(`/api/lvl2/cmd/${base64command}`)
             .then(res => res.json())
             .then(res => {
-                appendOutput(res.stdout);
-                appendOutput(res.stderr);
+                if(res.stdout) appendOutput(res.stdout);
+                if(res.stderr) appendOutput(res.stderr);
+                if(!res.stdout && !res.stderr) appendOutput("");
             })
             .catch(err => {
                 appendOutput(`${err}`);
