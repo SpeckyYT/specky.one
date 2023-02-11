@@ -1,6 +1,6 @@
 include ../includes/style.pug
 
-h1(style="color: #63f2bd") Welcome to the admin panel, #{powerLevel > 0 ? discord.user.username : "random person"}!
+h1(style="color: #63f2bd") Welcome to the admin panel, #{powerLevel > 0 && discord.user.username || "random person"}!
 
 if powerLevel == 0
     h2 here's an image of a jerboa

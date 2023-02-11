@@ -16,10 +16,14 @@ if req.discord.powerLevel() == 0
 else
     h1 You're already logged in with power level #{req.discord.powerLevel()}
     
-    a(href = "/").
+    a(href = "/" style="font-size: 3vw;").
         Click here to go to the main page
+    
+    a.center.logout-button(href = "/logout") Click here to logout
 
-    br
-
-    a(href = "/logout" style = "position: absolute; text-align: center; bottom: 5vh; font-size: 2vw; background: red;").
-        Click here to logout
+style.
+    .logout-button {
+        font-size: 2vw;
+        height: fit-content;
+        background: red;
+    }

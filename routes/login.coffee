@@ -7,7 +7,7 @@ router.get "/login", (req, res) =>
         res: res
 
 router.get "/logout", (req, res) =>
-    await res.discord.logout()
+    await req.discord.logout()
     res.redirect "/"
 
 module.exports =
