@@ -8,6 +8,11 @@
 # prints some more stuff that may be useful
 DEBUG = true
 
+# gives anyone access to a really useful yet dangerous page
+# this page allows to obtain full admin access and other features
+# use this setting only if you're developing while nobody else can access the webpage 
+DEV_MODE = false
+
 ## DISCORD LOGIN RELATED
 
 # discord client ID

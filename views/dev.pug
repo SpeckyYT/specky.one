@@ -1,0 +1,62 @@
+include includes/style.pug
+
+h1 Development settings
+
+p power level #[input#pl(type="number" value=`${devModeSettings.powerLevel}` min=0 max=2)]
+
+if devModeSettings.isAdmin
+    p is admin #[input#ia(type="checkbox" checked)]
+else
+    p is admin #[input#ia(type="checkbox")]
+
+p labels (separated by comma) #[input#lb(type="text" value=devModeSettings.labels.join(","))]
+
+p user
+input#id(type="number" placeholder="ID" value=devModeSettings.user.id)
+input#un(type="text" placeholder="Username" value=devModeSettings.user.username)
+
+br
+input#send(type="button" value="Submit")
+br
+p#result(style="color: yellow;")
+
+script.
+    const powerLevel = document.querySelector('#pl');
+    const isAdmin = document.querySelector('#ia');
+    const labels = document.querySelector('#lb');
+    const id = document.querySelector('#id');
+    const username = document.querySelector('#un');
+
+    const sendButton = document.querySelector('#send');
+
+    const result = document.querySelector('#result');
+
+    sendButton.addEventListener("click", () => {
+        const outputJSON = JSON.stringify({
+            powerLevel: Number(powerLevel.value),
+            isAdmin: isAdmin.checked,
+            labels: labels.value.split(",").map(v => v.trim()).filter(v => v.length > 0),
+            user: {
+                id: id.value,
+                username: username.value,
+            },
+        })
+
+        fetch("/dev", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: outputJSON,
+        })
+        .then(v => {
+            if(v.ok) {
+                result.innerHTML = `Successfully saved! (random number: ${Math.random()})`;
+            } else {
+                result.innerHTML = `Error: ${v.code}`;
+            }
+        })
+        .catch(err => {
+            result.innerHTML = `Error: ${err}`;
+        })
+    })

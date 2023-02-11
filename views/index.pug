@@ -3,6 +3,19 @@ doctype html
 -
     const categories = [
         {
+            name: "Development Mode",
+            description: "Here are some settings for development (be sure to turn this off in production)",
+            contents: [
+                {
+                    name: "Settings",
+                    description: "Dev settings",
+                    image: "https://macworld.com/wp-content/uploads/2023/01/ventura-settings-1.jpg?quality=50&strip=all",
+                    url: "/dev"
+                }
+            ],
+            filter: () => global.DEV_MODE,
+        },
+        {
             name: "Projects and websites",
             description: "Here are some cool projects and websites made by Specky",
             contents: [
@@ -164,6 +177,10 @@ doctype html
     ]
     .map(cat => {
         const category = cat;
+
+        if(typeof category.filter == "function") {
+            if(!category.filter()) return null;
+        }
 
         if(typeof category.level == "number") {
             const powerLevel = req.discord.powerLevel();

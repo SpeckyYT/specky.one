@@ -2,6 +2,7 @@ require('dotenv').config();
 
 // TODO: moves this to an env manager module
 global.DEBUG = process.env.DEBUG == "true";
+global.DEV_MODE = process.env.DEV_MODE == "true";
 global.REDIRECT_URI = process.env.REDIRECT_URI || false;
 global.REDIRECT_URI_CALLBACK = process.env.REDIRECT_URI_CALLBACK || false;
 global.CLIENT_ID = process.env.CLIENT_ID || false;
@@ -23,6 +24,8 @@ const session = require('express-session');
 const { StatusCodes } = require('http-status-codes');
 
 const discordAuth = require('./middleware/discordAuth').default;
+const devMode = require('./middleware/devMode');
+
 const log = require('./util/log');
 require('./util/global');
 
@@ -54,6 +57,7 @@ app.use((req, res, next) => {
 // We need this here so it's applied to all routes, even the discord middleware.
 app.use(sessionMiddleware);
 app.use(discordAuth);
+app.use(devMode);
 
 const routes = filehound.create()
     .path("./routes")
@@ -82,6 +86,10 @@ for(const routePath of routes) {
 }
 
 log("TOTAL", "", colors.bgGreen, totalTime)
+
+if(DEV_MODE) {
+    console.log(colors.bgRed(colors.black("\nDEV MODE IS ENABLED\nIF THIS IS RUNNING IN PRODUCTION, THEN DISABLE IT NOW\n")));
+}
 
 app.all('*', (req, res) => {
     renderError(req, res, StatusCodes.NOT_FOUND, "No idea how you got here")
