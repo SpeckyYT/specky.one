@@ -18,8 +18,16 @@ const getFilesOfUser = async id => {
     return fs.readdir(userFolder);
 }
 
+// create media folder
 if(!fss.existsSync(mediaFolder))
     fss.mkdirSync(mediaFolder);
+
+// clean empty user folders
+for(const userFolder of fss.readdirSync(mediaFolder).map(f => path.join(mediaFolder, f))) {
+    if(fss.readdirSync(userFolder).length == 0) {
+        fss.rmdirSync(userFolder);
+    }
+}
 
 router.get("/", (req, res) => {
     res.render("other/media.pug", { req, res })
@@ -40,11 +48,6 @@ router.get("/:id/:file", (req, res) => {
 
 router.use("*", async (req, res, next) => {
     if(req.discord.powerLevel() > 0) {
-        const userFolder = getUserFolder(req.session?.discord?.user?.id);
-
-        if(!fss.existsSync(userFolder))
-            await fs.mkdir(userFolder);
-
         return next();
     } else {
         return res.sendStatus(401)
@@ -78,6 +81,11 @@ router.post("/files", jsonBodyParser, async (req, res) => {
             }
         }
 
+        // create user folder
+        if(!fss.existsSync(userFolder)) {
+            await fs.mkdir(userFolder);
+        }
+
         await fs.writeFile(path.join(userFolder, filename), Buffer.from(content))
 
         res.send("File saved")
@@ -104,6 +112,11 @@ router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
         res.send("File deleted")
     } catch (err) {
         res.sendStatus(500)
+    }
+
+    // delete user folder if empty
+    if((await fs.readdir(userFolder)).length == 0) {
+        await fs.rmdir(userFolder);
     }
 })
 
