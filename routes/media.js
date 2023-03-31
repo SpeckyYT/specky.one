@@ -15,7 +15,7 @@ const jsonBodyParser = bodyParser.json({ limit: '100gb'});
 const getUserFolder = id => path.join(mediaFolder, id || "unknown");
 const getFilesOfUser = async id => {
     const userFolder = getUserFolder(id);
-    return fs.readdir(userFolder);
+    return fss.existsSync(userFolder) ? fs.readdir(userFolder) : [];
 }
 
 // create media folder
