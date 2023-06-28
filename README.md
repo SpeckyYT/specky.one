@@ -29,9 +29,4 @@ REDIRECT_URI_CALLBACK = "https://specky.one/auth"
 
 # admin's discord ids (split by spaces)
 ADMINS = "334361254435225602"
-
-## MOVIE CRITIC RELATED
-
-# TMDB API key
-TMDB_KEY = ""
 ```
