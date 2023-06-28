@@ -6,16 +6,17 @@ const PIXELS = 256; // pixels * pixels is the max
 const path = require('path');
 const fs = require('fs');
 const jimp = require('jimp');
-const { MIME_JPEG } = require('jimp');
+const { MIME_JPEG, MIME_PNG } = require('jimp');
 const filehound = require('filehound');
 const { default: axios } = require('axios');
 const colors = require('colors/safe');
+const { StatusCodes: { FORBIDDEN, } } = require("http-status-codes");
 
 const log = require('../util/log.js');
 
 const cache = new Map();
 
-const publicFolder = path.join(process.cwd(), "/public/");
+const publicFolder = path.normalize(path.join(process.cwd(), "/public/"));
 
 const bufferToBuffer = (buffer) => {
     if(buffer.bitmap) return buffer.bitmap.data.data; // png
@@ -23,26 +24,22 @@ const bufferToBuffer = (buffer) => {
     throw "Unable to get image buffer";
 }
 
-router.get("/", async (req, res) => {
-    if(!req.query.image) return res.status(400).send();
+const FONT = jimp.loadFont(jimp.FONT_SANS_32_WHITE);
 
-    const localPublic = path.join(publicFolder, req.query.image);
-    const image = path.relative(publicFolder, localPublic);
+const handleFile = async (path, res) => {
+    if(!path.startsWith(publicFolder)) return res.sendStatus(FORBIDDEN);
 
-    if(!localPublic.startsWith(publicFolder))
-        return res.status(403).send();
+    if(cache.has(path))
+        return res.send(cache.get(path));
 
-    if(cache.has(image))
-        return res.send(cache.get(image));
-
-    const saveAndSend = (buffer) => {
-        cache.set(image, buffer);
+    const saveAndSend = (buffer, dont_save = false) => {
+        if(!dont_save) cache.set(path, buffer);
         return res.send(buffer);
     }
 
-    if(fs.existsSync(localPublic)) {
+    if(fs.existsSync(path)) {
         try {
-            const image = await jimp.read(localPublic);
+            const image = await jimp.read(path);
             const width = image.getWidth();
             const height = image.getHeight();
 
@@ -53,10 +50,32 @@ router.get("/", async (req, res) => {
 
             return saveAndSend(bufferToBuffer(await image.resize(x, y).getBufferAsync(MIME_JPEG)));
         } catch(err) {
-            return res.status(500).send(`${err}`);
+            const extension = path.split(".").pop() || "file";
+
+            const image = await jimp.create(PIXELS, PIXELS, "#bac");
+
+            image.print(await FONT, PIXELS/3, PIXELS/3, `FILE`);
+            image.print(await FONT, PIXELS/2, PIXELS/2, `.${extension}`);
+
+            return saveAndSend(bufferToBuffer(await image.getBufferAsync(MIME_PNG)), true);
         }
+    } else { 
+        return res.status(404).send();
     }
-    return res.status(404).send();
+}
+
+router.get("/", async (req, res) => {
+    if(!req.query.image) return res.status(400).send();
+
+    const localPublic = path.join(publicFolder, req.query.image);
+
+    return handleFile(localPublic, res);
+})
+
+router.get("/*", (req, res) => {
+    const requestedPath = path.normalize(path.join(publicFolder, req.path));
+    
+    return handleFile(requestedPath, res);
 })
 
 function scaleDimensions(width, height) {
@@ -82,25 +101,30 @@ function scaleDimensions(width, height) {
         .path(path.join(process.cwd(), "public"))
         .depth(Infinity)
         .ext(['.png', '.jpeg', '.jpg', '.gif'])
-        .discard(".*[\\/]+(media)[\\/]+.*")
+        .discard("media")
         .findSync();
-
+    console.log(images.join("\n"));
     for(const imagePath of images) {
         await wait(1000);
 
         const startTime = Date.now();
-        const imageURI = path.relative(path.join(process.cwd(), "public"), imagePath);
+        const imageURI = imagePath;
         const baseName = path.parse(imageURI).base.slice(0, 25);
 
         const save = (buffer) => {
             cache.set(imageURI, buffer);
         }
 
-        try {
+        const checkAlreadyCached = () => {
             if(cache.has(imageURI)) {
                 log(`Image ${baseName}`, "already cached", colors.magenta, startTime);
-                continue
+                return true
             }
+            return false
+        }
+
+        try {
+            if(checkAlreadyCached()) continue;
 
             // todo: should be turned into a function or something
             const image = await jimp.read(imagePath);
