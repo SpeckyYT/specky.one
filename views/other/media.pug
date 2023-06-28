@@ -264,6 +264,7 @@ script.
             let name = fileItem.getElementById("file-name");
             // Set the preview image src and file name text
             preview.src = `/preview/media/${file}`;
+            preview.imageLink = `${window.location.origin}/media/${file}`;
             name.textContent = file.split("/").slice(-1);
             // Append the file item to the grid
             grid.appendChild(fileItem);
@@ -321,7 +322,7 @@ script.
     document.querySelector("#open").addEventListener("click", function(event) {
         if(!currentTarget) return;
 
-        window.open(currentTarget.querySelector('img').src, "_blank");
+        window.open(currentTarget.querySelector('img').imageLink, "_blank");
 
         popup("Opened in new window!", "info")
     });
@@ -329,7 +330,7 @@ script.
     document.querySelector("#copy").addEventListener("click", function(event) {
         if(!currentTarget) return;
 
-        return navigator.clipboard.writeText(currentTarget.querySelector('img').src)
+        return navigator.clipboard.writeText(currentTarget.querySelector('img').imageLink)
         .then(() => {
             popup("Copied to clipboard!", "info");
         })
@@ -342,7 +343,7 @@ script.
         if(!currentTarget) return;
 
         const img = currentTarget.querySelector('img');
-        const url = new URL(img.src);
+        const url = new URL(img.imageLink);
         const pathname = url.pathname;
 
         const actualPath = pathname.split(/\/|\\/g).slice(-2).join("/");
