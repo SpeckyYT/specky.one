@@ -82,8 +82,9 @@ function scaleDimensions(width, height) {
         .path(path.join(process.cwd(), "public"))
         .depth(Infinity)
         .ext(['.png', '.jpeg', '.jpg', '.gif'])
+        .discard(".*[\\/]+(media)[\\/]+.*")
         .findSync();
-    
+
     for(const imagePath of images) {
         await wait(1000);
 

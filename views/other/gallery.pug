@@ -31,6 +31,8 @@ html(lang="en")
                 style="width: 50%;"
             )
 
+    br
+
     div.grid
         for art in arts
             div.art(
@@ -51,12 +53,13 @@ script.
 
     function summonArticle(art) {
         const filename = art.getAttribute("filename");
+
+        if(document.getElementById(filename)) return document.getElementById(filename);
+
         const name = art.getAttribute("name");
         const description = art.getAttribute("description");
         const context = art.getAttribute("context");
         const year = art.getAttribute("year");
-
-        if(document.getElementById(filename)) return document.getElementById(filename);
 
         const article = document.createElement("article");
         article.setAttribute("id", filename)
@@ -124,13 +127,14 @@ style.
     #copyright_notice {
         display: block;
         font-family: Arial;
-        color: #000;
+        color: #fff;
+        outline: 5px solid #fff;
         left: 50%;
         width: fit-content;
         padding: 0px 10px 10px 10px;
         padding-color: #fff;
         margin: auto auto 15px auto;
-        background: linear-gradient(125deg, #aaaaff, #ffaaff);
+        background: #000;
         border-style:solid;
         border-width:2px;
         border-color:black;
