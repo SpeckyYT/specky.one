@@ -27,6 +27,7 @@
     "pretty-ms": "^7.0.0",
     "pug": "^3.0.2",
     "quick.db": "^9.0.8",
+    "resolve-path": "^1.4.0",
     "ws": "^8.5.0"
   },
   "devDependencies": {

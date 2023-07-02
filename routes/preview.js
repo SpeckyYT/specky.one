@@ -13,10 +13,11 @@ const colors = require('colors/safe');
 const { StatusCodes: { FORBIDDEN, } } = require("http-status-codes");
 
 const log = require('../util/log.js');
+const { resolvePath } = require('../util/path.js');
 
 const cache = new Map();
 
-const publicFolder = path.normalize(path.join(process.cwd(), "/public/"));
+const publicFolder = path.join(process.cwd(), "public");
 
 const bufferToBuffer = (buffer) => {
     if(buffer.bitmap) return buffer.bitmap.data.data; // png
@@ -27,6 +28,7 @@ const bufferToBuffer = (buffer) => {
 const FONT = jimp.loadFont(jimp.FONT_SANS_32_WHITE);
 
 const handleFile = async (path, res) => {
+    console.log(path, publicFolder)
     if(!path.startsWith(publicFolder)) return res.sendStatus(FORBIDDEN);
 
     if(cache.has(path))
@@ -67,14 +69,14 @@ const handleFile = async (path, res) => {
 router.get("/", async (req, res) => {
     if(!req.query.image) return res.status(400).send();
 
-    const localPublic = path.join(publicFolder, req.query.image);
+    const localPublic = resolvePath(publicFolder, req.query.image);
 
     return handleFile(localPublic, res);
 })
 
 router.get("/*", (req, res) => {
-    const requestedPath = path.normalize(path.join(publicFolder, req.path));
-    
+    const requestedPath = resolvePath(publicFolder, req.path);
+
     return handleFile(requestedPath, res);
 })
 

@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const fs = require("fs");
 const path = require("path");
+const { resolvePath } = require('../util/path');
 
 const router = Router();
 
-const blogPath = (filename) => path.join("blog", filename);
+const blogPath = (filename) => `blog${path.sep}${filename}`;
 
 const blogs = [
     // Required: title, filename, path
@@ -28,7 +29,7 @@ const blogs = [
         },
     },
 ]
-.filter(blog => fs.existsSync(path.join(process.cwd(), "views", "blog", blog.filename)))
+.filter(blog => fs.existsSync(resolvePath(process.cwd(), "views", "blog", blog.filename)))
 .map(blog => {
     blog.embed ??= {}
 

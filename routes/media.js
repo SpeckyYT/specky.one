@@ -2,6 +2,8 @@ const { Router } = require('express');
 const router = Router();
 const bodyParser = require('body-parser');
 
+const { resolvePath } = require("../util/path");
+
 const fs = require('fs/promises');
 const fss = require('fs');
 const path = require('path');
@@ -9,10 +11,10 @@ const path = require('path');
 const maxSize = 2**25; // 33MB seem good
 const maxFiles = 30;
 
-const mediaFolder = path.normalize(path.join(process.cwd(), "public", "media"));
+const mediaFolder = path.join(process.cwd(), "public", "media");
 const jsonBodyParser = bodyParser.json({ limit: '100gb'});
 
-const getUserFolder = id => path.normalize(path.join(mediaFolder, id || "unknown"));
+const getUserFolder = id => resolvePath(mediaFolder, id || "unknown");
 const getFilesOfUser = async id => {
     const userFolder = getUserFolder(id);
     return fss.existsSync(userFolder) ? fs.readdir(userFolder) : [];
@@ -37,9 +39,9 @@ router.get("/:id/:file", (req, res) => {
     const id = req.params.id;
     const file = req.params.file;
 
-    const filePath = path.normalize(path.join(mediaFolder, id, file));
+    const filePath = resolvePath(mediaFolder, id, file);
 
-    if(filePath.includes(mediaFolder) && fss.existsSync(filePath)) {
+    if(filePath && fss.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
         res.sendStatus(404)
@@ -86,7 +88,7 @@ router.post("/files", jsonBodyParser, async (req, res) => {
             await fs.mkdir(userFolder);
         }
 
-        await fs.writeFile(path.join(userFolder, filename), Buffer.from(content))
+        await fs.writeFile(resolvePath(userFolder, filename), Buffer.from(content))
 
         res.send("File saved")
     } catch (err) {
@@ -102,9 +104,9 @@ router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
 
     const userFolder = getUserFolder(req.session?.discord?.user?.id);
 
-    const filePath = path.normalize(path.join(userFolder, file));
+    const filePath = resolvePath(userFolder, file);
 
-    if(!filePath.includes(userFolder) || !fss.existsSync(filePath))
+    if(!filePath || !fss.existsSync(filePath))
         return res.sendStatus(404)
 
     try {
