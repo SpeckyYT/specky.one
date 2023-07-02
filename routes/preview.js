@@ -103,7 +103,7 @@ function scaleDimensions(width, height) {
         .ext(['.png', '.jpeg', '.jpg', '.gif'])
         .discard("media")
         .findSync();
-    console.log(images.join("\n"));
+
     for(const imagePath of images) {
         await wait(1000);
 

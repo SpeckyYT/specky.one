@@ -9,7 +9,7 @@ const path = require('path');
 const maxSize = 2**25; // 33MB seem good
 const maxFiles = 30;
 
-const mediaFolder = path.join(process.cwd(), "public", "media");
+const mediaFolder = path.normalize(path.join(process.cwd(), "public", "media"));
 const jsonBodyParser = bodyParser.json({ limit: '100gb'});
 
 const getUserFolder = id => path.join(mediaFolder, id || "unknown");
@@ -37,9 +37,9 @@ router.get("/:id/:file", (req, res) => {
     const id = req.params.id;
     const file = req.params.file;
 
-    const filePath = path.join(mediaFolder, id, file);
+    const filePath = path.normalize(path.join(mediaFolder, id, file));
 
-    if(fss.existsSync(filePath)) {
+    if(filePath.includes(mediaFolder) && fss.existsSync(filePath)) {
         res.sendFile(filePath);
     } else {
         res.sendStatus(404)
