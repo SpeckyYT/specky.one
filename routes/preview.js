@@ -28,8 +28,7 @@ const bufferToBuffer = (buffer) => {
 const FONT = jimp.loadFont(jimp.FONT_SANS_32_WHITE);
 
 const handleFile = async (path, res) => {
-    console.log(path, publicFolder)
-    if(!path.startsWith(publicFolder)) return res.sendStatus(FORBIDDEN);
+    if(!path) return res.sendStatus(FORBIDDEN);
 
     if(cache.has(path))
         return res.send(cache.get(path));
@@ -74,7 +73,7 @@ router.get("/", async (req, res) => {
     return handleFile(localPublic, res);
 })
 
-router.get("/*", (req, res) => {
+router.get("*", (req, res) => {
     const requestedPath = resolvePath(publicFolder, req.path);
 
     return handleFile(requestedPath, res);
