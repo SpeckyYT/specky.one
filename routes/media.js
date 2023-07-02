@@ -102,9 +102,9 @@ router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
 
     const userFolder = getUserFolder(req.session?.discord?.user?.id);
 
-    const filePath = path.join(userFolder, file);
+    const filePath = path.normalize(path.join(userFolder, file));
 
-    if(!fss.existsSync(filePath))
+    if(!filePath.includes(mediaFolder) || !fss.existsSync(filePath))
         return res.sendStatus(404)
 
     try {
