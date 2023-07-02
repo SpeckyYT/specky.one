@@ -12,7 +12,7 @@ const maxFiles = 30;
 const mediaFolder = path.normalize(path.join(process.cwd(), "public", "media"));
 const jsonBodyParser = bodyParser.json({ limit: '100gb'});
 
-const getUserFolder = id => path.join(mediaFolder, id || "unknown");
+const getUserFolder = id => path.normalize(path.join(mediaFolder, id || "unknown"));
 const getFilesOfUser = async id => {
     const userFolder = getUserFolder(id);
     return fss.existsSync(userFolder) ? fs.readdir(userFolder) : [];
@@ -104,7 +104,7 @@ router.delete("/:id/:file", jsonBodyParser, async (req, res) => {
 
     const filePath = path.normalize(path.join(userFolder, file));
 
-    if(!filePath.includes(mediaFolder) || !fss.existsSync(filePath))
+    if(!filePath.includes(userFolder) || !fss.existsSync(filePath))
         return res.sendStatus(404)
 
     try {
