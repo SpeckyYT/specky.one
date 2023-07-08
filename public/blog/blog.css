@@ -80,6 +80,10 @@ code.inline {
     border-radius: 4px;
     font-family: 'Courier New', Courier, monospace;
 }
+code.inline a:link      { color: lightblue; }
+code.inline a:visited   { color: lightcoral; }
+code.inline a:hover     { color: lightgreen; }
+code.inline a:active    { color: lightyellow; }
 
 .answers {
     padding: 10px;

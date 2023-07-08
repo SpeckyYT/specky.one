@@ -1,0 +1,101 @@
+include includes/footer.pug
+include includes/return.pug
+include includes/embed.pug
+include ../other/spwn_ideas/includes/spwn_highlight.pug
+
+link(rel="stylesheet" href="/blog/blog.css")
+
+-
+    const speckyRepos = [
+        "GLTCH",                    // 23/06/2023
+        "PCMN",                     // 06/06/2023
+        "PTNC",                     // 04/03/2023
+        "PSSWRD",                   // 28/02/2023
+        "spwn_mancala",             // 18/02/2023
+        "DCMPLR",                   // 28/07/2022
+        "APPL2",                    // 13/07/2022
+        "DCR8",                     // 16/06/2022
+        "SLTS",                     // 06/04/2022
+        "LXR",                      // 29/03/2022
+        "fallout_equestria_spwn",   // 01/03/2022
+        "spwn-ip",                  // 20/01/2022
+        "save-state",               // 08/01/2022
+        "LRCS",                     // 04/01/2022
+        "SNKE",                     // 16/12/2021
+        "spwn-endecode",            // 23/11/2021
+        "spwnfuck",                 // 20/11/2021
+        "macro-safe",               // 09/11/2021
+        "FLPYBRD",                  // 20/10/2021
+        "is-number",                // 22/09/2021
+        "spwn-ndimens",             // 04/09/2021
+        "ANMT",                     // 18/08/2021
+        "SPWN-speed",               // 08/08/2021
+        "spwn-osu-parser",          // 06/08/2021
+        "SPWN-canvas",              // 26/06/2021
+        "SPWN-crash",               // 25/06/2021
+    ];
+
+head
+    title What is SPWN?
+
++return
+
+article
+    h1 What is the SPWN programming language?
+
+    p.info.
+        #[a(href="https://github.com/spu7Nix/SPWN-language/") SPWN] is a programming language that compiles to Geometry Dash objects.
+        This language was made by Spu7Nix and some other friends, and was made in #[a(href="https://rust-lang.org/") Rust].
+
+    h1 How did I start knowing about SPWN?
+
+    p.
+        A friend of mine (Lory) sent me a DM on Discord saying something along the lines of
+        #[code.inline "yo, check out this programming language spu7nix created, it uses rust"]
+        Soon after, I watched #[a(href="https://youtu.be/cQyNar6rgW8") the video] and joined the discord server of spwn.
+        
+    p.
+        I checked the documentations, installed spwn and instantly came up with an idea to do with SPWN.
+        That idea was a trigger setup that crashes Geometry Dash.
+        I started coding and I realized that I wasn't able to do what I required to.
+        But luckily the spwn discord server was really useful and helped me out really quickly and I finally was able to make #[a(href="http://github.com/SpeckyYT/spwn-crash") it].
+
+    h1 Did I have issues with learning SPWN?
+
+    p.
+        SPWN's syntax is quite familiar if you know C-like languages (JS, C++, Rust, etc), and since I knew JavaScript it was easy to read and write SPWN.
+        
+        The parentheses on most of the statements are not required, since they take an "expression", not an "(expression)" (not sure why C/C++/JS require them).
+        For example:
+
+    +spwn().
+        if variable == 5 { // no ()s required
+            // code
+        }
+        while boolean {
+            // other code
+        }
+
+    p.
+        Additionally the variables work similarly to JavaScript, but with a small twist.
+        Instead of using "let/const", it only uses "let" for mutable and if you declare without "let" then it becomes constant.
+        (in the future it will be replaced with "mut")
+
+    +spwn().
+        let a = 1 // mutable variable
+        a = 2     // overwrite
+
+        b = 3     // constant variable
+        b = 4     // error, redeclaration not allowed
+
+    // TODO: add more shit
+
+
+    h1 What projects did I do with SPWN?
+
+    p I made A TON of SPWN projects, at least #{speckyRepos.length} of them.
+
+    p
+        for repo in speckyRepos
+            code.inline #[a(href=`https://github.com/SpeckyYT/${repo}`) #{repo}]
+            | #{" "}
