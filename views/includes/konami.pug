@@ -1,7 +1,7 @@
 script.
     function setupKonamiCode(
         cb = () => {},
-        once = true,
+        times = 1,
         targetSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
     ) {
         const sequence = Array(targetSequence.length).fill(null);
@@ -30,10 +30,10 @@ script.
             "keyCode",
         ];
 
-        let done = false;
+        let timesDone = 0;
 
         document.addEventListener('keydown', (e) => {
-            if(done) return;
+            if(times > 0 && timesDone >= times) return;
             if(ignoreButtons.includes(e.key)) return;
 
             sequence.push(e)
@@ -41,9 +41,7 @@ script.
 
             if(isTargetSequence(sequence)) {
                 sequence.fill(null) // clears the sequence, so you need to retype it, just to make sure
-
-                if(once) done = true;
-
+                timesDone++;
                 cb();
             }
         });
