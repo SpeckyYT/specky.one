@@ -9,6 +9,10 @@ all_art = [
     name: "10000ms"
     year: 2020
 ,
+    filename: "247.png"
+    name: "247"
+    year: 2023
+,
     filename: "a_dream.png"
     name: "A Dream"
     year: 2019
@@ -79,6 +83,10 @@ all_art = [
     name: "Discussion"
     year: 2021
 ,
+    filename: "dlace.png"
+    name: "Dlace"
+    year: 2023
+,
     filename: "DMSR.png"
     name: "DMSR"
     year: 2020
@@ -115,6 +123,10 @@ all_art = [
     filename: "flow.png"
     name: "Flow"
     year: 2019
+,
+    filename: "fuse.png"
+    name: "Fuse"
+    year: 2023
 ,
     filename: "galaxy collapsed.png"
     name: "Galaxy Collapsed"
@@ -182,6 +194,10 @@ all_art = [
     name: "Looking For The Sun"
     year: 2019
 ,
+    filename: "Lore.png"
+    name: "Lore"
+    year: 2023
+,
     filename: "mansion.png"
     name: "Mansion"
     year: 2021
@@ -202,6 +218,10 @@ all_art = [
     filename: "maze.png"
     name: "Maze"
     year: 2022
+,
+    filename: "melogranow.png"
+    name: "Melogranow"
+    year: 2023
 ,
     filename: "mirage.png"
     name: "Mirage"
@@ -376,6 +396,10 @@ all_art = [
     filename: "vocal.png"
     name: "Vocal"
     year: 2020
+,
+    finally: "VX.png"
+    name: "VX"
+    year: 2023
 ,
     filename: "waltz.png"
     name: "Waltz"
