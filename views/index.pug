@@ -123,8 +123,8 @@ script.
                 {
                     name: "NicsiRadio",
                     description: "A radio station made by Nicsi, Specky's brother",
-                    image: "https://specky.one:2053/static/uploads/nicsi_radio/background.1678651373.png",
-                    url: "http://nicsiradio.com",
+                    image: "https://nicsiradio.com/static/uploads/background.1689357242.png",
+                    url: "https://nicsiradio.com",
                     extra: "nicsiradio",
                 },
             ],
@@ -236,7 +236,7 @@ html(lang="en")
                                                 const songImage = document.getElementById("nr-song-image");
 
                                                 async function updateCurrentlyPlaying() {
-                                                    const json = await fetch("https://specky.one:2053/api/nowplaying")
+                                                    const json = await fetch("https://nicsiradio.com/api/nowplaying")
                                                     .then(res => res.json());
                                                     
                                                     const { played_at, duration, song } = json.find(s => s.station.id == 1).now_playing;
