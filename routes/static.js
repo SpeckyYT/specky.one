@@ -7,6 +7,7 @@ const match = {
     '/sort': 'other/visort.pug',
     '/sugo': 'games/sugo.pug',
     '/summertime': 'memes/summertime.pug',
+    '/case': 'utils/case_converter.pug',
 }
 
 for(const [key,file] of Object.entries(match)){
