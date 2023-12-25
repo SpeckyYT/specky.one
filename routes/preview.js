@@ -40,6 +40,10 @@ const handleFile = async (path, res) => {
 
     if(fs.existsSync(path)) {
         try {
+            if(fs.statSync(path).size > 4000000) {
+                throw "size too big, generating default preview instead"
+            }
+
             const image = await jimp.read(path);
             const width = image.getWidth();
             const height = image.getHeight();
