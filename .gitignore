@@ -5,3 +5,8 @@ public/media
 node_modules/
 .env
 *.sqlite
+
+
+# Added by cargo
+
+/target

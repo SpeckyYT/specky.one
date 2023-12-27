@@ -1,0 +1,12 @@
+[package]
+name = "specky_one"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lazy_static = "1.4.0"
+rocket = { version = "0.4.11", features = ["private-cookies"] }
+rocket_contrib = "0.4.11"
+serde = { version = "1.0.188", features = ["derive"] }
