@@ -1,4 +1,4 @@
-use std::{path::PathBuf, fs};
+use std::{path::PathBuf, fs, io::Error};
 
 use rocket::http::Cookies;
 use lazy_static::lazy_static;
@@ -10,7 +10,7 @@ lazy_static!{
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct File {
+pub struct FileData {
     filename: String,
     size: u128,
 }
@@ -24,10 +24,10 @@ route_gen!{
     }
 
     #[get("/<id>/<file..>")]
-    fn get_file(id: u64, file: PathBuf) -> Option<Vec<u8>> {
+    fn get_file(id: u64, file: PathBuf) -> Result<Vec<u8>, Error> {
         let file_path = MEDIA.join(id.to_string()).join(file);
 
-        fs::read(file_path).map_err(|a| a.to_string()).ok()
+        fs::read(file_path)
     }
 
     #[get("/files")]

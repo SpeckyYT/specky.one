@@ -1,3 +1,5 @@
+mod index;
+mod auth_discord;
 mod media;
 
 #[macro_export]
@@ -6,7 +8,7 @@ macro_rules! route_gen {
         [$route:literal]
 
         $(
-            #[$meta:meta]
+            $(#[$meta:meta])*
             fn $fn_name:ident $params:tt $(-> $return:ty)? $code_block:block
         )*
 
@@ -16,7 +18,7 @@ macro_rules! route_gen {
     } => {
         pub fn build() -> Vec<(String, Vec<rocket::Route>)> {
             $(
-                #[$meta]
+                $(#[$meta])*
                 fn $fn_name $params $(-> $return)? $code_block
             )*
 
@@ -50,5 +52,7 @@ macro_rules! route_collector {
 }
 
 route_collector![
+    index,
+    auth_discord,
     media,
 ];
