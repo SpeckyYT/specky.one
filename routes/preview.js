@@ -2,6 +2,7 @@ const { Router } = require('express');
 const router = Router();
 
 const PIXELS = 256; // pixels * pixels is the max
+const IMAGE_BYTES_SIZE = 2**24; // 16MB
 
 const path = require('path');
 const fs = require('fs');
@@ -40,7 +41,7 @@ const handleFile = async (path, res) => {
 
     if(fs.existsSync(path)) {
         try {
-            if(fs.statSync(path).size > 4000000) {
+            if(fs.statSync(path).size > IMAGE_BYTES_SIZE) {
                 throw "size too big, generating default preview instead"
             }
 
