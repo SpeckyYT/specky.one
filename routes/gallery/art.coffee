@@ -20,7 +20,10 @@ all_art = [
     filename: "absent.png"
     name: "Absent"
     year: 2022
-
+,
+    filename: "ace.png"
+    name: "Ace"
+    year: 2024
 ,
     filename: "afterglow.png"
     name: "Afterglow"
@@ -239,6 +242,10 @@ all_art = [
     name: "Moonrise"
     year: 2021
 ,
+    filename: "moth.png"
+    name: "Moth"
+    year: 2024
+,
     filename: "mth.png"
     name: "MTH"
     year: 2022
@@ -286,6 +293,10 @@ all_art = [
     filename: "reality.png"
     name: "Reality"
     year: 2020
+,
+    filename: "render.png"
+    name: "Render"
+    year: 2024
 ,
     filename: "saber.png"
     name: "Saber"
@@ -356,6 +367,10 @@ all_art = [
     name: "Staircase"
     year: 2020
 ,
+    filename: "steve.png"
+    name: "Steve"
+    year: 2023
+,
     filename: "sum of blackness.png"
     name: "Sum Of Blackness"
     year: 2020
@@ -397,7 +412,7 @@ all_art = [
     name: "Vocal"
     year: 2020
 ,
-    finally: "VX.png"
+    filename: "VX.png"
     name: "VX"
     year: 2023
 ,
