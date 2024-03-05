@@ -127,6 +127,10 @@ all_art = [
     name: "Flow"
     year: 2019
 ,
+    filename: "free.png"
+    name: "Free"
+    year: 2021
+,
     filename: "fuse.png"
     name: "Fuse"
     year: 2023
@@ -189,9 +193,18 @@ all_art = [
     name: "Listening"
     year: 2022
 ,
+    filename: "LLL.png"
+    name: "LLL"
+    year: 2019
+,
     filename: "local-fantasy.png"
     name: "Local Fantasy"
     year: 2022
+,
+    filename: "lonely.png"
+    name: "Lonely"
+    year: 2020
+    context: listened_to_song "The Undertaker's Daughter - Steampianist (feat. Vocaloid Oliver)"
 ,
     filename: "LookingForTheSun.png"
     name: "Looking For The Sun"
@@ -225,6 +238,10 @@ all_art = [
     filename: "melogranow.png"
     name: "Melogranow"
     year: 2023
+,
+    filename: "memories.png"
+    name: "Memories"
+    year: 2020
 ,
     filename: "mirage.png"
     name: "Mirage"
@@ -427,6 +444,10 @@ all_art = [
     """
     year: 2020
 ,
+    filename: "wave.png"
+    name: "Wave"
+    year: 2021
+,
     filename: "Wolle.png"
     name: "Wolle"
     year: 2020
@@ -439,6 +460,10 @@ all_art = [
     name: "Wszystkim"
     context: listened_to_song "Byłaś Dla Mnie Wszystkim - Poparzeni Kawa Trzy"
     year: 2020
+,
+    filename: "zoe.png"
+    name: "Zoe"
+    year: 2024
 ]
 .map (art) ->
     art.description ?= default_description
