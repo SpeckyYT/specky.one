@@ -33,6 +33,9 @@ all_art = [
     name: "Alien Fractal"
     year: 2020
 ,
+    filename: "arteastrattahv2.png"
+    name: "Arte Astrattah V2"
+,
     filename: "ASITD.png"
     name: "ASITD"
     year: 2020
@@ -149,8 +152,8 @@ all_art = [
     name: "Golira"
     year: 2021
 ,
-    filename: "guardia-spagnola.png"
-    name: "Guardia Spagnola"
+    filename: "guarda-spagnola.png"
+    name: "Guarda Spagnola"
     year: 2021
 ,
     filename: "headaxe.png"
@@ -401,6 +404,10 @@ all_art = [
     context: listened_to_song "Sunglow - Yamajet feat. ひうらまさこ (Masako Hiura)"
     year: 2020
 ,
+    filename: "TheMagicCube.png"
+    name: "The Magic Cube"
+    year: 2020
+,
     filename: "TheMiddle.png"
     name: "The Middle"
     year: 2020
@@ -417,8 +424,8 @@ all_art = [
     name: "Unable"
     year: 2021
 ,
-    filename: "unfocussed.png"
-    name: "Unfocussed"
+    filename: "unfocused.png"
+    name: "Unfocused"
     year: 2021
 ,
     filename: "viola.png"
@@ -459,6 +466,10 @@ all_art = [
     filename: "wszystkim.png"
     name: "Wszystkim"
     context: listened_to_song "Byłaś Dla Mnie Wszystkim - Poparzeni Kawa Trzy"
+    year: 2020
+,
+    filename: "xor.png"
+    name: "XOR"
     year: 2020
 ,
     filename: "zoe.png"
