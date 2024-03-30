@@ -11,7 +11,8 @@ if req.discord.powerLevel() == 0
 else
     h2 Your files
 
-    div#file-grid
+    div#file-grid.file-grid
+
     template#file-template
         div#file-item
             img#file-preview(src="" alt="File Preview")
@@ -32,6 +33,14 @@ else
         input#file-input.hidden(type="file")
     br
     input#send(type="button" value="Save")
+
+    if req.discord.powerLevel() >= 2
+        div#users
+        p#user-id
+        div#user.file-grid
+
+    template#user-button-template
+        button(type="button")#user-button ID
 
 style.
     /* upload */
@@ -63,7 +72,7 @@ style.
     }
 
     /* file grid */
-    #file-grid {
+    .file-grid {
         background-color: #222;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -151,6 +160,7 @@ script.
     const fileDropArea = document.querySelector('#file-drop-area');
     const saveButton = document.querySelector('#send');
     const fileInput = document.querySelector('#file-input');
+    const fileTemplate = document.getElementById("file-template");
 
     fileDropArea.addEventListener("click", function(event) {
         fileInput.click();
@@ -245,32 +255,35 @@ script.
         return path.split("/").slice(-1).join("/")
     }
 
+    function addMedia(grid, file) {
+        // Clone the template
+        let fileItem = fileTemplate.content.cloneNode(true);
+        // Get the preview image and file name elements
+        let preview = fileItem.getElementById("file-preview");
+        let name = fileItem.getElementById("file-name");
+        // Set the preview image src and file name text
+        preview.src = `/preview/media/${file}`;
+        preview.imageLink = `${window.location.origin}/media/${file}`;
+        name.textContent = file.split("/").slice(-1);
+        // Append the file item to the grid
+        grid.appendChild(fileItem);
+    }
+
     async function updateFiles() {
         const files = await fetch('/media/files').then(res => res.json());
 
         // Get the grid element and the file template
         const grid = document.getElementById("file-grid");
-        const template = document.getElementById("file-template");
 
         // Clear the current grid
         grid.innerHTML = "";
 
         // Iterate through the files array
         for (const file of files) {
-            // Clone the template
-            let fileItem = template.content.cloneNode(true);
-            // Get the preview image and file name elements
-            let preview = fileItem.getElementById("file-preview");
-            let name = fileItem.getElementById("file-name");
-            // Set the preview image src and file name text
-            preview.src = `/preview/media/${file}`;
-            preview.imageLink = `${window.location.origin}/media/${file}`;
-            name.textContent = file.split("/").slice(-1);
-            // Append the file item to the grid
-            grid.appendChild(fileItem);
+            addMedia(grid, file);
         }
 
-        updateContextMenu()
+        updateContextMenu("#file-grid #file-item")
     }
 
     updateFiles();
@@ -283,8 +296,8 @@ script.
         e.preventDefault()
     })
 
-    function updateContextMenu() {
-        const fileItems = document.querySelectorAll("#file-grid #file-item");
+    function updateContextMenu(selection) {
+        const fileItems = document.querySelectorAll(selection);
 
         for (var i = 0; i < fileItems.length; i++) {
             fileItems[i].addEventListener("contextmenu", async function(e) {
@@ -315,8 +328,17 @@ script.
         }
     }
 
-    document.addEventListener("click", function() {
-        contextMenu.classList.add("hidden");
+    function hideContextMenu(event) {
+        if(event.target.id != "context-menu" && !contextMenu.classList.contains("hidden")) {
+            contextMenu.classList.add("hidden");
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        hideContextMenu(e)
+    });
+    document.addEventListener("contextmenu", function(e) {
+        hideContextMenu(e)
     });
 
     document.querySelector("#open").addEventListener("click", function(event) {
@@ -362,3 +384,41 @@ script.
             await updateFiles();
         })
     });
+
+if req.discord.powerLevel() >= 2
+    style.
+        #users {
+            padding: 40px 10px 20px 10px;
+        }
+
+    script.
+        const usersDiv = document.querySelector("#users");
+        const userButtonTemplate = document.querySelector("#user-button-template");
+        const userDiv = document.querySelector("#user");
+
+        function updateIDs() {
+            return fetch("files/ids")
+            .then(data => data.json())
+            .then(ids => {
+                usersDiv.innerHTML = ""
+                for(const id of ids) {
+                    const currentChild = userButtonTemplate.content.cloneNode(true);
+                    currentChild.querySelector("button").innerHTML = id;
+                    usersDiv.appendChild(currentChild);
+                    usersDiv.children[usersDiv.children.length - 1].addEventListener("click", () => {
+                        document.querySelector("#user-id").innerHTML = id
+                        fetch(`files/${id}`)
+                        .then(data => data.json())
+                        .then(async files => {
+                            userDiv.innerHTML = ""
+                            for(const file of files) {
+                                addMedia(userDiv, file)
+                            }
+                            updateContextMenu("#user #file-item")
+                        })
+                    })
+                }
+            });
+        }
+
+        updateIDs()

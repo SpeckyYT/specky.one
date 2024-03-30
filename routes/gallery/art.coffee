@@ -35,6 +35,7 @@ all_art = [
 ,
     filename: "arteastrattahv2.png"
     name: "Arte Astrattah V2"
+    year: 2019
 ,
     filename: "ASITD.png"
     name: "ASITD"

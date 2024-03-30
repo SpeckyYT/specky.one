@@ -35,19 +35,6 @@ router.get("/", (req, res) => {
     res.render("other/media.pug", { req, res })
 })
 
-router.get("/:id/:file", (req, res) => {
-    const id = req.params.id;
-    const file = req.params.file;
-
-    const filePath = resolvePath(mediaFolder, id, file);
-
-    if(filePath && fss.existsSync(filePath)) {
-        res.sendFile(filePath);
-    } else {
-        res.sendStatus(404)
-    }
-})
-
 router.use("*", async (req, res, next) => {
     if(req.discord.powerLevel() > 0) {
         return next();
@@ -93,6 +80,34 @@ router.post("/files", jsonBodyParser, async (req, res) => {
         res.send("File saved")
     } catch (err) {
         res.status(500).send(`${err}`);
+    }
+})
+
+router.get("/files/:id", async (req, res) => {
+    if (req.discord.powerLevel() >= 2) {
+        if(req.params.id == "ids") {
+            const content = await getFilesOfUser(".");
+            return res.json(content.map(f => path.parse(f).base));
+        } else if (!isNaN(parseInt(req.params.id))) {
+            const content = await getFilesOfUser(req.params.id);
+            return res.json(content.map(f => `${req.params.id}/${path.parse(f).base}`));
+        } else {
+            res.sendStatus(400);
+        }
+    }
+    return res.sendStatus(401);
+})
+
+router.get("/:id/:file", (req, res) => {
+    const id = req.params.id;
+    const file = req.params.file;
+
+    const filePath = resolvePath(mediaFolder, id, file);
+
+    if(filePath && fss.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        res.sendStatus(404)
     }
 })
 
