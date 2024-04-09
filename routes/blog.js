@@ -45,6 +45,23 @@ const blogs = [
             color: "#e000b0",
         },
     },
+    {
+        title: "The one day I nearly died",
+        filename: "todind.pug",
+        path: "todind",
+        date: new Date(Date.parse("April 09, 2024")),
+        writers: [
+            'Specky',
+        ],
+        tags: [],
+        embed: {
+            title: "The one day I nearly died",
+            description: "One of the things that happened to me.",
+            url: "todind",
+            image: "https://c7.alamy.com/comp/RPX89D/harassment-of-a-member-of-the-team-a-child-in-school-the-concept-of-discrimination-bullying-survival-differences-outcast-social-isolation-RPX89D.jpg",
+            color: "#6ad6e5",
+        },
+    },
 ]
 .filter(blog => fs.existsSync(resolvePath(process.cwd(), "views", "blog", blog.filename)))
 .map(blog => {

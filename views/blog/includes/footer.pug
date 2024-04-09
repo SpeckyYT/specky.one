@@ -1,9 +1,9 @@
 -
     const toStyledDate = d => Intl.DateTimeFormat('it-IT').format(d);
     const footerInfos = blog ? [
-        blog.date && `Blog made on ${toStyledDate(blog.date)}`,
+        blog.date && `Blog started on ${toStyledDate(blog.date)}`,
         blog.writers && `Writers:\n${blog.writers.join(", ")}`,
-        blog.tags && `Tags:\n${blog.tags.join(" ")}`,
+        blog.tags && `Tags:\n${blog.tags.length ? blog.tags.join(" ") : "None"}`,
     ].filter(s => s) : [];
 
 mixin footer()
