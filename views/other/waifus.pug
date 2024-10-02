@@ -1,0 +1,232 @@
+doctype html
+
+include ../includes/embed.pug 
+include ../includes/style.pug
+
+-
+    const waifus = [
+        // GAMES
+        {
+            source: "Nintendo",
+            name: "Princess Daisy",
+            images: [
+                "https://i.ytimg.com/vi/Q2ZK_RzegpY/maxresdefault.jpg",
+                "https://p.turbosquid.com/ts-thumb/IO/hbnsQa/ZU/1200/jpg/1636268787/600x600/fit_q87/4048407fcf2e00e18c640ce2fbbad8cf3f812ec5/1200.jpg",
+            ],
+        },
+        {
+            source: "Minecraft",
+            name: "Alex",
+            description: "Jenny will still remain in my heart tho",
+            images: [
+                "https://skin.laby.net/api/render/skin/42505e58ec9bcc1e53944952b6775de3.png?shadow=true&both_sides=true&bg_color2=527528305&width=400&height=400",
+                "https://e7.pngegg.com/pngimages/434/982/png-clipart-minecraft-pocket-edition-video-games-mojang-lego-minecraft-alex-minecraft-mining-game-angle-thumbnail.png",
+            ],
+        },
+        {
+            source: "WarioWare",
+            name: "Mona",
+            description: "Ashley isn't bad, but hear me out",
+            images: [
+                "https://www.mariowiki.it/images/thumb/3/33/WWGIT-Mona.jpg/800px-WWGIT-Mona.jpg",
+                "https://i.ytimg.com/vi/5xo6AonHJhU/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB93f9Ek3o-KSWT2_30RVrRv8Fw_A",
+                "https://static.zerochan.net/Mona.%28Warioware%29.full.3487351.jpg",
+            ],
+        },
+        {
+            source: "Puyo Puyo Tetris",
+            name: "Rulue",
+            description: "I was initially a bit indecisive between Rulue and Raffina",
+            images: [
+                "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/1ba744e8-e833-40b0-8c91-f25696019714/dd086w5-ed3f577b-e633-4f5a-ba07-e417ac4b3249.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzFiYTc0NGU4LWU4MzMtNDBiMC04YzkxLWYyNTY5NjAxOTcxNFwvZGQwODZ3NS1lZDNmNTc3Yi1lNjMzLTRmNWEtYmEwNy1lNDE3YWM0YjMyNDkucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.2rAOXv3syoa3qHCwW7q_E3RMDPQy_bo4oPzk8a0mmos",
+                "https://photo.cosplayfu.com/character/mini/244391_238780.jpg",
+            ],
+        },
+        {
+            source: "Doki Doki Literature Club",
+            name: "Yuri",
+            description: "Crazy in head, crazy in bed",
+            images: [
+                "https://static1.thegamerimages.com/wordpress/wp-content/uploads/2021/06/Doki-Doki-Literature-Club-Yuri-with-book-and-official-images-feature-image.jpg",
+                "https://steamuserimages-a.akamaihd.net/ugc/919166841046316830/E0E3BDFA6D29A3D0500B2DFCE5A06E9F4AED1BAD/?imw=512&&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false",
+            ],
+        },
+        {
+            source: "Crush Crush",
+            name: "Mio",
+            images: [
+                "https://external-preview.redd.it/GCudt4xgwzPkZ-c9730Fq7IkKqK2qBZS_Lll6e_8PLg.png?format=pjpg&auto=webp&s=87b8e7639ac7b2d289854565ded7659c709d3430",
+                "https://i.ytimg.com/vi/Fp3deaZ0UX0/maxresdefault.jpg",
+            ],
+        },
+        {
+            source: "Crawlco Block Knockers",
+            name: "Sharon",
+            nsfw: true,
+            images: [
+                "https://m.media-amazon.com/images/I/91nBMRuyCgL._AC_UF894,1000_QL80_.jpg",
+            ],
+        },
+        {
+            source: "Boo Party",
+            name: "Simone",
+            images: [
+                "https://i0.wp.com/do-it-cat.com/wp-content/uploads/2023/07/2023072317250100_s.jpg?resize=660%2C371&ssl=1",
+            ],
+        },
+        {
+            source: "Nekopara",
+            name: "Cinnamon",
+            images: [
+                "https://e7.pngegg.com/pngimages/930/386/png-clipart-nekopara-cinnamon-catgirl-chocolate-coconut-purple-cg-artwork.png",
+                "https://konachan.com/sample/d5fa3fdc5bb5f8faf7ab624673914d38/Konachan.com%20-%20256759%20sample.jpg",
+                "https://cdn.donmai.us/sample/da/26/__cinnamon_nekopara_drawn_by_kamishiro_mai_capti_no__sample-da26495cada7148bfac7a3aaa6f4d031.jpg",
+            ],
+        },
+        {
+            source: "Booty Calls",
+            name: "Shannon",
+            nsfw: true,
+            images: [
+                "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/671aa799-a67b-4baf-a9df-7906ac7a6d01/dgjssjl-2dbe12d4-ff24-47d5-8bc1-c9612b6107de.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzY3MWFhNzk5LWE2N2ItNGJhZi1hOWRmLTc5MDZhYzdhNmQwMVwvZGdqc3NqbC0yZGJlMTJkNC1mZjI0LTQ3ZDUtOGJjMS1jOTYxMmI2MTA3ZGUuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.ohHIEF0QGYG88TlGilyZCG7lvMsKd6f5F4bT6mPzCKU",
+            ],
+        },
+        {
+            source: "Helltaker",
+            name: "Modeus",
+            images: [
+                "https://preview.redd.it/a46k45167bh51.jpg?width=640&crop=smart&auto=webp&s=21fb436f28652844da475e6a7def8cf57702bcb0",
+                "https://preview.redd.it/x53zj7enevw71.png?auto=webp&s=98803663c64dbe494a90e24878a20b06fd2eb732",
+            ],
+        },
+        {
+            source: "Ace Attorney",
+            name: "Mia Fey",
+            description: "bro is that specky.one",
+            images: [
+                "https://media.tenor.com/KmJlOyEXlpYAAAAe/ace-attorney-mia-fey.png",
+                "https://i.pinimg.com/736x/29/7f/72/297f72ab76d29bb6e5b2154ec3da4403.jpg",
+            ],
+        },
+        {
+            source: "Overwatch",
+            name: "Mei",
+            description: "She's perfect",
+            images: [
+                "https://cdnb.artstation.com/p/assets/images/images/055/140/265/large/hong-chan-lim-screenshot-22-10-05-16-09-37-000.jpg?1666206015",
+                "https://images.blz-contentstack.com/v3/assets/blt2477dcaf4ebd440c/bltd0eb5529be69efbc/633773a6f87c00687e8ef21a/1600_Mei_02.jpg",
+                "https://w0.peakpx.com/wallpaper/1004/902/HD-wallpaper-mei-overwatch-mei-overwatch.jpg",
+            ],
+        },
+        // FURRY
+        {
+            source: "Animal Crossing",
+            name: "Ankha",
+            description: "I guess the meme helped boosting my liking for her",
+            images: [
+                "https://w7.pngwing.com/pngs/988/463/png-transparent-animal-crossing-ankha-games-animal-crossing-thumbnail.png",
+                "https://img1.picmix.com/output/stamp/normal/0/4/6/6/2076640_e63ac.png",
+            ],
+        },
+        {
+            source: "Pokémon",
+            name: "Lopunny",
+            description: "It's an animal Joker",
+            images: [
+                "https://db.pokemongohub.net/_next/image?url=%2Fimages%2Fofficial%2Ffull%2F428.webp&w=640&q=75",
+                "https://marriland.com/wp-content/plugins/marriland-core/images/pokemon/sprites/home/full/lopunny.png",
+            ],
+        },
+        // SHOWS
+        {
+            source: "Yu-Gi-Oh! Zexal",
+            name: "Rio Kastle",
+            images: [
+                "https://s3.duellinksmeta.com/img/characters/rio-kastle/victory.webp",
+                "https://cosplayfu-website.s3.amazonaws.com/_Upload/b/Rio-Costume-from-Yu-Gi-Oh.jpg",
+
+            ],
+        },
+        {
+            source: "Pretty Cure",
+            name: "Honoka Yukishiro",
+            images: [
+                "https://cosplayfu-website.s3.amazonaws.com/_Upload/b/10931-Honoka-Cosplay-from-Pretty-Cure-1.jpg",
+                "https://w7.pngwing.com/pngs/650/148/png-transparent-honoka-yukishiro-reika-aoki-pretty-cure-all-stars-anime-anime-black-hair-fictional-character-cartoon.png",
+            ],
+        },
+        {
+            source: "Miraculous Ladybug",
+            name: "Alya",
+            description: "Juleka isn't that bad, but I like more talkative/smart people",
+            images: [
+                "https://i.pinimg.com/originals/b1/a4/ef/b1a4ef87f4ffd0a3d8ebbbf66de13957.png",
+                "https://i.pinimg.com/originals/85/c8/f0/85c8f043958e12289dc2f1b136470dc0.png",
+            ],
+        },
+    ]
+
+head
+    title Waifus
+    +embed(
+        "Waifus",
+        "The list of Specky's waifus",
+        "https://specky.one/waifus",
+        "https://nintendon.it/wp-content/uploads/2018/12/Nintendo-female-NintendOn-1024x576.png",
+        "#FF00AA"
+    )
+
+body
+    h1 Specky's waifus 
+    p.
+        Here's a list of videogame/anime women Specky likes
+    
+    .waifus
+        for waifu of waifus
+            if waifu.nsfw ? req.discord.powerLevel() > 0 : true
+                .waifu(title=waifu.description)
+                    h2 #{waifu.source}
+                    p #{waifu.name}
+                    if waifu.images && waifu.images.length > 0
+                        img.undraggable(src=waifu.images[0] class=waifu.nsfw?"nsfw":"")
+
+style.
+    .waifus {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-gap: 10px;
+        margin: 0 auto;
+        max-width: 80vw;
+    }
+    .waifu {
+        border: 10px dashed #FFFFFF;
+    }
+    .waifu img {
+        max-width: 97%;
+        max-height: 33vh;
+    }
+    .nsfw {
+        cursor: pointer;
+        filter: brightness(0.2);
+        backdrop-filter: brightness(0);
+        filter: blur(1vw) grayscale(100%);
+    }
+    .undraggable {
+        /* https://stackoverflow.com/questions/12906789/preventing-an-image-from-being-draggable-or-selectable-without-using-js */
+        user-drag: none;
+        -webkit-user-drag: none;
+        user-select: none;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+    }
+
+script.
+    for (const nsfw of document.querySelectorAll('.nsfw')) {
+        nsfw.addEventListener('click', (event) => {
+            event.preventDefault();
+            if (nsfw.classList.contains('nsfw')) {
+                nsfw.classList.remove('nsfw');
+            }
+        });
+    }
