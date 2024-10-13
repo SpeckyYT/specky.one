@@ -9,6 +9,7 @@ const match = {
     '/summertime': 'memes/summertime.pug',
     '/case': 'utils/case_converter.pug',
     '/waifus': 'other/waifus.pug',
+    '/dictionary': 'other/dictionary.pug',
 }
 
 for(const [key,file] of Object.entries(match)){

@@ -1,0 +1,26 @@
+doctype html
+
+include ../includes/embed.pug 
+include ../includes/style.pug
+
+head
+    title Dictionary
+    +embed(
+        "Dictionary",
+        "Literally the entire dictionary (trust)",
+        "https://specky.one/dictionary",
+        "https://drsw10gc90t0z.cloudfront.net/AcuCustom/Sitename/DAM/544/Dictionary__Shutterstock1.jpg",
+        "#4B0082",
+    )
+
+body
+    h1 Dictionary
+    p.
+        guys please help me
+
+
+script.
+    (async function() {
+        const dictionary = await fetch("/dictionary/dictionary1.json").then(j=>j.json());
+        console.log(dictionary);
+    })();
