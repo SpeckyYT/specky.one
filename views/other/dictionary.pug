@@ -17,10 +17,40 @@ body
     h1 Dictionary
     p.
         guys please help me
+    
+    .messages
+
+template#message_template
+    .user
+        .head
+            img.avatar
+            p.username
+            p.timestamp
+            // also add (edited)
+        p.content
 
 
 script.
     (async function() {
         const dictionary = await fetch("/dictionary/dictionary1.json").then(j=>j.json());
-        console.log(dictionary);
+
+        const allUsers = new Map();
+
+        for(const message of dictionary) {
+            const user = allUsers.has(message.author_id) ? allUsers.get(message.author_id) :
+                await fetch(`https://discord-arts.asure.dev/v1/user/${message.author_id}`)
+                    .then(j=>j.json())
+                    .then(user => (allUsers.set(message.author_id, user.data), user.data) )
+                    .catch(()=>{});
+
+            const template = document.getElementById('message_template').content.cloneNode(true);
+            template.querySelector('img.avatar').src = user.assets.avatarURL || user.assets.defaultAvatarURL;
+            template.querySelector('p.username').textContent = user.basicInfo.globalName || user.basicInfo.username;
+            template.querySelector('p.timestamp').textContent = message.timestamp; // needs to be parsed
+            template.querySelector('p.content').textContent = message.content;
+            document.querySelector('div.messages').appendChild(template);
+        }
     })();
+
+style.
+    /* insert style here */
