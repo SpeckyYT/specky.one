@@ -14,31 +14,66 @@ head
 
 body
     h1 Dictionary
-    p.
+    span.
         guys please help me
-
+    #overlay
     .messages
 
 template#message_template
     .message
-        .head
-            img.avatar
-            p.username
-            p.timestamp
         .body
-            p.content
-            p.edited
-        .footer
+            img.avatar
+            .messageText
+                .messageInfo
+                    span.username
+                    span.timestamp
+                .content
+                    span.text
+                    span.edited
+        .messageReactions
+        .reactionScreen
             .reactions
+            .userEntries
 
 template#reaction
     .reaction
         img.reaction-image
-        p.reaction-count
+        span.reaction-count
+
+template#userEntry
+    .userEntry
+        img.avatar
+        span.username
+    
 
 script.
+    let currentMessage = "";
+    let lastChange = -1;
+    function displayReactions(message, reaction) {
+        const messageElement = document.querySelector(`div[data-message-id="${message}"]`);
+        messageElement.querySelectorAll(`div[data-reaction="${reaction}"]`).forEach(e => e.setAttribute("active", "1"));
+        messageElement.querySelectorAll(`.reaction, .users`).forEach(e => (e.getAttribute("data-reaction") != reaction && e.getAttribute("active") == "1") && e.setAttribute("active", "0"));
+        messageElement.querySelector(".reactionScreen").style.visibility = "visible";
+        document.getElementById("overlay").style.display = "block";
+        currentMessage = message;
+        lastChange = Date.now();
+    };
+
+    function hideReactions() {
+        if (lastChange + 100 > Date.now()) return;
+        const menu = document.querySelector(`div[data-message-id="${currentMessage}"] .reactionScreen`);
+        if (menu.style.visibility == "hidden") return;
+        menu.style.visibility = "hidden";
+        document.getElementById("overlay").style.display = "none";
+        currentMessage = null;
+    };
+
+    document.addEventListener("click", (ev) => {
+        if (!ev.target?.parentElement?.classList?.contains("reactionScreen") && currentMessage) hideReactions();
+    });
+
     (async function() {
-        const dictionary = await fetch("/dictionary/dictionary1.json").then(j=>j.json());
+        const dictionary = await fetch("/dictionary1.json").then(j=>j.json());
 
         const allUsers = new Map();
 
@@ -61,18 +96,54 @@ script.
             const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`
 
             const template = document.getElementById('message_template').content.cloneNode(true);
+            template.querySelector('.message').setAttribute("data-message-id", message.id);
             template.querySelector('img.avatar').src = user.assets.avatarURL || user.assets.defaultAvatarURL;
-            template.querySelector('p.username').textContent = user.basicInfo.globalName || user.basicInfo.username;
-            template.querySelector('p.timestamp').textContent = formattedDate;
-            template.querySelector('p.content').textContent = message.content;
-            template.querySelector('p.edited').textContent = message.edit && "(edited)";
+            template.querySelector('span.username').textContent = user.basicInfo.globalName || user.basicInfo.username;
+            template.querySelector('span.timestamp').textContent = formattedDate;
+            template.querySelector('span.text').textContent = message.content;
+            template.querySelector('span.edited').textContent = message.edit && "(edited)";
 
-            console.log(message.reactions);
-            for(const reaction of message.reactions) {
+            for(const i in message.reactions) {
+                const reaction = message.reactions[i];
                 const reactions = document.getElementById('reaction').content.cloneNode(true);
+                reactions.querySelector('.reaction').oncontextmenu = (ev) => {
+                    ev.preventDefault();
+                    displayReactions(message.id, reaction.emoji.code);
+                }
                 reactions.querySelector('img.reaction-image').src = reaction.emoji.imageUrl;
-                reactions.querySelector('p.reaction-count').textContent = reaction.count;
-                template.querySelector('.reactions').appendChild(reactions);
+                reactions.querySelector('span.reaction-count').textContent = reaction.count;
+                template.querySelector('.messageReactions').appendChild(reactions);
+
+                const clone = document.getElementById('reaction').content.cloneNode(true);
+                clone.querySelector('img.reaction-image').src = reaction.emoji.imageUrl;
+                clone.querySelector('span.reaction-count').textContent = reaction.count;
+
+                clone.querySelector('.reaction').setAttribute("data-reaction", reaction.emoji.code);
+                clone.querySelector('.reaction').setAttribute("active", i == "0" ? "1" : "0");
+                clone.querySelector('.reaction').onclick = (() => {
+                    displayReactions(message.id, reaction.emoji.code);
+                })
+
+                template.querySelector('.reactions').appendChild(clone);
+
+                const users = document.createElement("div");
+                users.classList.add("users");
+                users.setAttribute("data-reaction", reaction.emoji.code);
+                users.setAttribute("active", i == "0" ? "1" : "0");
+
+                for (const userID of reaction.users) {
+                    const user = allUsers.has(userID) ? allUsers.get(userID) :
+                        await fetch(`https://discord-arts.asure.dev/v1/user/${userID}`)
+                            .then(j=>j.json())
+                            .then(user => (allUsers.set(userID, user.data), user.data) )
+                            .catch(()=>{});
+                    const userEntry = document.getElementById('userEntry').content.cloneNode(true);
+                    userEntry.querySelector('img.avatar').src = user.assets.avatarURL || user.assets.defaultAvatarURL;
+                    userEntry.querySelector('span.username').textContent = user.basicInfo.globalName || user.basicInfo.username;
+                    users.appendChild(userEntry);
+                }
+
+                template.querySelector('.userEntries').appendChild(users);
             }
             
             document.querySelector('div.messages').appendChild(template);
@@ -81,98 +152,183 @@ script.
 
 style.
     body {
-        background-color: #2f3136;
+        background-color: #1e1e1e;
     }
-
-    /* bing copilot my beloved */
 
     .message {
-        display: flex;
-        flex-direction: column;
-        margin: 10px 0;
-        padding: 10px;
-        background-color: #2f3136;
-        border-radius: 5px;
-        color: #dcddde;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    .head {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
     }
 
     .body {
         display: flex;
-        align-items: center;
+        height: 2.5em;
     }
 
-    img.avatar {
-        width: 40px;
-        height: 40px;
+    .messageInfo {
+        height: 1.25em;
+    }
+
+    .timestamp {
+        color: gray;
+        font-size: 75%;
+        font-weight: 500;
+    }
+
+    .avatar {
         border-radius: 50%;
-        margin-right: 10px;
+        width: 2.5em;
+        margin-right: 1em;
     }
 
-    p.username {
-        font-weight: bold;
-        margin: 0;
-        color: #ffffff;
+    .username {
+        font-weight: 500;
+        color: lightgray;
+        font-size: 100%;
+        margin-right: .25em;
     }
 
-    p.timestamp {
-        font-size: 0.75rem;
-        color: #72767d;
-        margin-left: 10px;
+    .content {
+        height: 1em;
+        margin-bottom: 0;
     }
 
-    p.content {
-        margin: 0;
-        line-height: 1.4;
-        color: #dcddde;
+    .text {
+        color: white;
+        font-size: 95%;
+        font-weight: 300;
     }
 
-    p.edited {
-        font-size: 0.75rem;
-        color: #72767d;
-        margin-left: 10px;
+    .edited {
+        color: gray;
+        font-size: 65%;
+        font-weight: 300;
     }
 
-    .footer {
-        display: flex;
-        align-items: center;
-        margin-top: 5px;
+    .messageReactions {
+        display: inline-grid;
+        grid-auto-flow: column;
+        gap: 0.375em;
+        padding-left: 3.5em;
     }
 
-    .reactions {
-        display: flex;
-        align-items: center;
+    .reaction-image {
+        height: 1em;
     }
 
     .reaction {
+        height: 1em;
+        border: .0625rem solid transparent;
+        background-color: #171717;
         display: flex;
         align-items: center;
-        background-color: #36393f;
-        border-radius: 10px;
-        padding: 2px 6px;
-        margin-right: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s;
+        margin-top: .5em;
+        margin-bottom: .5em;
+        border-radius: .75rem;
+        padding: .25rem .375rem;
     }
 
     .reaction:hover {
-        background-color: #42464d;
+        background-color: #2A2A2A;
     }
 
-    img.reaction-image {
-        width: 16px;
-        height: 16px;
+    .reaction-count {
+        color: lightgray;
+        font-weight: 600;
+        margin-left: .375em;
+        height: 100%;
+        line-height: 1em;
+        vertical-align: middle;
+        text-align: center;
     }
 
-    p.reaction-count {
-        font-size: 0.75rem;
-        color: #dcddde;
-        margin-right: 5px;
+    .reactionScreen {
+        display: flex;
+        height: 28em;
+        width: 32em;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        visibility: hidden;
+        z-index: 999;
     }
 
+    .reactions {
+        background-color: #171717;
+        display: inline-flex;
+        flex-direction: column;
+        gap: 0.375em;
+        padding: 0.5em;
+    }
+
+    .reactions .reaction[active="1"] {
+        background-color: #090909;
+        padding-right: 2.25em;
+        grid-column: 1;
+    }
+
+    .reactions .reaction-image {
+        height: 1.25em;
+    }
+
+    .reactions .reaction {
+        padding: 0.5em;
+        margin: 0;
+    }
+
+    .userEntries {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+    }
+
+    .userEntries .users[active="1"] {
+        background-color: #1b1b1b;
+        padding: 0.5em;
+        height: 100%;
+    }
+
+    .userEntry {
+        display: flex;
+        height: 1.75em;
+        align-items: center;
+        margin-bottom: 0.375em;
+    }
+
+    .userEntry .avatar {
+        width: 1.75em;
+        margin-right: .65em;
+        margin-left: .1em;
+    }
+
+    .userEntry .username {
+        font-weight: 400;
+        line-height: 1em;
+        font-size: 1em;
+        color: lightgray;
+    }
+
+    .userEntries .users[active="0"] {
+        display: none;
+    }
+
+    #overlay {
+        position: fixed;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 2;
+    }
+
+    .users hr {
+        margin: 0.75em 0;
+        border: none;
+        height: 1px;
+        background-color: #2A2A2A;
+        
+    }
