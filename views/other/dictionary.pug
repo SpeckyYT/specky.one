@@ -96,9 +96,26 @@ script.
             for(const i in message.reactions) {
                 const reaction = message.reactions[i];
                 const reactions = document.getElementById('reaction').content.cloneNode(true);
-                reactions.querySelector('.reaction').oncontextmenu = (ev) => {
+                const reactionElement = reactions.querySelector('.reaction');
+                reactionElement.setAttribute('data-reaction', reaction.emoji.code);
+                reactionElement.oncontextmenu = (ev) => {
                     ev.preventDefault();
                     displayReactions(message.id, reaction.emoji.code);
+                }
+                reactionElement.onclick = (ev) => {
+                    ev.preventDefault();
+                    const reactionElement = ev.currentTarget;
+                    reactionElement.classList.toggle('reaction-incremented');
+                    const countElement = reactionElement.querySelector('span.reaction-count');
+                    let count = parseInt(countElement.textContent, 10);
+                    if(reactionElement.classList.contains('reaction-incremented')) {
+                        count += 1;
+                    } else {
+                        count -= 1;
+                    }
+                    countElement.textContent = count;
+                    // also update the count on the reaction page (I tried for a while but failed)
+                    // and enable / disable the "you" reaction
                 }
                 reactions.querySelector('img.reaction-image').src = reaction.emoji.imageUrl;
                 reactions.querySelector('span.reaction-count').textContent = reaction.count;
@@ -123,11 +140,19 @@ script.
 
                 for (const userID of reaction.users) {
                     const user = await fetchUser(userID);
-                    const userEntry = document.getElementById('userEntry').content.cloneNode(true);
-                    userEntry.querySelector('img.avatar').src = user.assets.avatarURL || user.assets.defaultAvatarURL;
-                    userEntry.querySelector('span.username').textContent = user.basicInfo.globalName || user.basicInfo.username;
+                    const userEntry = createReactionUserEntry(
+                        user.basicInfo.globalName || user.basicInfo.username,
+                        user.assets.avatarURL || user.assets.defaultAvatarURL,
+                    );
                     users.appendChild(userEntry);
                 }
+                // // this sounds like a funny idea, no idea exactly how to implement it
+                // const youEntry = createReactionUserEntry(
+                //     "You",
+                //     "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/svg/1f921.svg",
+                // );
+                // youEntry.querySelector(".userEntry").classList.add("reaction-you");
+                // users.appendChild(youEntry);
 
                 template.querySelector('.userEntries').appendChild(users);
             }
@@ -161,6 +186,13 @@ script.
             hour12: false 
         };
         return date.toLocaleString(undefined, options).replace(',', '');
+    }
+
+    function createReactionUserEntry(username, avatar) {
+        const userEntry = document.getElementById('userEntry').content.cloneNode(true);
+        userEntry.querySelector('img.avatar').src = avatar;
+        userEntry.querySelector('span.username').textContent = username;
+        return userEntry
     }
 
 style.
@@ -237,12 +269,15 @@ style.
         align-items: center;
         margin-top: .5em;
         margin-bottom: .5em;
-        border-radius: .75rem;
+        border-radius: .5rem;
         padding: .25rem .375rem;
     }
 
-    .reaction:hover {
+    .reaction:hover:not(.reaction-incremented) {
         background-color: #2A2A2A;
+        outline-style: solid;
+        outline-width: 0.1em;
+        outline-color: #585A5E;
     }
 
     .reaction-count {
@@ -253,6 +288,13 @@ style.
         line-height: 1em;
         vertical-align: middle;
         text-align: center;
+    }
+
+    .reaction-incremented {
+        background-color: #373A54;
+        outline-style: solid;
+        outline-width: 0.1em;
+        outline-color: #4F59CD;
     }
 
     .reactionScreen {
