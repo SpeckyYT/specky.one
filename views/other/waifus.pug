@@ -209,7 +209,11 @@ style.
         cursor: pointer;
         filter: brightness(0.2);
         backdrop-filter: brightness(0);
+        transition: filter 0.3s ease-in-out;
         filter: blur(1vw) grayscale(100%);
+    }
+    .nsfw:hover {
+        filter: blur(0.5vw) grayscale(50%);
     }
     .undraggable {
         /* https://stackoverflow.com/questions/12906789/preventing-an-image-from-being-draggable-or-selectable-without-using-js */
