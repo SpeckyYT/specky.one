@@ -3,6 +3,10 @@
 ## .env structure
 
 ```py
+## HTTPS
+CERT_KEY = "path to `privkey.pem` file"
+CERT_CERT = "path to `fullchain.pem` file"
+
 ## UTILS
 
 # prints some more stuff that may be useful

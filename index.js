@@ -22,6 +22,9 @@ const filehound = require('filehound');
 const colors = require('colors/safe');
 const session = require('express-session');
 const { StatusCodes } = require('http-status-codes');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 const discordAuth = require('./middleware/discordAuth').default;
 const devMode = require('./middleware/devMode');
@@ -98,7 +101,25 @@ app.all('*', (req, res) => {
 app.uptime = Date.now();
 
 if(!global.isTest) {
-    app.listen(80);
+    const options = {
+        key: (() => {
+            try {
+                return fs.readFileSync(process.env.CERT_KEY);
+            } catch(err) {
+                return null
+            }
+        })(),
+        cert: (() => {
+            try {
+                return fs.readFileSync(process.env.CERT_CERT);
+            } catch(err) {
+                return null
+            }
+        })(),
+    };
+
+    http.createServer(app).listen(80);
+    https.createServer(options, app).listen(443);
 } else {
     process.exit(0);
 }
