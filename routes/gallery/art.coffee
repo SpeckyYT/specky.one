@@ -78,7 +78,7 @@ all_art = [
     context: listened_to_song "Daidai Genome - Tsunamaru ft. nami"
     year: 2021
 ,
-    filename: "despression.png"
+    filename: "depression.png"
     name: "Depression"
     year: 2024
 ,
