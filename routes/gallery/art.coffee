@@ -78,6 +78,10 @@ all_art = [
     context: listened_to_song "Daidai Genome - Tsunamaru ft. nami"
     year: 2021
 ,
+    filename: "despression.png"
+    name: "Depression"
+    year: 2024
+,
     filename: "desync.png"
     name: "Desync"
     year: 2022
@@ -388,6 +392,10 @@ all_art = [
     name: "Staircase"
     year: 2020
 ,
+    filename: "susie.png"
+    name: "Susie"
+    year: 2025
+,
     filename: "steve.png"
     name: "Steve"
     year: 2023
@@ -412,6 +420,10 @@ all_art = [
     filename: "TheMiddle.png"
     name: "The Middle"
     year: 2020
+,
+    filename: "tomatoes.png"
+    name: "Tomatoes"
+    year: 2025
 ,
     filename: "tpc.png"
     name: "TPC"
