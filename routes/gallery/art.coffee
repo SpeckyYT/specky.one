@@ -173,6 +173,10 @@ all_art = [
     name: "Helplessness"
     year: 2021
 ,
+    filename: "holder.png"
+    name: "Holder"
+    year: 2025
+,
     filename: "IBSL.png"
     name: "IBSL"
     year: 2022
@@ -488,6 +492,10 @@ all_art = [
     filename: "xor.png"
     name: "XOR"
     year: 2020
+,
+    filename: "younger.png"
+    name: "Younger"
+    year: 2025
 ,
     filename: "zoe.png"
     name: "Zoe"
