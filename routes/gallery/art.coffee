@@ -3,10 +3,14 @@ default_context = "Nobody knows anything about this"
 # default_year = "#{new Date().getFullYear()}"
 
 listened_to_song = (song) -> """I was listening to "#{song}" while making this."""
+made_for_friend = (friend) -> "Made for a friend called '#{friend}'"
 
 all_art = [
     filename: "10000ms.png"
     name: "10000ms"
+    context: """
+        This image took around 10 seconds to make, that's why it's called like that
+    """
     year: 2020
 ,
     filename: "247.png"
@@ -19,6 +23,9 @@ all_art = [
 ,
     filename: "absent.png"
     name: "Absent"
+    context: """
+        I was part of the BombSquad community for a bit, then left, later someone started impersonating me and I got banned for what they did.
+    """
     year: 2022
 ,
     filename: "ace.png"
@@ -51,6 +58,9 @@ all_art = [
 ,
     filename: "Butterfly.png"
     name: "Butterfly"
+    context: """
+        The white strip kinda looked like a Butterfly to me, so that's how I named it.
+    """
     year: 2020
 ,
     filename: "call.png"
@@ -59,10 +69,16 @@ all_art = [
 ,
     filename: "clone.png"
     name: "Clone"
+    context: """
+        This is a "Clone" of Butterfly, but horizontal instead of vertical.
+    """
     year: 2021
 ,
     filename: "coding.png"
     name: "Coding"
+    context: """
+        I took a screenshot of my screen while I was coding, and I distorted the image. If you zoom, you'll see some filenames and code.
+    """
     year: 2020
 ,
     filename: "complains.png"
@@ -104,6 +120,9 @@ all_art = [
 ,
     filename: "download.png"
     name: "Download"
+    context: """
+        I was downloading games.
+    """
     year: 2020
 ,
     filename: "dream.png"
@@ -137,10 +156,17 @@ all_art = [
 ,
     filename: "free.png"
     name: "Free"
+    context: """
+        I was claiming free games online.
+    """
     year: 2021
 ,
     filename: "fuse.png"
     name: "Fuse"
+    context: """
+        I was watching a video about fireworks.
+        https://youtu.be/lfkjm2YRG-Q
+    """
     year: 2023
 ,
     filename: "galaxy collapsed.png"
@@ -155,11 +181,25 @@ all_art = [
 ,
     filename: "golira.png"
     name: "Golira"
+    context: """
+        There was a person with a black and white gorilla profile picture contacting me, so I named this one Golira.
+    """
     year: 2021
 ,
     filename: "guarda-spagnola.png"
     name: "Guarda Spagnola"
+    context: """
+        I saw a meme saying "Fanculo le guardie spagnole" which means "Fuck the spanish guards/police" in italian.
+        I misspelled the name and it will permanently remain like this.
+    """
     year: 2021
+,
+    filename: "guaxinim.png"
+    name: "Guaxinim"
+    context: """
+        I was on a Discord call with a person called 'Golden Guaxinim'.
+    """
+    year: 2025
 ,
     filename: "headaxe.png"
     name: "Headaxe"
@@ -167,6 +207,9 @@ all_art = [
 ,
     filename: "heaven portal.png"
     name: "Heaven Portal"
+    context: """
+        I was watching a video about Super Mario 64, where there's a trick called 'Heaven Portal' which is an upwarp.
+    """
     year: 2020
 ,
     filename: "helplessness.png"
@@ -175,6 +218,9 @@ all_art = [
 ,
     filename: "holder.png"
     name: "Holder"
+    context: """
+        I was talking to someone on Discord about pen holders.
+    """
     year: 2025
 ,
     filename: "IBSL.png"
@@ -191,6 +237,7 @@ all_art = [
 ,
     filename: "liava.png"
     name: "Liava"
+    context: made_for_friend "Liava"
     year: 2021
 ,
     filename: "light.png"
@@ -203,6 +250,9 @@ all_art = [
 ,
     filename: "listening.png"
     name: "Listening"
+    context: """
+        I was on Discord listening to other people and not saying much.
+    """
     year: 2022
 ,
     filename: "LLL.png"
@@ -211,6 +261,9 @@ all_art = [
 ,
     filename: "local-fantasy.png"
     name: "Local Fantasy"
+    context: """
+        Made this as the icon for a small collection of Specky Gallery Artworks, but it didn't take off.
+    """
     year: 2022
 ,
     filename: "lonely.png"
@@ -228,6 +281,9 @@ all_art = [
 ,
     filename: "mansion.png"
     name: "Mansion"
+    context: """
+        I was watching a livestream of a friend of mine and he was playing Mario Party on a Ghost Mansion board.
+    """
     year: 2021
 ,
     filename: "mayday.png"
@@ -249,6 +305,7 @@ all_art = [
 ,
     filename: "melogranow.png"
     name: "Melogranow"
+    context: made_for_friend "Wolfe/Melogranow/the 23e guy"
     year: 2023
 ,
     filename: "memories.png"
@@ -273,6 +330,9 @@ all_art = [
 ,
     filename: "moth.png"
     name: "Moth"
+    context: """
+        This is a clone of Butterfly
+    """
     year: 2024
 ,
     filename: "mth.png"
@@ -281,10 +341,16 @@ all_art = [
 ,
     filename: "nds.png"
     name: "NDS"
+    context: """
+        NDS stands for "Niente Di Serio" which means "Nothing serious (referred to this artwork)."
+    """
     year: 2019
 ,
     filename: "nnn.png"
     name: "NNN"
+    context: """
+        I think you should know what this means...
+    """
     year: 2020
 ,
     filename: "nothingtodo.png"
@@ -293,6 +359,9 @@ all_art = [
 ,
     filename: "Old Style.png"
     name: "Old Style"
+    context: """
+        I made this one for showcasing how bad my "Old Style" was.
+    """
     year: 2020
 ,
     filename: "orb.png"
@@ -317,6 +386,9 @@ all_art = [
 ,
     filename: "radio.png"
     name: "Radio"
+    context: """
+        I was making "specky.one/radio" (currently dead)
+    """
     year: 2022
 ,
     filename: "reality.png"
@@ -337,6 +409,7 @@ all_art = [
 ,
     filename: "school.png"
     name: "School"
+    context: "School in 2020 be like:"
     year: 2020
 ,
     filename: "scratched_dreams.png"
@@ -378,6 +451,9 @@ all_art = [
 ,
     filename: "spherebroke.png"
     name: "Sphere Broke"
+    context: """
+        This is a reimagining of Sphere.
+    """
     year: 2020
 ,
     filename: "spikes.png"
@@ -398,6 +474,7 @@ all_art = [
 ,
     filename: "susie.png"
     name: "Susie"
+    context: made_for_friend "Susie"
     year: 2025
 ,
     filename: "steve.png"
@@ -419,6 +496,9 @@ all_art = [
 ,
     filename: "TheMagicCube.png"
     name: "The Magic Cube"
+    context: """
+        "The Magic Cube" was my first pseudonym online.
+    """
     year: 2020
 ,
     filename: "TheMiddle.png"
@@ -427,14 +507,21 @@ all_art = [
 ,
     filename: "tomatoes.png"
     name: "Tomatoes"
+    context: made_for_friend "a can of italian tomatoes"
     year: 2025
 ,
     filename: "tpc.png"
     name: "TPC"
+    context: """
+       TPC stands for "Troppo Poco Complicato" which means "Not complicated enough"
+    """
     year: 2020
 ,
     filename: "twosei.png"
     name: "Two Sei"
+    context: """
+        Two (2) + Sei (6 in italian) => 26, which is the offset rotation degrees of the lines in this artwork.
+    """
     year: 2020
 ,
     filename: "unable.png"
@@ -451,10 +538,17 @@ all_art = [
 ,
     filename: "vocal.png"
     name: "Vocal"
+    context: """
+        I was on Discord listening to other people and not saying much.
+    """
     year: 2020
 ,
     filename: "VX.png"
     name: "VX"
+    context: """
+        I was watching a video about the Kim Jong Nam assassination.
+        https://youtu.be/tLJOnYLiBgA
+    """
     year: 2023
 ,
     filename: "waltz.png"
@@ -478,6 +572,9 @@ all_art = [
 ,
     filename: "Wolle.png"
     name: "Wolle"
+    context: """
+        I got inspired by my friend Wolle for this one (he's currently know as BlackWolf).
+    """
     year: 2020
 ,
     filename: "wrap.png"
@@ -495,10 +592,16 @@ all_art = [
 ,
     filename: "younger.png"
     name: "Younger"
+    context: """
+        I was on Discord, and people were making fun of a person's name since it made them seem to be younger / more childish.
+    """
     year: 2025
 ,
     filename: "zoe.png"
     name: "Zoe"
+    context: """
+        I was upset when I saw that I never named an artwork starting with a 'Z', so I named this one in this way.
+    """
     year: 2024
 ]
 .map (art) ->
