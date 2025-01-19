@@ -56,7 +56,8 @@ const handleFile = async (path, res) => {
 
             return saveAndSend(bufferToBuffer(await image.resize(x, y).getBufferAsync(MIME_JPEG)));
         } catch(err) {
-            const extension = path.split(".").pop() || "file";
+            const filename = path.split(/\\|\//g).pop();
+            const extension = filename.split(".").pop() || "file";
 
             const image = await jimp.create(PIXELS, PIXELS, "#bac");
 

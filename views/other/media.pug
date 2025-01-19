@@ -214,11 +214,11 @@ script.
 
         const newFile = new File([file], fileName, { type: file.type });
 
-        popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
-
         const formData = new FormData();
         formData.append('file', newFile);
 
+        popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
+        
         await fetch('/media/files', {
             method: 'POST',
             body: formData,
