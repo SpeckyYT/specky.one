@@ -153,6 +153,31 @@ router.delete("/:id/:file", async (req, res) => {
     }
 })
 
+router.patch("/:id/:file", async (req, res) => {
+    const id = req.params.id;
+    const oldFile = req.params.file;
+    const newFile = req.query.newname;
+
+    if (id != (req.session?.discord?.user?.id || "unknown")) return res.sendStatus(403);
+
+    if (!newFile || !isValidFilename(newFile)) return res.status(400).send("Invalid new filename");
+
+    const userFolder = getUserFolder(req.session?.discord?.user?.id);
+    const oldFilePath = resolvePath(userFolder, oldFile);
+    const newFilePath = resolvePath(userFolder, newFile);
+
+    if(!oldFilePath || !newFilePath) return res.sendStatus(400);
+    if (!fss.existsSync(oldFilePath)) return res.sendStatus(404);
+    if (fss.existsSync(newFilePath)) return res.sendStatus(409);
+
+    try {
+        await fs.rename(oldFilePath, newFilePath);
+        res.send("File renamed");
+    } catch (err) {
+        res.status(500).send(`${err}`);
+    }
+});
+
 // https://stackoverflow.com/a/11101624
 function isValidFilename(filename) {
     const rg1 = /^[^\\/:\*\?"<>\|]+$/; // forbidden characters \ / : * ? " < > |

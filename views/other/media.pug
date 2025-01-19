@@ -22,6 +22,7 @@ else
     div#context-menu.hidden
         div#open.menu-item Open in browser
         div#copy.menu-item Copy link
+        div#rename.menu-item Rename
         div#delete.menu-item.red-text Delete
 
     h2 Upload
@@ -209,14 +210,14 @@ script.
         if(file.size >= 2**32)
             return popup("What the fuck are you doing? 🤨")
 
-        const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
+        const fileName = fixFilename(file.name) || `${Date.now()}`;
 
-        file.name = fileName;
+        const newFile = new File([file], fileName, { type: file.type });
 
         popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', newFile);
 
         await fetch('/media/files', {
             method: 'POST',
@@ -255,6 +256,10 @@ script.
         name.textContent = file.split("/").slice(-1);
         // Append the file item to the grid
         grid.appendChild(fileItem);
+    }
+
+    function fixFilename(filename) {
+        return filename.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g, "");
     }
 
     async function updateFiles() {
@@ -347,6 +352,33 @@ script.
         .catch(() => {
             popup("Failed to load to clipboard.");
         })
+    });
+
+    document.querySelector("#rename").addEventListener("click", function(event) {
+        if(!currentTarget) return;
+
+        const img = currentTarget.querySelector('img');
+        const url = new URL(img.imageLink);
+        const pathname = url.pathname;
+        const actualPath = pathname.split(/\/|\\/g).slice(-2).join("/");
+
+        const newFileName = prompt("Enter new file name:", getBasename(actualPath));
+        const finalFilename = fixFilename(newFileName);
+        if (!finalFilename) return popup("Filename can't be empty");
+
+        return fetch(`/media/${actualPath}?newname=${finalFilename}`, { method: "PATCH" })
+        .then(async response => {
+            if (response.ok) {
+                popup(`File renamed to "${finalFilename}" successfully!`, "success");
+                await updateFiles();
+            } else {
+                popup(`Unknown error: ${response.status}`);
+            }
+        })
+        .catch(async err => {
+            popup(`${err}`);
+            await updateFiles();
+        });
     });
 
     document.querySelector("#delete").addEventListener("click", function(event) {
