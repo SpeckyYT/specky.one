@@ -32,7 +32,7 @@ else
 
         input#file-input.hidden(type="file")
     br
-    input#send(type="button" value="Save")
+    input#send(type="button" value="Upload")
 
     if req.discord.powerLevel() >= 2
         div#users
@@ -211,28 +211,16 @@ script.
 
         const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
 
+        file.name = fileName;
+
         popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
+
+        const formData = new FormData();
+        formData.append('file', file);
 
         await fetch('/media/files', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                filename: fileName,
-                size: file.size,
-                content: await (async () => {
-                    const reader = new FileReader()
-                    reader.readAsArrayBuffer(file)
-
-                    return new Promise(res => {
-                        reader.onload = async function(e) {
-                            const bytes = Array.from(new Uint8Array(e.target.result))
-                            res(bytes);
-                        }
-                    })
-                })()
-            }),
+            body: formData,
         })
         .then(response => {
             if(response.ok) {
