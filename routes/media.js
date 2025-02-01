@@ -7,6 +7,7 @@ const fs = require('fs/promises');
 const fss = require('fs');
 const path = require('path');
 const multer = require('multer');
+const prettyBytes = require('pretty-bytes');
 
 const maxSize = 2**32; // 4GB seem good
 const maxUserSize = 2**25; // 33MB seem good
@@ -32,7 +33,11 @@ for(const userFolder of fss.readdirSync(mediaFolder).map(f => path.join(mediaFol
 }
 
 router.get("/", (req, res) => {
-    res.render("other/media.pug", { req, res })
+    res.render("other/media.pug", {
+        req, res,
+        maxSize, maxUserSize, maxUserFiles,
+        prettyBytes,
+    })
 })
 
 router.use("*", async (req, res, next) => {

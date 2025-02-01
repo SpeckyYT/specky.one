@@ -2,6 +2,10 @@ include ../includes/style.pug
 include ../includes/popup.pug
 include ../includes/konami.pug
 
+-
+    const myFileSize = req.discord.isAdmin() ? maxSize : maxUserSize;
+    const myFileCount = req.discord.isAdmin() ? 9999 : maxUserFiles;
+
 h1 Specky Media Hosting
 
 if req.discord.powerLevel() == 0
@@ -9,6 +13,13 @@ if req.discord.powerLevel() == 0
     p #[a(href="/") Go back] and login with Discord to use this service
 
 else
+    details
+        summary What can you upload?
+        | Maximal size per file: #{prettyBytes(myFileSize)}
+        br
+        | Maximum amount of files: #{myFileCount}
+
+
     h2 Your files
 
     div#file-grid.file-grid
@@ -187,14 +198,6 @@ script.
         fileInput.dispatchEvent(changeEvent);
     });
 
-    // konami code
-    let bypassSizeLimit = false;
-
-    const output = setupKonamiCode(() => {
-        popup("You enabled bigger file uploads (if you are a normal user, this won't do anything)", "success");
-        bypassSizeLimit = true;
-    })
-
     /* save */
     saveButton.addEventListener("click", async (event) => {
         event.preventDefault()
@@ -204,11 +207,12 @@ script.
         if(!file)
             return popup("File not found")
     
-        if(!bypassSizeLimit && file.size > 2**25)
+        // TODO: add in the future a way to make size expandible or something
+        if(file.size > #{myFileSize})
             return popup("File is too big");
         
-        if(file.size >= 2**32)
-            return popup("What the fuck are you doing? 🤨")
+        //- if(file.size >= #{maxSize})
+        //-     return popup("What the fuck are you doing? 🤨")
 
         const fileName = fixFilename(file.name) || `${Date.now()}`;
 
