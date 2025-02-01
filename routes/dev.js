@@ -28,7 +28,7 @@ if(DEV_MODE) {
             devModeSettings.powerLevel = powerLevel
         }
         if(typeof isAdmin == "boolean") {
-            devModeSettings.isAdmin = true
+            devModeSettings.isAdmin = isAdmin
         }
         if(user && typeof user == "object") {
             devModeSettings.user = {
