@@ -36,6 +36,8 @@ setImmediate(async () => {
             grid[w][h] = grid[w][h] || ALLOWED_COLORS[0];
         }
     }
+    let history = await lonelyDB.get("history");
+    if(!Array.isArray(history)) lonelyDB.set("history", []);
 });
 
 // if you are reading this, resulution won't be set to something bigger than 64
@@ -60,17 +62,17 @@ const stats = {
 };
 
 function giveTimeout() {
-    if (stats.activity <= 20) {
+    if (stats.activity <= 60) {
         return 5;
-    } if (stats.activity <= 50) {
+    } if (stats.activity <= 120) {
         return 10;
-    } else if (stats.activity <= 100) {
+    } else if (stats.activity <= 180) {
         return 20;
-    } else if (stats.activity <= 200) {
+    } else if (stats.activity <= 240) {
         return 30;
-    } else if (stats.activity <= 500) {
+    } else if (stats.activity <= 300) {
         return 60;
-    } else if (stats.activity <= 1000) {
+    } else if (stats.activity <= 360) {
         return 120;
     } else {
         return 180;
@@ -90,7 +92,13 @@ function updateListeners(data, ignore) {
     }
 }
 
+const updateGridDB = () => {
+    lonelyDB.set('grid', grid)
+};
+
 server.on('connection', async (sock, req) => {
+    if(grid instanceof Promise) return sock.terminate();
+
     let id = `${req.socket.remoteAddress}`;
 
     function sendJSON(content) {
@@ -126,7 +134,10 @@ server.on('connection', async (sock, req) => {
                 if(grid[x][y] != color){
                     grid[x][y] = color;
                     increaseActivity();
-                    timeout[id] = Date.now() + giveTimeout() * 1000;
+                    let timeNow = Date.now();
+                    timeout[id] = timeNow + giveTimeout() * 1000;
+                    updateGridDB();
+                    lonelyDB.push("history", [x, y, timeNow, color]);
                     sendJSON({
                         x: x,
                         y: y,
@@ -169,7 +180,7 @@ server.on('connection', async (sock, req) => {
 
 cron.schedule("0 * * * * *", (date) => {
     // once per minute will save the grid
-    db.set('grid', grid)
+    updateGridDB();
 })
 
 router.get('/', async (req, res, next) => {
