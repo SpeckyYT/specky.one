@@ -1,22 +1,8 @@
 const { Router } = require('express');
 const router = Router();
 
-/*
 const ws = require('ws');
 const cron = require('node-cron');
-const sigi = require('sigidb');
-
-const db = sigi('lonely.sqlite');
-
-// Lonely Place informations
-const grid = db.get('grid') || [];
-
-// if you are reading this, resulution won't be set to something bigger than 64
-// since the front-end canvas doesn't implement a zoom feature to zoom in in a pretty way
-//
-// If you want to upgrade the resolution, you should implement a zoom feature to the front-end
-const WIDTH = 64;
-const HEIGHT = 64;
 
 // Literally copy and pasted from r/place 🤣🤣🤣🤣
 const ALLOWED_COLORS = [
@@ -38,12 +24,26 @@ const ALLOWED_COLORS = [
     '#ffa7d1',
 ]
 
-for (let w = 0; w < WIDTH; w++) {
-    grid[w] = grid[w] || [];
-    for (let h = 0; h < HEIGHT; h++) {
-        grid[w][h] = grid[w][h] || ALLOWED_COLORS[0];
+// Lonely Place informations
+const lonelyDB = database.table("lonely");
+let grid = lonelyDB.get("grid").catch(()=>[]);
+
+setImmediate(async () => {
+    grid = await grid || [];
+    for (let w = 0; w < WIDTH; w++) {
+        grid[w] = grid[w] || [];
+        for (let h = 0; h < HEIGHT; h++) {
+            grid[w][h] = grid[w][h] || ALLOWED_COLORS[0];
+        }
     }
-}
+});
+
+// if you are reading this, resulution won't be set to something bigger than 64
+// since the front-end canvas doesn't implement a zoom feature to zoom in in a pretty way
+//
+// If you want to upgrade the resolution, you should implement a zoom feature to the front-end
+const WIDTH = 64;
+const HEIGHT = 64;
 
 // Server for Lonely Place
 const PORT = 1505;
@@ -172,16 +172,18 @@ cron.schedule("0 * * * * *", (date) => {
     db.set('grid', grid)
 })
 
-*/
-
-router.get('/', async (req, res) => {
-    res.render('games/lonely.pug', {
-        req,
-        res,
-        // port: PORT,
-        // width: WIDTH,
-        // height: HEIGHT,
-    })
+router.get('/', async (req, res, next) => {
+    if(grid instanceof Promise) {
+        next() // 404 if grid not loaded
+    } else {
+        res.render('games/lonely.pug', {
+            req,
+            res,
+            port: PORT,
+            width: WIDTH,
+            height: HEIGHT,
+        })
+    }
 })
 
 module.exports = {
