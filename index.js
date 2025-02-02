@@ -13,7 +13,7 @@ global.TMDB_KEY = process.env.TMDB_KEY || '';
 global.LANGUAGES = ['.js', '.coffee']
 global.uptime = Date.now();
 
-// global.database = require('./handlers/database');
+global.database = require('./handlers/database');
 
 require('coffeescript').register();
 const path = require('path');
