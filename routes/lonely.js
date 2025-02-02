@@ -3,6 +3,7 @@ const router = Router();
 
 const ws = require('ws');
 const cron = require('node-cron');
+const https = require('https');
 
 // Literally copy and pasted from r/place 🤣🤣🤣🤣
 const ALLOWED_COLORS = [
@@ -50,10 +51,17 @@ const HEIGHT = 64;
 // Server for Lonely Place
 const PORT = 1505;
 
-const server = new ws.Server({
-    path: '/lonely/ws',
-    port: PORT,
-});
+let server;
+if(DEV_MODE) {
+    server = new ws.Server({
+        port: PORT,
+    });
+} else {
+    const httpsServer = https.createServer(httpsCertificates).listen(PORT);
+    server = new ws.Server({
+        server: httpsServer,
+    });
+}
 
 const listeners = {};
 const timeout = {};
@@ -193,6 +201,7 @@ router.get('/', async (req, res, next) => {
             port: PORT,
             width: WIDTH,
             height: HEIGHT,
+            DEV_MODE: DEV_MODE,
         })
     }
 })

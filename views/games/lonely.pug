@@ -86,8 +86,13 @@ head
                     }));
                 }
             });
-      
-            const socket = new WebSocket("ws://#{req.hostname}:#{port}/lonely/ws");
+
+            let socket = undefined;
+            if(#{DEV_MODE}) {
+                socket = new WebSocket("ws://#{req.hostname}:#{port}");
+            } else {
+                socket = new WebSocket("wss://#{req.hostname}:#{port}");
+            }
 
             socket.addEventListener("open", async (event) => {
                 isSocketConnected = true

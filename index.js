@@ -40,6 +40,23 @@ global.sessionMiddleware = session({
     resave: true,
     store: sessionMemoryStore,
 })
+global.httpsCertificates = {
+    key: (() => {
+        try {
+            return fs.readFileSync(process.env.CERT_KEY);
+        } catch(err) {
+            return null
+        }
+    })(),
+    cert: (() => {
+        try {
+            return fs.readFileSync(process.env.CERT_CERT);
+        } catch(err) {
+            return null
+        }
+    })(),
+}
+
 global.isTest = process.argv.includes("TEST");
 
 global.app = express();
@@ -101,25 +118,8 @@ app.all('*', (req, res) => {
 app.uptime = Date.now();
 
 if(!global.isTest) {
-    const options = {
-        key: (() => {
-            try {
-                return fs.readFileSync(process.env.CERT_KEY);
-            } catch(err) {
-                return null
-            }
-        })(),
-        cert: (() => {
-            try {
-                return fs.readFileSync(process.env.CERT_CERT);
-            } catch(err) {
-                return null
-            }
-        })(),
-    };
-
     http.createServer(app).listen(80);
-    https.createServer(options, app).listen(443);
+    https.createServer(httpsCertificates, app).listen(443);
 } else {
     process.exit(0);
 }
