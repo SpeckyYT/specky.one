@@ -346,6 +346,20 @@ all_art = [
     """
     year: 2019
 ,
+    filename: "ng.png"
+    name: "NG"
+    description: """
+        Never has the day come, it's gonna be great, they say...
+    """
+    context: """
+        This is the representation of a dream I had.
+        There was a meme on the left on a brown paper with two lines of text, an empty line, and a line of text.
+        There was a penguin on the right filling the blank in the meme, but nothing had sense.
+        After this dream segment, I was thinking "I'll write a story where the first line of every row is a word of Never Gonna Give You Up".
+        So I came up with the text I wrote in the description of this art piece.
+    """
+    year: 2025
+,
     filename: "nnn.png"
     name: "NNN"
     context: """
@@ -565,6 +579,13 @@ all_art = [
     filename: "wave.png"
     name: "Wave"
     year: 2021
+,
+    filename: "win.png"
+    name: "WIN"
+    context: """
+        WIN stands for "What I Needed"
+    """
+    year: 2025
 ,
     filename: "wishes.png"
     name: "Wishes"
