@@ -67,6 +67,7 @@ const listeners = {};
 const timeout = {};
 const stats = {
     activity: 0,
+    connections: 0,
 };
 
 function giveTimeout() {
@@ -92,11 +93,9 @@ function increaseActivity() {
     setTimeout(() => stats.activity--, 5*60*1000);
 }
 
-function updateListeners(data, ignore) {
+function updateListeners(data) {
     for (const id in listeners) {
-        if (id != ignore) {
-            listeners[id].send(JSON.stringify(data));
-        }
+        listeners[id].send(JSON.stringify(data));
     }
 }
 
@@ -107,7 +106,9 @@ const updateGridDB = () => {
 server.on('connection', async (sock, req) => {
     if(grid instanceof Promise) return sock.terminate();
 
-    let id = `${req.socket.remoteAddress}`;
+    let ip = `${req.socket.remoteAddress}`;
+    let id = `${stats.connections} ${req.socket.remoteAddress}`;
+    stats.connections++;
 
     function sendJSON(content) {
         sock.send(JSON.stringify(content));
@@ -119,9 +120,9 @@ server.on('connection', async (sock, req) => {
     })
 
     sock.on('message', (data) => {
-        if(timeout[id] > Date.now()) {
+        if(timeout[ip] > Date.now()) {
             return sendJSON({
-                timeout: timeout[id],
+                timeout: timeout[ip],
             })
         }
 
@@ -143,7 +144,7 @@ server.on('connection', async (sock, req) => {
                     grid[x][y] = color;
                     increaseActivity();
                     let timeNow = Date.now();
-                    timeout[id] = timeNow + giveTimeout() * 1000;
+                    timeout[ip] = timeNow + giveTimeout() * 1000;
                     updateGridDB();
                     lonelyDB.push("history", [x, y, timeNow, color]);
                     sendJSON({
@@ -152,13 +153,13 @@ server.on('connection', async (sock, req) => {
                         color: color,
                         success: true,
                         reason: null,
-                        timeout: timeout[id],
+                        timeout: timeout[ip],
                     })
                     updateListeners({
                         x: x,
                         y: y,
                         color: color,
-                    }, id)
+                    })
                 } else {
                     sendJSON({
                         success: false,
