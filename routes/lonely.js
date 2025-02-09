@@ -104,6 +104,9 @@ const updateGridDB = () => {
 };
 
 server.on('connection', async (sock, req) => {
+    await new Promise(res => sessionMiddleware(req, {}, res));
+    await new Promise(res => discordAuth(req, {}, res));
+
     if(grid instanceof Promise) return sock.terminate();
 
     let ip = `${req.socket.remoteAddress}`;
@@ -144,7 +147,14 @@ server.on('connection', async (sock, req) => {
                     grid[x][y] = color;
                     increaseActivity();
                     let timeNow = Date.now();
-                    timeout[ip] = timeNow + giveTimeout() * 1000;
+                    const powerLevel = req.discord.powerLevel();
+                    if(powerLevel == 1) {
+                        timeout[ip] = timeNow + giveTimeout() * 1000;
+                    } else if(powerLevel == 2) {
+                        timeout[ip] = timeNow + 2000;
+                    } else {
+                        timeout[ip] = timeNow + 3 * giveTimeout() * 1000;
+                    }
                     updateGridDB();
                     lonelyDB.push("history", [x, y, timeNow, color]);
                     sendJSON({

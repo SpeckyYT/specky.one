@@ -26,12 +26,12 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 
-const discordAuth = require('./middleware/discordAuth').default;
 const devMode = require('./middleware/devMode');
 
 const log = require('./util/log');
 require('./util/global');
 
+global.discordAuth = require('./middleware/discordAuth').default;
 global.sessionMemoryStore = new session.MemoryStore();
 global.sessionMiddleware = session({
     secret: Array(32).fill("").map(() => `${(Math.floor(36 * Math.random())).toString(36)}`).join(""),
