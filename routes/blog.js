@@ -2,6 +2,7 @@ const { Router } = require('express');
 const fs = require("fs");
 const path = require("path");
 const { resolvePath } = require('../util/path');
+const prettyMs = require('pretty-ms');
 
 const router = Router();
 
@@ -62,6 +63,23 @@ const blogs = [
             color: "#6ad6e5",
         },
     },
+    {
+        title: "Project 140225",
+        filename: "project140225.pug",
+        path: "project140225",
+        date: new Date(Date.parse("February 14, 2025")),
+        writers: [
+            'Specky',
+        ],
+        tags: [],
+        embed: {
+            title: "Project 140225",
+            description: "One of my most ambitious projects ever.",
+            url: "project140225",
+            image: "https://cdn.pixabay.com/photo/2016/02/08/19/58/heart-1187486_1280.jpg",
+            color: "#ed3c9d",
+        },
+    },
 ]
 .filter(blog => fs.existsSync(resolvePath(process.cwd(), "views", "blog", blog.filename)))
 .map(blog => {
@@ -106,6 +124,7 @@ router.get("/:blog", async (req, res, next) => {
         req,
         res,
         blog,
+        prettyMs,
     });
 })
 

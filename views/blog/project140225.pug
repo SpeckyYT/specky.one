@@ -1,0 +1,126 @@
+include includes/footer.pug
+include includes/return.pug
+include includes/embed.pug
+
+link(rel="stylesheet" href="/blog/blog.css")
+
+head
+    title Project 140225
+
++return
+
+-
+    function kindToEmoji(number) {
+        if(!number) return "🤐"
+        if(number == 1) return "♥️"
+        if(number == 2) return "💔"
+        if(number == 3) return "💝"
+        return "❓"
+    }
+
+article
+    h1 Project 140225
+
+    p.info.
+        All dates are in DD/MM/YY
+
+    code.inline 04/02/25
+    p.
+        Some days prior, I went skiing and saw a "Saint Valentine Party" poster, and on this day I came up with an idea.
+        I will ask out random girls on Discord and see if I can get anyone to hang out with me on Saint Valentine day.
+    
+    code.inline 10/02/25
+    p.
+        I started looking at a lot of discord profiles, finding someone who was clearly showing feminine traits in their 'about me'.
+        I ended up making a quite small list of people.
+    
+    code.inline 11/02/25
+    p.
+        I wrote a message with all of the informations, when I'd be available (14/02 and 15/02), what we could play, and everything.
+        I started sending out the messages to a few of them.
+
+        Surprisingly, I got a response in less than an hour later.
+        She said she's 16 and rejected the offer.
+
+    code.inline 12/02/25
+    p.
+        Nobody else responded yet... I panicked, only two days remained...
+        I sent out a few more messages to some people I scrolled through at random on phone.
+
+        Two girls responded, both rejections.
+        The first one responded that she's taken and happy.
+        The second one said that she already has a valentine.
+
+        But out of nowhere, not even two minutes after I sent the message, a girl wrote "Sure!".
+        Perfect, I had a valentine!
+
+    code.inline 13/02/25
+    p.
+        I notified the person that accepted, that I won't be available on the 15/02.
+
+        Another girl responded saying "drop 300", and I was unsure what she meant, so I asked her, and she wrote "$300".
+        I responded that someone already reserved me to be their valentine.
+        She responded "gtfo dummy u a loser; like ong u lying".
+        I do not really condone this behaviour, I tried to be nice and the best thing I was expecting is for someone to say either yes or no, but this is not something I accept, so I blocked her.
+
+        A girl DMed me "Who are you?" (I was already at sleep at this time)
+
+    code.inline 14/02/25
+    p.
+        I responded to the "Who are you?" question with a "I... am Steve" gif, I thought it was quite funny.
+        We had a short conversation about VR stuff, but she sadly was not available for hanging around.
+
+        The girl that accepted sadly declined, she wasn't home.
+
+        So yeah, I ended up being alone on saint valentine day. I joined a vocal chat and started writing this blog.
+    
+    code.inline 15/02/25
+    p.
+        I DMed all of the girls who did not respond with "if you're reading this at a later date, I hope you had a great saint valentine day!".
+
+        I contacted some friends of mine telling how poorly this project went.
+
+        I finished writing this blog, and this is about everything.
+
+    .answers
+        -
+            const girls = [
+                [1338951021572919308n],
+                [1338951607806591087n],
+                [1338951893501612094n],
+                [1338952268678172723n, 1338980116297945150n, "is 16", 1],
+                [1339133280980701205n],
+                [1339134529436254281n],
+                [1339178186830909471n, 1339721222514020364n, "Who are you?", 1],
+                [1339188287021256706n, 1339188528570962061n, "taken and happy", 1],
+                [1339188650092793919n],
+                [1339189299857326090n, 1339647259003846668n, "drop 300; gtfo dummy u a loser; like ong u lying", 2],
+                [1339193882159747072n],
+                [1339194413603356773n],
+                [1339196090968440975n, 1339196346489372702n, "already has valentine", 1],
+                [1339201246833147914n, 1339201605362389064n, "Sure!", 3],
+            ].map((array, i) => {
+                const start = (array[0] >> 22n) + 1420070400000n;
+                
+                const dateOptions = { year: 'numeric', month: 'numeric', day: 'numeric' };
+                const startDate = new Date(Number(start)).toLocaleTimeString("it-IT", dateOptions);
+
+                const otherData = [];
+                if(array.length > 1) {
+                    const response = (array[1] >> 22n) + 1420070400000n;
+                    const responseDate = new Date(Number(response)).toLocaleTimeString("it-IT", dateOptions);
+                    otherData.push([responseDate, prettyMs(Number(response - start))])
+                    otherData.push(array[2])
+                    if(array[3]) otherData.push(array[3])
+                }
+                return [i + 1, startDate, ...otherData]
+            });
+        for girl in girls
+            h1= `Girl ${girl[0]} ${kindToEmoji(girl[4])}`
+            p= `I sent the first message at ${girl[1]}`
+            if girl[2]
+                p= `Responded at ${girl[2][0]} (${girl[2][1]} after my first message)`
+            if girl[3]
+                p= `Response context: "${girl[3]}"`
+            if girl.length <= 2
+                p No response
