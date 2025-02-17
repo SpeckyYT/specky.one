@@ -15,6 +15,7 @@ head
         if(number == 1) return "♥️"
         if(number == 2) return "💔"
         if(number == 3) return "💝"
+        if(number == 4) return "💜"
         return "❓"
     }
 
@@ -46,6 +47,7 @@ article
     p.
         Nobody else responded yet... I panicked, only two days remained...
         I sent out a few more messages to some people I scrolled through at random on phone.
+        One of them had "Valentine for hire" in their status. It was probably a scam. :/ jk
 
         Two girls responded, both rejections.
         The first one responded that she's taken and happy.
@@ -80,10 +82,16 @@ article
 
         I contacted some friends of mine telling how poorly this project went.
 
-        I finished writing this blog, and this is about everything.
+        I finished writing the main part of this blog.
+
+    code.inline 16/02/25
+    p.
+        The person who had "Valentine for hire" in their status responded with "mb gng hope you had a nice one".
+        Really appreciated the answer.
 
     .answers
         -
+            const IHopeYouHadAGreatSaintValentineDay = 1340098459499237377n;
             const girls = [
                 [1338951021572919308n],
                 [1338951607806591087n],
@@ -95,7 +103,7 @@ article
                 [1339188287021256706n, 1339188528570962061n, "taken and happy", 1],
                 [1339188650092793919n],
                 [1339189299857326090n, 1339647259003846668n, "drop 300; gtfo dummy u a loser; like ong u lying", 2],
-                [1339193882159747072n],
+                [1339193882159747072n, 1340545210014498951n, "mb gng; had 'valentine for hire' in status", 4],
                 [1339194413603356773n],
                 [1339196090968440975n, 1339196346489372702n, "already has valentine", 1],
                 [1339201246833147914n, 1339201605362389064n, "Sure!", 3],
@@ -109,18 +117,35 @@ article
                 if(array.length > 1) {
                     const response = (array[1] >> 22n) + 1420070400000n;
                     const responseDate = new Date(Number(response)).toLocaleTimeString("it-IT", dateOptions);
-                    otherData.push([responseDate, prettyMs(Number(response - start))])
+                    const responseText = `${responseDate}${array[1] >= IHopeYouHadAGreatSaintValentineDay ? " (after my 'I hope you had a great saint valentine day!' message)" : ""}`;
+
+                    otherData.push([responseText, prettyMs(Number(response - start))])
                     otherData.push(array[2])
                     if(array[3]) otherData.push(array[3])
                 }
                 return [i + 1, startDate, ...otherData]
             });
-        for girl in girls
-            h1= `Girl ${girl[0]} ${kindToEmoji(girl[4])}`
-            p= `I sent the first message at ${girl[1]}`
-            if girl[2]
-                p= `Responded at ${girl[2][0]} (${girl[2][1]} after my first message)`
-            if girl[3]
-                p= `Response context: "${girl[3]}"`
-            if girl.length <= 2
-                p No response
+        
+        h1 Disclaimer
+
+        p.
+            Below is the list of every girl I contacted for this project.
+            Of course, everyone is anonymous.
+            This all is just for documentation purposes.
+
+            I understand that not everyone checks their DM requests frequently.
+            I do not judge anyone, no matter if they responded poorly, responded late, or didn't respond at all.
+
+
+        details
+            summary Click here if you read the disclaimer
+            for girl in girls
+                h1= `Girl ${girl[0]} ${kindToEmoji(girl[4])}`
+                p= `I sent the first message at ${girl[1]}`
+                if girl[2]
+                    p= `Responded at ${girl[2][0]} (${girl[2][1]} after my first message)`
+                if girl[3]
+                    p= `Response context: "${girl[3]}"`
+                if girl.length <= 2
+                    p No response
+            // TODO: add a timeline with all of the responses and stuff
