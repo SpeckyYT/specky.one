@@ -52,6 +52,10 @@ all_art = [
     name: "Boats"
     year: 2021
 ,
+    filename: "brombeis.png"
+    name: "Brombeis"
+    year: 2025
+,
     filename: "burnt dream.png"
     name: "Burnt Dream"
     year: 2019
@@ -259,6 +263,10 @@ all_art = [
     name: "LLL"
     year: 2019
 ,
+    filename: "loading.png"
+    name: "Loading"
+    year: 2025
+,
     filename: "local-fantasy.png"
     name: "Local Fantasy"
     context: """
@@ -459,6 +467,10 @@ all_art = [
     name: "Shuffle"
     year: 2021
 ,
+    filename: "simone.png"
+    name: "Simone"
+    year: 2025
+,
     filename: "sphere.png"
     name: "Sphere"
     year: 2020
@@ -545,6 +557,10 @@ all_art = [
     filename: "unfocused.png"
     name: "Unfocused"
     year: 2021
+,
+    filename: "victor.png"
+    name: "Victor"
+    year: 2025
 ,
     filename: "viola.png"
     name: "Viola"
