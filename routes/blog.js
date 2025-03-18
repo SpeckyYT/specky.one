@@ -29,23 +29,23 @@ const blogs = [
             color: "#C19A6B",
         },
     },
-    {
-        title: "What is the SPWN programming language?",
-        filename: "spwn.pug",
-        path: "spwn",
-        date: new Date(Date.parse("July 08, 2023")),
-        writers: [
-            'Specky',
-        ],
-        tags: ["spwn", "programming language", "geometry dash"],
-        embed: {
-            title: "What is the SPWN programming language?",
-            description: "In this blog, we'll dive into one of the most powerful tools ever created for Geometry Dash.",
-            url: "spwn",
-            image: "https://user-images.githubusercontent.com/85206419/127884996-92251ba7-4c28-4bf0-bb40-d363d5e31ccb.png",
-            color: "#e000b0",
-        },
-    },
+    // {
+    //     title: "What is the SPWN programming language?",
+    //     filename: "spwn.pug",
+    //     path: "spwn",
+    //     date: new Date(Date.parse("July 08, 2023")),
+    //     writers: [
+    //         'Specky',
+    //     ],
+    //     tags: ["spwn", "programming language", "geometry dash"],
+    //     embed: {
+    //         title: "What is the SPWN programming language?",
+    //         description: "In this blog, we'll dive into one of the most powerful tools ever created for Geometry Dash.",
+    //         url: "spwn",
+    //         image: "https://user-images.githubusercontent.com/85206419/127884996-92251ba7-4c28-4bf0-bb40-d363d5e31ccb.png",
+    //         color: "#e000b0",
+    //     },
+    // },
     {
         title: "The one day I nearly died",
         filename: "todind.pug",
