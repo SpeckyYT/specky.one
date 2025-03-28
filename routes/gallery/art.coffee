@@ -287,6 +287,10 @@ all_art = [
     name: "Lore"
     year: 2023
 ,
+    filename: "malaka.png"
+    name: "Malaka"
+    year: 2025
+,
     filename: "mansion.png"
     name: "Mansion"
     context: """
@@ -613,6 +617,13 @@ all_art = [
         I got inspired by my friend Wolle for this one (he's currently know as BlackWolf).
     """
     year: 2020
+,
+    filename: "worried.png"
+    name: "Worried"
+    context: """
+        A close friend of mine hasn't replied to my messages for a while... I hope they're doing fine...
+    """
+    year: 2025
 ,
     filename: "wrap.png"
     name: "Wrap"
