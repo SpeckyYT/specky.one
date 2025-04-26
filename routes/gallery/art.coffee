@@ -298,6 +298,10 @@ all_art = [
     """
     year: 2021
 ,
+    filename: "marika.png"
+    name: "Marika"
+    year: 2025
+,
     filename: "mayday.png"
     name: "Mayday"
     description: """
