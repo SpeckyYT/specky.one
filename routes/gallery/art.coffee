@@ -398,6 +398,13 @@ all_art = [
     name: "Orb"
     year: 2021
 ,
+    filename: "orion.png"
+    name: "Orion"
+    context: """
+        I asked my friend Taco to name this one.
+    """
+    year: 2025
+,
     filename: "osu.png"
     name: "OSU"
     year: 2020
