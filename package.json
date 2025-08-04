@@ -4,7 +4,8 @@
   "description": "specky.one website",
   "main": "index.js",
   "scripts": {
-    "test": "node . TEST"
+    "test": "node . TEST",
+    "start": "node ."
   },
   "author": "SpeckyYT",
   "license": "ISC",
