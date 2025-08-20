@@ -3,7 +3,9 @@ doctype html
 include ../includes/style.pug
 
 -
-    const timelapses = ["https://youtu.be/PzKUy5-26PU"]
+    const timelapses = [
+        "https://youtube.com/embed/PzKUy5-26PU",
+    ]
 
 head
     title Lonely Place
@@ -164,7 +166,7 @@ body
     h2 Timelapses
     #timelapses
         for timelapse in timelapses
-            iframe(width=300 height=300 src=timelapse)
+            iframe(width=300 height=300 src=timelapse allowfullscreen)
 
 style.
     body {
