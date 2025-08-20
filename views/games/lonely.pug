@@ -2,6 +2,9 @@ doctype html
 
 include ../includes/style.pug
 
+-
+    const timelapses = ["https://youtu.be/PzKUy5-26PU"]
+
 head
     title Lonely Place
     link(rel="icon" type="image/png" size="64" href="../assets/icon.png")
@@ -155,6 +158,13 @@ body
     // add color buttons
     div.color-buttons
     h2.infos
+
+    br
+
+    h2 Timelapses
+    #timelapses
+        for timelapse in timelapses
+            iframe(width=300 height=300 src=timelapse)
 
 style.
     body {
