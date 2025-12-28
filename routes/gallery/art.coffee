@@ -444,6 +444,10 @@ all_art = [
     name: "Sadmess"
     year: 2019
 ,
+    filename: "Sally.png"
+    name: "Sally"
+    year: 2025
+,
     filename: "school.png"
     name: "School"
     context: "School in 2020 be like:"
@@ -611,6 +615,10 @@ all_art = [
     name: "Wave"
     year: 2021
 ,
+    filename: "wife.png"
+    name: "Wife"
+    year: 2025
+,
     filename: "win.png"
     name: "WIN"
     context: """
@@ -648,6 +656,10 @@ all_art = [
     filename: "xor.png"
     name: "XOR"
     year: 2020
+,
+    filename: "yaml.png"
+    name: "YAML"
+    year: 2025
 ,
     filename: "younger.png"
     name: "Younger"
