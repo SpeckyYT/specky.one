@@ -146,6 +146,11 @@ all_art = [
     context: listened_to_song "Fantascene Falls - Super Monkey Ball [DS] Touch & Roll"
     year: 2021
 ,
+    filename: "fireplace.png"
+    context: "I was in a call with two friends (Thomppa and Elu) and showed them how I make my art"
+    name: "Fireplace"
+    year: 2026
+,
     filename: "first-studio.png"
     name: "First Studio"
     year: 2021
