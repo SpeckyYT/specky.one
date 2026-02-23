@@ -166,7 +166,7 @@ script.
             return allUsers.get(id)
         } else {
             for(let i = 0; i < 10; i++) {
-                const user = await fetch(`https://discord-arts.asure.dev/v1/user/${id}`)
+                const user = await fetch(`/api/lvl0/discord/user/${id}`)
                     .then(j=>j.json())
                     .then(user => (allUsers.set(id, user.data), user.data) )
                     .catch(()=>{});
