@@ -40,11 +40,15 @@ else
 
     div#file-drop-area.center
         div#file-drop-message.
-            Drag and drop a file here or #[a#file-input-label(style="") click to select a file]
+            Drag and drop or #[a#file-input-label(style="") click here] to select a file
 
         input#file-input.hidden(type="file")
     br
-    input#send(type="button" value="Upload")
+    // show selected filename
+    div#selected-file Upload a file to enable the button
+    input#send(type="button" value="Upload" disabled)
+
+    progress#upload-progress(value="0" max="100" hidden)
 
     if req.discord.powerLevel() >= 2
         div#users
@@ -74,6 +78,14 @@ style.
         background-color: #999;
         animation: drop-area-pulse 0.5s linear infinite alternate;
     }
+
+    /* make details summary look clickable */
+    details summary {
+        cursor: pointer;
+    }
+    details summary:hover {
+        text-decoration: underline;
+    }
     @keyframes drop-area-pulse {
         from {
             box-shadow: 0 0 10px #fff;
@@ -81,6 +93,22 @@ style.
         to {
             box-shadow: 0 0 20px #fff;
         }
+    }
+
+    #upload-progress {
+        width: 60vw;
+        margin-top: 10px;
+        height: 1.5em;
+        appearance: none;
+    }
+    #upload-progress::-webkit-progress-bar {
+        background-color: #333;
+    }
+    #upload-progress::-webkit-progress-value {
+        background-color: #4caf50;
+    }
+    #upload-progress::-moz-progress-bar {
+        background-color: #4caf50;
     }
 
     /* file grid */
@@ -173,13 +201,28 @@ script.
     const saveButton = document.querySelector('#send');
     const fileInput = document.querySelector('#file-input');
     const fileTemplate = document.getElementById("file-template");
+    const progressBar = document.getElementById('upload-progress');
+    const selectedDisplay = document.getElementById('selected-file');
 
+    // initially disable upload
+    const defaultFileSelect = 'Select a file to upload';
+    saveButton.disabled = true;
+    selectedDisplay.textContent = defaultFileSelect;
     fileDropArea.addEventListener("click", function(event) {
         fileInput.click();
     })
 
     fileInput.addEventListener("change", function(event) {
-        popup(`File "${fileInput.files[0].name}" selected`, "info");
+        const name = fileInput.files[0]?.name || '';
+        popup(`File "${name}" selected`, "info");
+        const sel = document.getElementById('selected-file');
+        if (name) {
+            sel.textContent = `Selected: ${name} (click Upload)`;
+            saveButton.disabled = false;
+        } else {
+            sel.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+        }
     });
 
     fileDropArea.addEventListener("dragover", function(event) {
@@ -222,26 +265,55 @@ script.
         formData.append('file', newFile);
 
         popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
+        // remove click hint while uploading
+        selectedDisplay.textContent = `Uploading: ${getBasename(fileName)}`;
+        saveButton.disabled = true;
+        // hide the button while transfer is ongoing
+        saveButton.hidden = true;
         
-        await fetch('/media/files', {
-            method: 'POST',
-            body: formData,
-        })
-        .then(response => {
-            if(response.ok) {
-                popup(`File "${getBasename(fileName)}" saved successfully!`, "success")
-            } else {
-                if(response.status == 401)
-                    popup(`Unauthorized, login via Discord to use this service`)
-                else
-                    popup(`Unknown error: ${response.status}`)
+        // use XMLHttpRequest to track progress
+        const xhr = new XMLHttpRequest();
+        const progressBar = document.getElementById('upload-progress');
+        progressBar.hidden = false;
+        progressBar.value = 0;
+
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = (e.loaded / e.total) * 100;
+                progressBar.value = percent;
             }
-        })
-        .catch(error => {
-            popup(`${error}`)
         });
 
-        await updateFiles()
+        xhr.addEventListener('load', async () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                popup(`File "${getBasename(fileName)}" saved successfully!`, "success");
+            } else {
+                if (xhr.status == 401)
+                    popup(`Unauthorized, login via Discord to use this service`);
+                else
+                    popup(`Unknown error: ${xhr.status}`);
+            }
+            progressBar.hidden = true;
+            // clear selection after done
+            fileInput.value = '';
+            selectedDisplay.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+            saveButton.hidden = false;
+            await updateFiles();
+        });
+
+        xhr.addEventListener('error', async () => {
+            popup(`Upload failed`);
+            progressBar.hidden = true;
+            fileInput.value = '';
+            selectedDisplay.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+            saveButton.hidden = false;
+            await updateFiles();
+        });
+
+        xhr.open('POST', '/media/files');
+        xhr.send(formData);
     });
 
     function getBasename(path) {
