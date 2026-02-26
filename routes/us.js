@@ -33,7 +33,6 @@ router.all('/shorten', async (req, res) => {
     try {
         new URL(url)
     } catch (err) {
-        console.log(err)
         return res.status(400).json({ error: 'invalid URL' })
     }
 
