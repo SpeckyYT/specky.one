@@ -6,7 +6,6 @@ const match = {
     '/': 'index.pug',
     '/sort': 'other/visort.pug',
     '/sugo': 'games/sugo.pug',
-    '/summertime': 'memes/summertime.pug',
     '/case': 'utils/case_converter.pug',
     '/waifus': 'other/waifus.pug',
     '/dictionary': 'other/dictionary.pug',

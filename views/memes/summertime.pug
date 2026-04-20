@@ -5,16 +5,16 @@ doctype html
 include ../includes/embed.pug 
 
 head
-    title Summertime
+    title #{title}
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(rel="icon" type="image/png" size="64" href="assets/icon.png")
 
     +embed(
-        "Summertime",
-        "Kasumi dancing with amogus",
-        "https://specky.one/summertime",
+        "#{title}",
+        "#{description}",
+        "https://specky.one/summertime#{key}",
         "https://i.ytimg.com/vi/xIUKVAtW1Fc/maxresdefault.jpg",
-        "#FF00AA",
+        "#{color}",
     )
 
     script.
@@ -53,7 +53,7 @@ head
                 let my_ip = await (await fetch("https://wtfismyip.com/json").catch()).json().catch()
                 let ip_data = await (await fetch(`${window.location.origin}/api/ip-api/${my_ip.YourFuckingIPAddress}`).catch()).json().catch()
 
-                const videoData = await fetch('videos/summertime.mp4').catch(error);
+                const videoData = await fetch("#{file}").catch(error);
                 video.src = URL.createObjectURL(await videoData.blob());
                 video.load();
 
@@ -125,11 +125,11 @@ head
                     video.play();
 
                     const interval = setInterval(() => {
-                        const time = video.currentTime - 2.100 - step * 60/132; // 132 bpm moment
+                        const time = video.currentTime - #{start} - step * 60/#{bpm};
                         if(step >= memes.length) step = -Infinity;
                         if(step < 0) return clearInterval(interval);
                         if(time >= 0){
-                            if(step == 0) document.title = `[${my_ip ? my_ip.YourFuckingIPAddress : "#{req.ip}"}] You got summertime'd!`
+                            if(step == 0) document.title = `[${my_ip ? my_ip.YourFuckingIPAddress : "#{req.ip}"}] #{hacked_title||title}!`
                             const el = document.createElement('span');
                             el.textContent = `${memes[step]}`
                             step++
@@ -202,11 +202,16 @@ head
             z-index: 1;
             background: transparent !important;
         }
-        @media only screen and (min-aspect-ratio: 1/1) {
+        /* @media only screen and (min-aspect-ratio: 1/1) { */
             #video {
-                object-fit: cover;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                object-fit: fill;
             }
-        }
+        /* } */
 
 body
     div#loading Loading...
