@@ -147,8 +147,8 @@ all_art = [
     year: 2021
 ,
     filename: "fireplace.png"
-    context: "I was in a call with two friends (Thomppa and Elu) and showed them how I make my art"
     name: "Fireplace"
+    context: "I was in a call with two friends (Thomppa and Elu) and showed them how I make my art"
     year: 2026
 ,
     filename: "first-studio.png"
@@ -162,6 +162,13 @@ all_art = [
     filename: "flow.png"
     name: "Flow"
     year: 2019
+,
+    filename: "flux.png"
+    name: "Flux"
+    context: """
+        I was in vc with my friend Cuba and he was suggesting me how to make it
+    """
+    year: 2026
 ,
     filename: "free.png"
     name: "Free"
