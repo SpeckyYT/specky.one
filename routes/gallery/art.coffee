@@ -239,6 +239,13 @@ all_art = [
     """
     year: 2025
 ,
+    filename: "horilla.png"
+    name: "Horilla"
+    context: """
+        I was in vocal chat, people saw a gorilla in this image, and a person suggested the name "Horizon", so I suggested the name "Horilla"
+    """
+    year: 2026
+,
     filename: "IBSL.png"
     name: "IBSL"
     year: 2022
