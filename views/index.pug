@@ -271,11 +271,18 @@ html(lang="en")
                                                 }
 
                                                 (async function() {
+                                                    let retries = 0;
                                                     while(true) {
                                                         try {
                                                             const timeStamp = await updateCurrentlyPlaying()
                                                             const difference = timeStamp - Date.now()
-                                                            await wait(Math.max(difference, 1000))
+                                                            if(difference < 0) {
+                                                                retries += 1;
+                                                                await wait(retries * 1000);
+                                                            } else {
+                                                                retries = 0;
+                                                                await wait(Math.max(difference, 1000));
+                                                            }
                                                         } catch {
                                                             await wait(10000)
                                                         }
