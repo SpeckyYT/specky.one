@@ -262,9 +262,10 @@ html(lang="en")
                                                     const json = await fetch("https://nicsiradio.com/api/nowplaying")
                                                     .then(res => res.json());
                                                     
-                                                    const { played_at, duration, song } = json.find(s => s.station.id == 1).now_playing;
+                                                    const { played_at, duration, song, is_request } = json.find(s => s.station.id == 1).now_playing;
 
                                                     songName.innerHTML = song.text
+                                                    songName.classList[is_request ? "add" : "remove"]("radio-request")
                                                     songImage.src = song.art
 
                                                     return new Date((played_at + duration) * 1000)
@@ -508,4 +509,7 @@ style.
     }
     .cool-outline {
         border: 10px dashed #FFFFFF;
+    }
+    .radio-request {
+        color: #f5a;
     }
