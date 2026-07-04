@@ -27,6 +27,7 @@ const https = require('https');
 const fs = require('fs');
 
 const devMode = require('./middleware/devMode');
+const logger = require('./middleware/logger');
 
 const log = require('./util/log');
 require('./util/global');
@@ -78,6 +79,10 @@ app.use((req, res, next) => {
 app.use(sessionMiddleware);
 app.use(discordAuth);
 app.use(devMode);
+app.use(logger({
+    maxEntries: 10000,
+    storeQuery: true,
+}));
 
 const routes = filehound.create()
     .path("./routes")

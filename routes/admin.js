@@ -33,6 +33,26 @@ router.all("/", (req, res) => {
     })
 })
 
+router.use((req, res, next) => {
+    if(req.discord.powerLevel() >= 2) {
+        return next()
+    } else {
+        return renderError(
+            req,
+            res,
+            401,
+            "Requires discord login / level 2",
+        )
+    }
+});
+
+router.all("/log", (req, res) => {
+    res.render("admin/log.pug", {
+        req,
+        res,
+    })
+})
+
 module.exports = {
     route: "/admin",
     router: router,
