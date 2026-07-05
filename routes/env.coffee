@@ -1,10 +1,16 @@
 { Router } = require 'express'
 router = Router()
-seedrandom = require 'seedrandom'
+{ createPcg32, randomInt } = require 'pcg'
 
 router.get "/", (req, res) =>
     seed = Math.floor Date.now() / 1000 / 60 / 60 / 24
-    rng = seedrandom seed
+    rng_state = createPcg32({}, seed, ~seed)
+
+    rng = ->
+        max = 2**32
+        [number, new_state] = randomInt(0, max, rng_state)
+        rng_state = new_state
+        number / max
 
     pick = (array) ->
         array[Math.floor rng() * array.length]
