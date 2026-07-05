@@ -30,6 +30,7 @@
     "pug": "^3.0.2",
     "quick.db": "^9.1.7",
     "resolve-path": "^1.4.0",
+    "seedrandom": "^3.0.5",
     "ws": "^8.5.0"
   },
   "devDependencies": {
