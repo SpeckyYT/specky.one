@@ -56,6 +56,9 @@ html(lang="en")
                 .card#kpi-errors
                     .label 5xx rate
                     .value 0%
+                .card#kpi-not-found
+                    .label 404 rate
+                    .value 0%
             .card(style="margin-top:14px")
                 h3 Path Filters
                 .filter-actions
@@ -206,6 +209,7 @@ html(lang="en")
                     document.querySelector('#kpi-unique .value').textContent = '—';
                     document.querySelector('#kpi-avg .value').textContent = '—';
                     document.querySelector('#kpi-errors .value').textContent = '—';
+                    document.querySelector('#kpi-not-found .value').textContent = '—';
                     clearChildren(document.getElementById('top-pages'));
                     const emptyItem = document.createElement('li');
                     emptyItem.className = 'small';
@@ -225,7 +229,8 @@ html(lang="en")
                     const filtered = visibleLogs.length;
                     const unique = new Set(visibleLogs.map(l => l.ip)).size;
                     const avg = filtered ? Math.round(visibleLogs.reduce((s, l) => s + l.response_time_ms, 0) / filtered) : 0;
-                    const errors = filtered ? Math.round(100 * visibleLogs.filter(l => l.status >= 500).length / filtered) : 0;
+                    const errors = visibleLogs.filter(l => Number(l.status) >= 500).length;
+                    const notFounds = visibleLogs.filter(l => Number(l.status) === 404).length;
                     const limit = Math.max(1, Number(pathLimitSelect?.value || pathCountLimit || 10));
                     pathCountLimit = limit;
 
@@ -233,7 +238,8 @@ html(lang="en")
                     document.querySelector('#kpi-filtered .value').textContent = filtered;
                     document.querySelector('#kpi-unique .value').textContent = unique;
                     document.querySelector('#kpi-avg .value').textContent = avg + ' ms';
-                    document.querySelector('#kpi-errors .value').textContent = errors + '%';
+                    document.querySelector('#kpi-errors .value').textContent = `${errors} (${Math.round(100 * errors / total) || 0}%)`;
+                    document.querySelector('#kpi-not-found .value').textContent = `${notFounds} (${Math.round(100 * notFounds / total) || 0}%)`;
 
                     const pathCounts = {};
                     visibleLogs.forEach(l => pathCounts[l.path] = (pathCounts[l.path] || 0) + 1);
