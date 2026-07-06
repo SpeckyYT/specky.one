@@ -62,11 +62,16 @@ router.get "/", (req, res) =>
         HSTS_ENABLED: false
         CONTENT_SECURITY_POLICY: "default-src 'self';"
 
+        # keys
+        OPENAI_KEY: "sk-proj-#{alpha_numeric_special 51}"
+ 
         # jokes
         FEATURE_ENABLE_INFINITE_LONELY_PLACE: false
+        FEATURE_ENABLE_GLOBAL_CHAT: false
 
         # db/auth/discord
         DATABASE_URL: "postgres://specky:#{alpha_numeric(8)}@localhost:5432/db"
+        SECONDARY_DATABASE_URL: "mongodb://specky:#{alpha_numeric 10}@localhost:27017/speckyone?authSource=admin"
         JWT_SECRET: "#{uppercase()}#{lowercase 10}#{year()}#{"#{month()}".padStart 2, "0"}#{"#{day()}".padStart 2, "0"}#{special()}"
         JWT_EXPIRES_IN: "7d"
         CACHE_TTL_SECONDS: 30
