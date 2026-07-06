@@ -2,7 +2,35 @@
 router = Router()
 { createPcg32, randomInt } = require 'pcg'
 
-router.get "/", (req, res) =>
+env_paths = [
+    "/.env"
+    "/.env.bak"
+    "/.env.example"
+    
+    "/app/.env"
+    "/admin/.env"
+    "/backend/.env"
+    
+    "/.env.production"
+    "/.env.old"
+    "/.env.save"
+
+    "/laravel/.env"
+    "/core/.env"
+    "/web/.env"
+    
+    "/secrets.env"
+    "/sendgrid.env"
+    "/.env.php"
+    "/config.env"
+    "/.env.env"
+
+    "/.env.local"
+    "/.env.prod"
+    "/.env.staging"
+]
+
+env_func = (req, res) =>
     seed = Math.floor Date.now() / 1000 / 60 / 60 / 24
     rng_state = createPcg32({}, seed, ~seed)
 
@@ -92,6 +120,9 @@ router.get "/", (req, res) =>
     res.type 'text/plain; charset=utf-8'
     res.send env_file
 
+for path from env_paths
+    router.get path, env_func
+
 module.exports =
-    route: "/.env"
+    route: "/"
     router: router
