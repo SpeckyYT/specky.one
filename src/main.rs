@@ -1,21 +1,23 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
 use dotenvy::dotenv;
+use rocket::launch;
 
-#[macro_use] extern crate rocket;
-
-mod routes;
+mod app_state;
 mod catchers;
+mod config;
+mod routes;
 mod util;
 
-fn main() {
+#[launch]
+fn rocket() -> _ {
     let _ = dotenv();
+    let _ = app_state::config();
 
-    let mut router = rocket::ignite().register(catchers::build());
-    
+    let mut router = rocket::build();
+
     for (base, routes) in routes::collect() {
         router = router.mount(&base, routes);
     }
+    router = router.register("/", catchers::build());
 
-    router.launch();
+    router
 }

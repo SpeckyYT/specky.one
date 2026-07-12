@@ -1,4 +1,4 @@
-use crate::route_gen;
+use rocket::get;
 
 route_gen!{
     ["/"]
