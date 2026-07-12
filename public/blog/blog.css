@@ -89,3 +89,9 @@ code.inline a:active    { color: lightyellow; }
     padding: 10px;
     border: 5px dashed black;
 }
+
+a {
+    text-decoration: none;
+    font-size: 20px;
+    color: black;
+}

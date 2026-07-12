@@ -22,13 +22,17 @@ const filehound = require('filehound');
 const colors = require('colors/safe');
 const session = require('express-session');
 const { StatusCodes } = require('http-status-codes');
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
-const discordAuth = require('./middleware/discordAuth').default;
 const devMode = require('./middleware/devMode');
+const logger = require('./middleware/logger');
 
 const log = require('./util/log');
 require('./util/global');
 
+global.discordAuth = require('./middleware/discordAuth').default;
 global.sessionMemoryStore = new session.MemoryStore();
 global.sessionMiddleware = session({
     secret: Array(32).fill("").map(() => `${(Math.floor(36 * Math.random())).toString(36)}`).join(""),
@@ -37,6 +41,23 @@ global.sessionMiddleware = session({
     resave: true,
     store: sessionMemoryStore,
 })
+global.httpsCertificates = {
+    key: (() => {
+        try {
+            return fs.readFileSync(process.env.CERT_KEY);
+        } catch(err) {
+            return null
+        }
+    })(),
+    cert: (() => {
+        try {
+            return fs.readFileSync(process.env.CERT_CERT);
+        } catch(err) {
+            return null
+        }
+    })(),
+}
+
 global.isTest = process.argv.includes("TEST");
 
 global.app = express();
@@ -58,6 +79,10 @@ app.use((req, res, next) => {
 app.use(sessionMiddleware);
 app.use(discordAuth);
 app.use(devMode);
+app.use(logger({
+    maxEntries: 10000,
+    storeQuery: true,
+}));
 
 const routes = filehound.create()
     .path("./routes")
@@ -98,7 +123,8 @@ app.all('*', (req, res) => {
 app.uptime = Date.now();
 
 if(!global.isTest) {
-    app.listen(80);
+    http.createServer(app).listen(80);
+    https.createServer(httpsCertificates, app).listen(443);
 } else {
     process.exit(0);
 }

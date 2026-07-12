@@ -1,0 +1,398 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        meta(name="viewport" content="width=device-width,initial-scale=1")
+        title Logs Dashboard
+        //- Chart.js CDN
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+        style.
+            :root{
+                --bg:#0f1724; --card:#0b1220; --muted:#9aa4b2; --accent:#4f46e5;
+            }
+            body{font-family:Inter,system-ui,Segoe UI,Roboto; background:var(--bg); color:#e6eef8; margin:0}
+            .container{max-width:1200px;margin:28px auto;padding:20px}
+            header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+            .kpis{display:flex;gap:12px}
+            .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); padding:14px;border-radius:10px;min-width:160px}
+            .grid{display:grid;grid-template-columns:1fr 420px;gap:14px;margin-top:14px}
+            .charts{display:flex;flex-direction:column;gap:12px}
+            .header-actions{display:flex;align-items:center;gap:10px}
+            .refresh-btn{background:var(--accent);color:white;border:none;border-radius:6px;padding:8px 12px;cursor:pointer}
+            .refresh-btn:disabled{opacity:0.7;cursor:wait}
+            .filter-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+            .filter-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;background:rgba(255,255,255,0.04);font-size:12px}
+            .filter-chip button{background:none;border:none;color:#fff;cursor:pointer;padding:0}
+            .filter-input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6eef8;padding:8px 10px;min-width:220px}
+            .filter-actions{display:flex;gap:8px;align-items:center}
+            .status-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+            .status-filters input{margin-right:4px}
+            .select-row{display:flex;align-items:center;gap:8px;margin-top:6px}
+            .select-row input{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6eef8;padding:6px 8px;width:70px}
+            table{width:100%;border-collapse:collapse;background:transparent}
+            th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:var(--muted)}
+            .small{font-size:12px;color:var(--muted)}
+    body
+        .container
+            header
+                h1 Logs Dashboard
+                .header-actions
+                    button.refresh-btn#refresh-btn(type="button") Refresh
+                    small.small Last updated: 
+                        span#last-updated #{new Date().toLocaleString()}
+            .kpis
+                .card#kpi-requests
+                    .label Total requests
+                    .value 0
+                .card#kpi-filtered
+                    .label Filtered requests
+                    .value 0
+                .card#kpi-unique
+                    .label Unique visitors
+                    .value 0
+                .card#kpi-avg
+                    .label Avg response ms
+                    .value 0
+                .card#kpi-errors
+                    .label 5xx rate
+                    .value 0%
+                .card#kpi-not-found
+                    .label 404 rate
+                    .value 0%
+            .card(style="margin-top:14px")
+                h3 Path Filters
+                .filter-actions
+                    input.filter-input#filter-input(type="text" placeholder="Add a path to ignore (e.g. /foo/*)")
+                    button.refresh-btn#add-filter-btn(type="button") Add filter
+                .status-filters(style="margin-top:8px")
+                    label.small(style="margin-right:10px")
+                        input.status-filter#status-2xx(type="checkbox" value="2xx" checked)
+                        span  2xx
+                    label.small(style="margin-right:10px")
+                        input.status-filter#status-4xx(type="checkbox" value="4xx" checked)
+                        span  4xx
+                    label.small
+                        input.status-filter#status-5xx(type="checkbox" value="5xx" checked)
+                        span  5xx
+                .filter-row#filter-row
+            .grid
+                .charts
+                    .card
+                        .select-row
+                            h3(style="margin:0") Traffic by Path
+                            label.small(for="path-limit-select") Show top
+                            input#path-limit-select(type="number" min="1" max="100" step="1" value="8")
+                            span.small paths
+                        canvas#chart-paths(width="600" height="240")
+                    .card
+                        h3 Response Time Distribution
+                        canvas#chart-latency(width="600" height="160")
+                .card
+                    h3 Most Visited Pages
+                    ul#top-pages(style="list-style:none;padding:0;margin:0")
+            .card(style="margin-top:14px")
+                h3 Recent Logs
+                table
+                    thead
+                        tr
+                            th Time
+                            th Path
+                            th Status
+                            th IP
+                            th Resp ms
+                    tbody#logs-table
+        script.
+            (function(){
+                const refreshButton = document.getElementById('refresh-btn');
+                const addFilterButton = document.getElementById('add-filter-btn');
+                const filterInput = document.getElementById('filter-input');
+                const filterRow = document.getElementById('filter-row');
+                const pathLimitSelect = document.getElementById('path-limit-select');
+                const lastUpdatedEl = document.getElementById('last-updated');
+                const status2xx = document.getElementById('status-2xx');
+                const status4xx = document.getElementById('status-4xx');
+                const status5xx = document.getElementById('status-5xx');
+                let pathChart = null;
+                let latencyChart = null;
+                const defaultFilters = ['/preview?.*', '/api/.*', '^.{100,}$'];
+                const storageKey = 'logs-dashboard-ignored-paths';
+                const getStoredFilters = () => {
+                    try {
+                        const raw = window.localStorage.getItem(storageKey);
+                        if (!raw) return { filters: [], statuses: { '2xx': true, '4xx': true, '5xx': true } };
+                        const parsed = JSON.parse(raw);
+                        return {
+                            filters: Array.isArray(parsed && parsed.filters) ? parsed.filters.filter(Boolean) : [],
+                            statuses: {
+                                '2xx': parsed && parsed.statuses && typeof parsed.statuses['2xx'] === 'boolean' ? parsed.statuses['2xx'] : true,
+                                '4xx': parsed && parsed.statuses && typeof parsed.statuses['4xx'] === 'boolean' ? parsed.statuses['4xx'] : true,
+                                '5xx': parsed && parsed.statuses && typeof parsed.statuses['5xx'] === 'boolean' ? parsed.statuses['5xx'] : true,
+                            }
+                        };
+                    } catch (err) {
+                        console.warn('Unable to load saved log filters', err);
+                        return { filters: [], statuses: { '2xx': true, '4xx': true, '5xx': true } };
+                    }
+                };
+                const persistFilters = () => {
+                    try {
+                        window.localStorage.setItem(storageKey, JSON.stringify({
+                            filters: Array.from(ignoredPaths),
+                            statuses: {
+                                '2xx': statusFilterState['2xx'],
+                                '4xx': statusFilterState['4xx'],
+                                '5xx': statusFilterState['5xx'],
+                            }
+                        }));
+                    } catch (err) {
+                        console.warn('Unable to save log filters', err);
+                    }
+                };
+                const savedFilterState = getStoredFilters();
+                const ignoredPaths = new Set(savedFilterState.filters.length ? savedFilterState.filters : defaultFilters);
+                const statusFilterState = { ...savedFilterState.statuses };
+                let pathCountLimit = Number(pathLimitSelect.value || 8);
+
+                const fmt = d => new Date(d).toLocaleTimeString();
+
+                const clearChildren = el => {
+                    while (el.firstChild) el.removeChild(el.firstChild);
+                };
+
+                const matchesFilter = (path, filter) => {
+                    if (!filter) return false;
+                    if (/[\\^$.*+?()[\]{}|]/.test(filter)) {
+                        try {
+                            return new RegExp(filter).test(path);
+                        } catch (err) {
+                            return false;
+                        }
+                    } else if (filter.endsWith('*')) {
+                        const prefix = filter.slice(0, -1);
+                        return path.startsWith(prefix);
+                    }
+                    return path === filter;
+                };
+
+                const matchesStatus = status => {
+                    const code = Number(status);
+                    if (statusFilterState['2xx'] && code >= 200 && code < 300) return true;
+                    if (statusFilterState['4xx'] && code >= 400 && code < 500) return true;
+                    if (statusFilterState['5xx'] && code >= 500 && code < 600) return true;
+                    return false;
+                };
+
+                const filterLogs = logs => logs.filter(log => {
+                    const path = log.path || '';
+                    return matchesStatus(log.status) && !Array.from(ignoredPaths).some(filter => matchesFilter(path, filter));
+                });
+
+                const renderFilters = () => {
+                    clearChildren(filterRow);
+                    Array.from(ignoredPaths).forEach(filter => {
+                        const chip = document.createElement('span');
+                        chip.className = 'filter-chip';
+                        chip.innerHTML = `<span>${filter}</span><button type="button" aria-label="Remove filter">×</button>`;
+                        chip.querySelector('button').addEventListener('click', () => {
+                            ignoredPaths.delete(filter);
+                            persistFilters();
+                            renderFilters();
+                            if (window.__lastLogs) renderDashboard(window.__lastLogs);
+                        });
+                        filterRow.appendChild(chip);
+                    });
+                };
+
+                const setEmptyState = () => {
+                    document.querySelector('#kpi-requests .value').textContent = '—';
+                    document.querySelector('#kpi-filtered .value').textContent = '—';
+                    document.querySelector('#kpi-unique .value').textContent = '—';
+                    document.querySelector('#kpi-avg .value').textContent = '—';
+                    document.querySelector('#kpi-errors .value').textContent = '—';
+                    document.querySelector('#kpi-not-found .value').textContent = '—';
+                    clearChildren(document.getElementById('top-pages'));
+                    const emptyItem = document.createElement('li');
+                    emptyItem.className = 'small';
+                    emptyItem.textContent = 'Unable to load logs.';
+                    document.getElementById('top-pages').appendChild(emptyItem);
+                    clearChildren(document.getElementById('logs-table'));
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = '<td colspan="5" class="small">Unable to load logs.</td>';
+                    document.getElementById('logs-table').appendChild(emptyRow);
+                };
+
+                const renderDashboard = logs => {
+                    window.__lastLogs = logs;
+                    const totalLogs = Array.isArray(logs) ? logs : [];
+                    const visibleLogs = filterLogs(totalLogs);
+                    const total = totalLogs.length;
+                    const filtered = visibleLogs.length;
+                    const unique = new Set(visibleLogs.map(l => l.ip)).size;
+                    const avg = filtered ? Math.round(visibleLogs.reduce((s, l) => s + l.response_time_ms, 0) / filtered) : 0;
+                    const errors = visibleLogs.filter(l => Number(l.status) >= 500).length;
+                    const notFounds = visibleLogs.filter(l => Number(l.status) === 404).length;
+                    const limit = Math.max(1, Number(pathLimitSelect?.value || pathCountLimit || 10));
+                    pathCountLimit = limit;
+
+                    document.querySelector('#kpi-requests .value').textContent = total;
+                    document.querySelector('#kpi-filtered .value').textContent = filtered;
+                    document.querySelector('#kpi-unique .value').textContent = unique;
+                    document.querySelector('#kpi-avg .value').textContent = avg + ' ms';
+                    document.querySelector('#kpi-errors .value').textContent = `${errors} (${Math.round(100 * errors / total) || 0}%)`;
+                    document.querySelector('#kpi-not-found .value').textContent = `${notFounds} (${Math.round(100 * notFounds / total) || 0}%)`;
+
+                    const pathCounts = {};
+                    visibleLogs.forEach(l => pathCounts[l.path] = (pathCounts[l.path] || 0) + 1);
+                    const top = Object.entries(pathCounts).sort((a, b) => b[1] - a[1]).slice(0, limit);
+
+                    const ul = document.getElementById('top-pages');
+                    clearChildren(ul);
+                    top.forEach(([path, c]) => {
+                        const li = document.createElement('li');
+                        li.style.padding = '6px 0';
+                        li.innerHTML = `<strong style="color:var(--accent)">${path}</strong> <span class="small"> — ${c} hits</span>`;
+                        ul.appendChild(li);
+                    });
+
+                    const tbody = document.getElementById('logs-table');
+                    clearChildren(tbody);
+                    visibleLogs.slice().reverse().slice(0, 50).forEach(l => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${fmt(l.timestamp)}</td><td>${l.method} ${l.path}</td><td>${l.status}</td><td>${l.ip}</td><td>${l.response_time_ms}</td>`;
+                        tbody.appendChild(tr);
+                    });
+
+                    if (pathChart) pathChart.destroy();
+                    if (latencyChart) latencyChart.destroy();
+
+                    const ctx1 = document.getElementById('chart-paths').getContext('2d');
+                    pathChart = new Chart(ctx1, {
+                        type: 'bar',
+                        data: {
+                            labels: top.map(t => t[0]),
+                            datasets: [{ label: 'Hits', data: top.map(t => t[1]), backgroundColor: 'rgba(79,70,229,0.9)' }]
+                        },
+                        options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5e1' } }, y: { ticks: { color: '#cbd5e1' } } } }
+                    });
+
+                    const bins = [0, 50, 100, 300, 1000];
+                    const sliceDetails = bins.map((b, i) => {
+                        const bucketLogs = visibleLogs.filter(l => {
+                            const v = l.response_time_ms;
+                            if (i === bins.length - 1) return v >= b;
+                            return v >= b && v < bins[i + 1];
+                        });
+                        const pathCounts = {};
+                        bucketLogs.forEach(l => pathCounts[l.path] = (pathCounts[l.path] || 0) + 1);
+                        const topPaths = Object.entries(pathCounts)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 10)
+                            .map(([path, count]) => `${path} (${count})`);
+                        return {
+                            label: i === bins.length - 1 ? `${b}+ ms` : `${b}-${bins[i + 1] - 1} ms`,
+                            count: bucketLogs.length,
+                            topPaths,
+                        };
+                    });
+
+                    const ctx2 = document.getElementById('chart-latency').getContext('2d');
+                    latencyChart = new Chart(ctx2, {
+                        type: 'pie',
+                        data: {
+                            labels: sliceDetails.map(detail => detail.label),
+                            datasets: [{ data: sliceDetails.map(detail => detail.count), backgroundColor: ['#60a5fa', '#34d399', '#f59e0b', '#f97316'] }]
+                        },
+                        options: {
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: '#cbd5e1' } },
+                                tooltip: {
+                                    callbacks: {
+                                        title(items) {
+                                            return items[0]?.label || '';
+                                        },
+                                        label(item) {
+                                            return `Requests: ${item.raw}`;
+                                        },
+                                        afterLabel(item) {
+                                            const detail = sliceDetails[item.dataIndex];
+                                            if (!detail || !detail.topPaths.length) return ['No requests in this bucket'];
+                                            return ['Top paths:'].concat(detail.topPaths.map(path => `• ${path}`));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+
+                    lastUpdatedEl.textContent = new Date().toLocaleString();
+                };
+
+                const syncPathLimit = () => {
+                    const value = Number(pathLimitSelect.value || 8);
+                    pathCountLimit = Number.isFinite(value) && value > 0 ? value : 8;
+                    if (window.__lastLogs) renderDashboard(window.__lastLogs);
+                };
+
+                pathLimitSelect.addEventListener('change', syncPathLimit);
+                pathLimitSelect.addEventListener('input', syncPathLimit);
+                pathLimitSelect.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        syncPathLimit();
+                    }
+                });
+
+                addFilterButton.addEventListener('click', () => {
+                    const value = filterInput.value.trim();
+                    if (!value) return;
+                    ignoredPaths.add(value);
+                    persistFilters();
+                    filterInput.value = '';
+                    renderFilters();
+                    if (window.__lastLogs) renderDashboard(window.__lastLogs);
+                });
+
+                [status2xx, status4xx, status5xx].forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        statusFilterState[checkbox.value] = checkbox.checked;
+                        persistFilters();
+                        if (window.__lastLogs) renderDashboard(window.__lastLogs);
+                    });
+                });
+
+                filterInput.addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        addFilterButton.click();
+                    }
+                });
+
+                renderFilters();
+
+                const loadLogs = async () => {
+                    refreshButton.disabled = true;
+                    refreshButton.textContent = 'Refreshing...';
+
+                    try {
+                        const response = await fetch('/api/lvl2/log', {
+                            cache: 'no-store',
+                            headers: { 'Cache-Control': 'no-cache' }
+                        });
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const payload = await response.json();
+                        const logs = Array.isArray(payload)
+                            ? payload
+                            : (payload && Array.isArray(payload.logs) ? payload.logs : []);
+                        renderDashboard(logs);
+                    } catch (err) {
+                        console.error(err);
+                        setEmptyState();
+                    } finally {
+                        refreshButton.disabled = false;
+                        refreshButton.textContent = 'Refresh';
+                    }
+                };
+
+                refreshButton.addEventListener('click', loadLogs);
+                loadLogs();
+            })();

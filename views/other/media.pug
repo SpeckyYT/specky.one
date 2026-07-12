@@ -2,6 +2,10 @@ include ../includes/style.pug
 include ../includes/popup.pug
 include ../includes/konami.pug
 
+-
+    const myFileSize = req.discord.isAdmin() ? maxSize : maxUserSize;
+    const myFileCount = req.discord.isAdmin() ? 9999 : maxUserFiles;
+
 h1 Specky Media Hosting
 
 if req.discord.powerLevel() == 0
@@ -9,9 +13,17 @@ if req.discord.powerLevel() == 0
     p #[a(href="/") Go back] and login with Discord to use this service
 
 else
+    details
+        summary What can you upload?
+        | Maximal size per file: #{prettyBytes(myFileSize)}
+        br
+        | Maximum amount of files: #{myFileCount}
+
+
     h2 Your files
 
-    div#file-grid
+    div#file-grid.file-grid
+
     template#file-template
         div#file-item
             img#file-preview(src="" alt="File Preview")
@@ -21,17 +33,30 @@ else
     div#context-menu.hidden
         div#open.menu-item Open in browser
         div#copy.menu-item Copy link
+        div#rename.menu-item Rename
         div#delete.menu-item.red-text Delete
 
     h2 Upload
 
     div#file-drop-area.center
         div#file-drop-message.
-            Drag and drop a file here or #[a#file-input-label(style="") click to select a file]
+            Drag and drop or #[a#file-input-label(style="") click here] to select a file
 
         input#file-input.hidden(type="file")
     br
-    input#send(type="button" value="Save")
+    // show selected filename
+    div#selected-file Upload a file to enable the button
+    input#send(type="button" value="Upload" disabled)
+
+    progress#upload-progress(value="0" max="100" hidden)
+
+    if req.discord.powerLevel() >= 2
+        div#users
+        p#user-id
+        div#user.file-grid
+
+    template#user-button-template
+        button(type="button")#user-button ID
 
 style.
     /* upload */
@@ -53,6 +78,14 @@ style.
         background-color: #999;
         animation: drop-area-pulse 0.5s linear infinite alternate;
     }
+
+    /* make details summary look clickable */
+    details summary {
+        cursor: pointer;
+    }
+    details summary:hover {
+        text-decoration: underline;
+    }
     @keyframes drop-area-pulse {
         from {
             box-shadow: 0 0 10px #fff;
@@ -62,8 +95,24 @@ style.
         }
     }
 
+    #upload-progress {
+        width: 60vw;
+        margin-top: 10px;
+        height: 1.5em;
+        appearance: none;
+    }
+    #upload-progress::-webkit-progress-bar {
+        background-color: #333;
+    }
+    #upload-progress::-webkit-progress-value {
+        background-color: #4caf50;
+    }
+    #upload-progress::-moz-progress-bar {
+        background-color: #4caf50;
+    }
+
     /* file grid */
-    #file-grid {
+    .file-grid {
         background-color: #222;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -151,13 +200,29 @@ script.
     const fileDropArea = document.querySelector('#file-drop-area');
     const saveButton = document.querySelector('#send');
     const fileInput = document.querySelector('#file-input');
+    const fileTemplate = document.getElementById("file-template");
+    const progressBar = document.getElementById('upload-progress');
+    const selectedDisplay = document.getElementById('selected-file');
 
+    // initially disable upload
+    const defaultFileSelect = 'Select a file to upload';
+    saveButton.disabled = true;
+    selectedDisplay.textContent = defaultFileSelect;
     fileDropArea.addEventListener("click", function(event) {
         fileInput.click();
     })
 
     fileInput.addEventListener("change", function(event) {
-        popup(`File "${fileInput.files[0].name}" selected`, "info");
+        const name = fileInput.files[0]?.name || '';
+        popup(`File "${name}" selected`, "info");
+        const sel = document.getElementById('selected-file');
+        if (name) {
+            sel.textContent = `Selected: ${name} (click Upload)`;
+            saveButton.disabled = false;
+        } else {
+            sel.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+        }
     });
 
     fileDropArea.addEventListener("dragover", function(event) {
@@ -176,14 +241,6 @@ script.
         fileInput.dispatchEvent(changeEvent);
     });
 
-    // konami code
-    let bypassSizeLimit = false;
-
-    const output = setupKonamiCode(() => {
-        popup("You enabled bigger file uploads (if you are a normal user, this won't do anything)", "success");
-        bypassSizeLimit = true;
-    })
-
     /* save */
     saveButton.addEventListener("click", async (event) => {
         event.preventDefault()
@@ -193,56 +250,92 @@ script.
         if(!file)
             return popup("File not found")
     
-        if(!bypassSizeLimit && file.size > 2**25)
+        // TODO: add in the future a way to make size expandible or something
+        if(file.size > #{myFileSize})
             return popup("File is too big");
         
-        if(file.size >= 2**32)
-            return popup("What the fuck are you doing? 🤨")
+        //- if(file.size >= #{maxSize})
+        //-     return popup("What the fuck are you doing? 🤨")
 
-        const fileName = file.name.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g,"") || `${Date.now()}`;
+        const fileName = fixFilename(file.name) || `${Date.now()}`;
+
+        const newFile = new File([file], fileName, { type: file.type });
+
+        const formData = new FormData();
+        formData.append('file', newFile);
 
         popup(`File "${getBasename(fileName)}" is getting sent!\nPlease wait until the file is uploaded.`, "info");
+        // remove click hint while uploading
+        selectedDisplay.textContent = `Uploading: ${getBasename(fileName)}`;
+        saveButton.disabled = true;
+        // hide the button while transfer is ongoing
+        saveButton.hidden = true;
+        
+        // use XMLHttpRequest to track progress
+        const xhr = new XMLHttpRequest();
+        const progressBar = document.getElementById('upload-progress');
+        progressBar.hidden = false;
+        progressBar.value = 0;
 
-        await fetch('/media/files', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                filename: fileName,
-                size: file.size,
-                content: await (async () => {
-                    const reader = new FileReader()
-                    reader.readAsArrayBuffer(file)
-
-                    return new Promise(res => {
-                        reader.onload = async function(e) {
-                            const bytes = Array.from(new Uint8Array(e.target.result))
-                            res(bytes);
-                        }
-                    })
-                })()
-            }),
-        })
-        .then(response => {
-            if(response.ok) {
-                popup(`File "${getBasename(fileName)}" saved successfully!`, "success")
-            } else {
-                if(response.status == 401)
-                    popup(`Unauthorized, login via Discord to use this service`)
-                else
-                    popup(`Unknown error: ${response.status}`)
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = (e.loaded / e.total) * 100;
+                progressBar.value = percent;
             }
-        })
-        .catch(error => {
-            popup(`${error}`)
         });
 
-        await updateFiles()
+        xhr.addEventListener('load', async () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                popup(`File "${getBasename(fileName)}" saved successfully!`, "success");
+            } else {
+                if (xhr.status == 401)
+                    popup(`Unauthorized, login via Discord to use this service`);
+                else
+                    popup(`Unknown error: ${xhr.status}`);
+            }
+            progressBar.hidden = true;
+            // clear selection after done
+            fileInput.value = '';
+            selectedDisplay.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+            saveButton.hidden = false;
+            await updateFiles();
+        });
+
+        xhr.addEventListener('error', async () => {
+            popup(`Upload failed`);
+            progressBar.hidden = true;
+            fileInput.value = '';
+            selectedDisplay.textContent = defaultFileSelect;
+            saveButton.disabled = true;
+            saveButton.hidden = false;
+            await updateFiles();
+        });
+
+        xhr.open('POST', '/media/files');
+        xhr.send(formData);
     });
 
     function getBasename(path) {
         return path.split("/").slice(-1).join("/")
+    }
+
+    function addMedia(grid, file) {
+        // Clone the template
+        let fileItem = fileTemplate.content.cloneNode(true);
+        // Get the preview image and file name elements
+        let preview = fileItem.getElementById("file-preview");
+        let name = fileItem.getElementById("file-name");
+        // Set the preview image src and file name text
+        preview.src = `/preview/media/${file}`;
+        preview.imageLink = `${window.location.origin}/media/${file}`;
+        name.textContent = file.split("/").slice(-1);
+        // Append the file item to the grid
+        grid.appendChild(fileItem);
+    }
+
+    function fixFilename(filename) {
+        return filename.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g, "");
     }
 
     async function updateFiles() {
@@ -250,27 +343,16 @@ script.
 
         // Get the grid element and the file template
         const grid = document.getElementById("file-grid");
-        const template = document.getElementById("file-template");
 
         // Clear the current grid
         grid.innerHTML = "";
 
         // Iterate through the files array
         for (const file of files) {
-            // Clone the template
-            let fileItem = template.content.cloneNode(true);
-            // Get the preview image and file name elements
-            let preview = fileItem.getElementById("file-preview");
-            let name = fileItem.getElementById("file-name");
-            // Set the preview image src and file name text
-            preview.src = `/preview/media/${file}`;
-            preview.imageLink = `${window.location.origin}/media/${file}`;
-            name.textContent = file.split("/").slice(-1);
-            // Append the file item to the grid
-            grid.appendChild(fileItem);
+            addMedia(grid, file);
         }
 
-        updateContextMenu()
+        updateContextMenu("#file-grid #file-item")
     }
 
     updateFiles();
@@ -283,8 +365,8 @@ script.
         e.preventDefault()
     })
 
-    function updateContextMenu() {
-        const fileItems = document.querySelectorAll("#file-grid #file-item");
+    function updateContextMenu(selection) {
+        const fileItems = document.querySelectorAll(selection);
 
         for (var i = 0; i < fileItems.length; i++) {
             fileItems[i].addEventListener("contextmenu", async function(e) {
@@ -315,8 +397,17 @@ script.
         }
     }
 
-    document.addEventListener("click", function() {
-        contextMenu.classList.add("hidden");
+    function hideContextMenu(event) {
+        if(event.target.id != "context-menu" && !contextMenu.classList.contains("hidden")) {
+            contextMenu.classList.add("hidden");
+        }
+    }
+
+    document.addEventListener("click", function(e) {
+        hideContextMenu(e)
+    });
+    document.addEventListener("contextmenu", function(e) {
+        hideContextMenu(e)
     });
 
     document.querySelector("#open").addEventListener("click", function(event) {
@@ -337,6 +428,33 @@ script.
         .catch(() => {
             popup("Failed to load to clipboard.");
         })
+    });
+
+    document.querySelector("#rename").addEventListener("click", function(event) {
+        if(!currentTarget) return;
+
+        const img = currentTarget.querySelector('img');
+        const url = new URL(img.imageLink);
+        const pathname = url.pathname;
+        const actualPath = pathname.split(/\/|\\/g).slice(-2).join("/");
+
+        const newFileName = prompt("Enter new file name:", getBasename(actualPath));
+        const finalFilename = fixFilename(newFileName);
+        if (!finalFilename) return popup("Filename can't be empty");
+
+        return fetch(`/media/${actualPath}?newname=${finalFilename}`, { method: "PATCH" })
+        .then(async response => {
+            if (response.ok) {
+                popup(`File renamed to "${finalFilename}" successfully!`, "success");
+                await updateFiles();
+            } else {
+                popup(`Unknown error: ${response.status}`);
+            }
+        })
+        .catch(async err => {
+            popup(`${err}`);
+            await updateFiles();
+        });
     });
 
     document.querySelector("#delete").addEventListener("click", function(event) {
@@ -362,3 +480,41 @@ script.
             await updateFiles();
         })
     });
+
+if req.discord.powerLevel() >= 2
+    style.
+        #users {
+            padding: 40px 10px 20px 10px;
+        }
+
+    script.
+        const usersDiv = document.querySelector("#users");
+        const userButtonTemplate = document.querySelector("#user-button-template");
+        const userDiv = document.querySelector("#user");
+
+        function updateIDs() {
+            return fetch("files/ids")
+            .then(data => data.json())
+            .then(ids => {
+                usersDiv.innerHTML = ""
+                for(const id of ids) {
+                    const currentChild = userButtonTemplate.content.cloneNode(true);
+                    currentChild.querySelector("button").innerHTML = id;
+                    usersDiv.appendChild(currentChild);
+                    usersDiv.children[usersDiv.children.length - 1].addEventListener("click", () => {
+                        document.querySelector("#user-id").innerHTML = id
+                        fetch(`files/${id}`)
+                        .then(data => data.json())
+                        .then(async files => {
+                            userDiv.innerHTML = ""
+                            for(const file of files) {
+                                addMedia(userDiv, file)
+                            }
+                            updateContextMenu("#user #file-item")
+                        })
+                    })
+                }
+            });
+        }
+
+        updateIDs()

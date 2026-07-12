@@ -2,6 +2,7 @@ const { Router } = require('express');
 const fs = require("fs");
 const path = require("path");
 const { resolvePath } = require('../util/path');
+const prettyMs = require('pretty-ms');
 
 const router = Router();
 
@@ -28,21 +29,55 @@ const blogs = [
             color: "#C19A6B",
         },
     },
+    // {
+    //     title: "What is the SPWN programming language?",
+    //     filename: "spwn.pug",
+    //     path: "spwn",
+    //     date: new Date(Date.parse("July 08, 2023")),
+    //     writers: [
+    //         'Specky',
+    //     ],
+    //     tags: ["spwn", "programming language", "geometry dash"],
+    //     embed: {
+    //         title: "What is the SPWN programming language?",
+    //         description: "In this blog, we'll dive into one of the most powerful tools ever created for Geometry Dash.",
+    //         url: "spwn",
+    //         image: "https://user-images.githubusercontent.com/85206419/127884996-92251ba7-4c28-4bf0-bb40-d363d5e31ccb.png",
+    //         color: "#e000b0",
+    //     },
+    // },
     {
-        title: "What is the SPWN programming language?",
-        filename: "spwn.pug",
-        path: "spwn",
-        date: new Date(Date.parse("July 08, 2023")),
+        title: "The one day I nearly died",
+        filename: "todind.pug",
+        path: "todind",
+        date: new Date(Date.parse("April 09, 2024")),
         writers: [
             'Specky',
         ],
-        tags: ["spwn", "programming language", "geometry dash"],
+        tags: [],
         embed: {
-            title: "What is the SPWN programming language?",
-            description: "In this blog, we'll dive into one of the most powerful tools ever created for Geometry Dash.",
-            url: "spwn",
-            image: "https://user-images.githubusercontent.com/85206419/127884996-92251ba7-4c28-4bf0-bb40-d363d5e31ccb.png",
-            color: "#e000b0",
+            title: "The one day I nearly died",
+            description: "One of the things that happened to me.",
+            url: "todind",
+            image: "https://c7.alamy.com/comp/RPX89D/harassment-of-a-member-of-the-team-a-child-in-school-the-concept-of-discrimination-bullying-survival-differences-outcast-social-isolation-RPX89D.jpg",
+            color: "#6ad6e5",
+        },
+    },
+    {
+        title: "Project 140225",
+        filename: "project140225.pug",
+        path: "project140225",
+        date: new Date(Date.parse("February 14, 2025")),
+        writers: [
+            'Specky',
+        ],
+        tags: [],
+        embed: {
+            title: "Project 140225",
+            description: "One of my most ambitious projects ever.",
+            url: "project140225",
+            image: "https://cdn.pixabay.com/photo/2016/02/08/19/58/heart-1187486_1280.jpg",
+            color: "#ed3c9d",
         },
     },
 ]
@@ -89,6 +124,7 @@ router.get("/:blog", async (req, res, next) => {
         req,
         res,
         blog,
+        prettyMs,
     });
 })
 

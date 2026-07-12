@@ -11,7 +11,7 @@ global.devModeSettings = {
 
 module.exports = async (req, res, next) => {
     if(DEV_MODE) {
-        req.discord.isAdmin = () => devModeSettings.isAdmin;
+        req.discord.isAdmin = () => devModeSettings.isAdmin || devModeSettings.powerLevel >= 2;
         req.discord.powerLevel = () => devModeSettings.powerLevel;
 
         req.session.discord.user = devModeSettings.user;

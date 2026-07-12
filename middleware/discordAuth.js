@@ -4,7 +4,7 @@ const { default: axios, AxiosError } = require('axios');
 const REFRESH_INTERVAL = 60 * 3;
 
 // in milliseconds
-const LOGIN_DURATION = 60 * 60 * 1000;
+const LOGIN_DURATION = 15 * 24 * 60 * 60 * 1000;
 
 const isDisabled = !REDIRECT_URI || !CLIENT_ID || !CLIENT_SECRET;
 

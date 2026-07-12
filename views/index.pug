@@ -36,7 +36,7 @@ script.
                 },
                 {
                     name: "Lonely Place",
-                    description: "A discontinued r/place clone (revival in the future??? 😳)",
+                    description: "A discontinued r/place clone (getting revived)",
                     image: "lonely/lonely_place.png",
                     url: "/lonely",
                 },
@@ -55,32 +55,43 @@ script.
                 {
                     name: "SPWN Ideas",
                     description: "Some project ideas for SPWN",
+                    level: 1,
                     image: "https://spu7nix.net/spwn/assets/spwn_logo_large.png",
                     url: "/spwnideas",
                 },
                 {
                     name: "ANMT video player",
                     description: "A video player for ANMT files",
+                    level: 1,
                     image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACQAAAAbAQMAAAAu4r+jAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURf///wAAAFXC034AAAAJcEhZcwAADsMAAA7DAcdvqGQAAABVSURBVBjTY8AGPoAIxr8gkvk/Osn+D0Ey/0GQjD+AhARYrxz7H2YGhnr2f/wMDP/P/7dvYPgPBAcYjn////8BA4P7nw6gKvY/DAVo5vxAN5P5DwMDAH04JMNHSB5QAAAAAElFTkSuQmCC",
                     url: "/anmt",
                 },
                 {
                     name: "Visort",
                     description: "A visualizer for Sorting Algorithms",
+                    level: 1,
                     image: "https://assets-global.website-files.com/606a802fcaa89bc357508cad/6123c034286044167618b263_7.png",
                     url: "/sort",
                 },
                 {
                     name: "Sugo",
                     description: "Gambling simulator for real gamblers",
+                    level: 1,
                     image: "https://corrierece.it/wp-content/uploads/2022/01/gioco.jpg",
                     url: "/sugo",
                 },
                 {
                     name: "Blog",
-                    description: 'Specky\'s Blog where he posts his ""discoveries""',
+                    description: 'Specky\'s Blog where he posts his ""discoveries"" and personal events',
                     image: "https://upload.wikimedia.org/wikipedia/commons/4/42/Blog_%281%29.jpg",
                     url: "/blog",
+                },
+                {
+                    name: "Waifus",
+                    description: "Specky's personal waifu collection",
+                    level: 1,
+                    image: "https://nintendon.it/wp-content/uploads/2018/12/Nintendo-female-NintendOn-1024x576.png",
+                    url: "/waifus",
                 },
             ],
         },
@@ -149,7 +160,7 @@ script.
                     name: "Discord Server",
                     description: "A place to jump into and help out developing or just to chill around.",
                     image: "https://cdn.discordapp.com/icons/538028973058424832/96021aa98c4e6e3f120af4a9985bb88b.png?size=2048",
-                    url: "https://discord.gg/4EecFku",
+                    url: "/discord",
                 },
                 {
                     name: "GitHub",
@@ -251,20 +262,28 @@ html(lang="en")
                                                     const json = await fetch("https://nicsiradio.com/api/nowplaying")
                                                     .then(res => res.json());
                                                     
-                                                    const { played_at, duration, song } = json.find(s => s.station.id == 1).now_playing;
+                                                    const { played_at, duration, song, is_request } = json.find(s => s.station.id == 1).now_playing;
 
                                                     songName.innerHTML = song.text
+                                                    songName.classList[is_request ? "add" : "remove"]("radio-request")
                                                     songImage.src = song.art
 
                                                     return new Date((played_at + duration) * 1000)
                                                 }
 
                                                 (async function() {
+                                                    let retries = 0;
                                                     while(true) {
                                                         try {
                                                             const timeStamp = await updateCurrentlyPlaying()
                                                             const difference = timeStamp - Date.now()
-                                                            await wait(Math.max(difference, 1000))
+                                                            if(difference < 0) {
+                                                                retries += 1;
+                                                                await wait(retries * 1000);
+                                                            } else {
+                                                                retries = 0;
+                                                                await wait(Math.max(difference, 1000));
+                                                            }
                                                         } catch {
                                                             await wait(10000)
                                                         }
@@ -490,4 +509,7 @@ style.
     }
     .cool-outline {
         border: 10px dashed #FFFFFF;
+    }
+    .radio-request {
+        color: #f5a;
     }

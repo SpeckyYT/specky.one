@@ -2,11 +2,15 @@ doctype html
 
 include ../includes/style.pug
 
+-
+    const timelapses = [
+        "https://youtube.com/embed/PzKUy5-26PU",
+    ]
+
 head
     title Lonely Place
     link(rel="icon" type="image/png" size="64" href="../assets/icon.png")
     script.
-        /*
         let currentColor = "";
         const setColor = c => currentColor = c;
         let isSocketConnected = false
@@ -87,8 +91,13 @@ head
                     }));
                 }
             });
-      
-            const socket = new WebSocket("ws://#{req.hostname}:#{port}/lonely/ws");
+
+            let socket = undefined;
+            if(#{DEV_MODE}) {
+                socket = new WebSocket("ws://#{req.hostname}:#{port}");
+            } else {
+                socket = new WebSocket("wss://#{req.hostname}:#{port}");
+            }
 
             socket.addEventListener("open", async (event) => {
                 isSocketConnected = true
@@ -141,17 +150,23 @@ head
                 isSocketConnected = false
             });
         }
-        */
 
 body
     // title
     h1 Lonely Place
-    // canvas#canvas(width=(width * 10), height=(height * 10))
-    img.center(src="lonely_place.png")
-    h2.infos Thanks for playing!
+    canvas#canvas(width=(width * 10), height=(height * 10))
+    // img.center(src="lonely_place.png")
+    // h2.infos Thanks for playing!
     // add color buttons
-    // div.color-buttons
-    // h2.infos
+    div.color-buttons
+    h2.infos
+
+    br
+
+    h2 Timelapses
+    #timelapses
+        for timelapse in timelapses
+            iframe(width=300 height=300 src=timelapse allowfullscreen)
 
 style.
     body {

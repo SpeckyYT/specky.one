@@ -2,6 +2,7 @@ const { Router } = require('express');
 const router = Router();
 
 const PIXELS = 256; // pixels * pixels is the max
+const IMAGE_BYTES_SIZE = 2**24; // 16MB
 
 const path = require('path');
 const fs = require('fs');
@@ -40,6 +41,10 @@ const handleFile = async (path, res) => {
 
     if(fs.existsSync(path)) {
         try {
+            if(fs.statSync(path).size > IMAGE_BYTES_SIZE) {
+                throw "size too big, generating default preview instead"
+            }
+
             const image = await jimp.read(path);
             const width = image.getWidth();
             const height = image.getHeight();
@@ -51,7 +56,8 @@ const handleFile = async (path, res) => {
 
             return saveAndSend(bufferToBuffer(await image.resize(x, y).getBufferAsync(MIME_JPEG)));
         } catch(err) {
-            const extension = path.split(".").pop() || "file";
+            const filename = path.split(/\\|\//g).pop();
+            const extension = filename.split(".").pop() || "file";
 
             const image = await jimp.create(PIXELS, PIXELS, "#bac");
 
