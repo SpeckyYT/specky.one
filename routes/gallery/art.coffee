@@ -258,6 +258,11 @@ all_art = [
     name: "Labs"
     year: 2020
 ,
+    filename: "learned_helplessness.png"
+    name: "Learned Helplessness"
+    context: "Sequel of [Helplessness]"
+    year: 2026
+,
     filename: "liava.png"
     name: "Liava"
     context: made_for_friend "Liava"
