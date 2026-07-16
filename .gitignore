@@ -5,3 +5,4 @@ public/media
 node_modules/
 .env
 *.sqlite
+target/

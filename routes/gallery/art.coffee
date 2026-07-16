@@ -563,6 +563,10 @@ all_art = [
     context: listened_to_song "Sunglow - Yamajet feat. ひうらまさこ (Masako Hiura)"
     year: 2020
 ,
+    filename: "tamed.png"
+    name: "Tamed"
+    year: 2026
+,
     filename: "TheMagicCube.png"
     name: "The Magic Cube"
     context: """

@@ -45,10 +45,108 @@ html(lang="en")
                 img.undraggable(src=`/preview?image=gallery/${art.filename}`, loading="lazy")
 
 script.
+    let activeArticle = null
+
     function createCustomElement(tag = "p", text) {
         const doc = document.createElement(tag)
         if(text) doc.appendChild(document.createTextNode(text))
         return doc
+    }
+
+    function getArtName(art) {
+        return (art.getAttribute("name") || "").trim()
+    }
+
+    function findArtByName(name) {
+        const normalizedName = (name || "").trim().toLowerCase()
+        if (!normalizedName) return null
+
+        for (const art of document.getElementsByClassName("art")) {
+            const artName = getArtName(art).toLowerCase()
+            if (artName === normalizedName) return art
+        }
+
+        return null
+    }
+
+    function updateHashForArt(art) {
+        const name = getArtName(art)
+        if (!name) {
+            history.replaceState(null, "", window.location.pathname + window.location.search)
+            return
+        }
+
+        history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${encodeURIComponent(name)}`)
+    }
+
+    function closeActiveArticle() {
+        if (activeArticle) {
+            activeArticle.setAttribute("visible", "false")
+            activeArticle = null
+            history.replaceState(null, "", window.location.pathname + window.location.search)
+        }
+    }
+
+    function openArticle(art, options = {}) {
+        const article = summonArticle(art)
+
+        if (activeArticle && activeArticle !== article) {
+            activeArticle.setAttribute("visible", "false")
+        }
+
+        activeArticle = article
+        article.setAttribute("visible", "false")
+        requestAnimationFrame(() => {
+            article.setAttribute("visible", "true")
+            if (typeof article.focus === "function") {
+                article.focus({ preventScroll: true })
+            }
+        })
+
+        if (options.updateHash !== false) {
+            updateHashForArt(art)
+        }
+    }
+
+    function createLinkedTextElement(tag = "p", text, currentArt) {
+        const element = document.createElement(tag)
+
+        if (!text) return element
+
+        const linkPattern = /\[([^\]\[]+)\]/g
+        let lastIndex = 0
+        let match
+
+        while ((match = linkPattern.exec(text)) !== null) {
+            const before = text.slice(lastIndex, match.index)
+            if (before) element.appendChild(document.createTextNode(before))
+
+            const targetName = match[1].trim()
+            const targetArt = findArtByName(targetName)
+
+            if (targetArt && targetArt !== currentArt) {
+                const link = document.createElement("a")
+                link.setAttribute("href", "#")
+                link.style.color = "#40FFFF"
+                link.style.textDecoration = "underline"
+                link.style.cursor = "pointer"
+                link.appendChild(document.createTextNode(targetName))
+                link.addEventListener("click", (event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    openArticle(targetArt)
+                })
+                element.appendChild(link)
+            } else {
+                element.appendChild(document.createTextNode(match[0]))
+            }
+
+            lastIndex = match.index + match[0].length
+        }
+
+        if (lastIndex < text.length) element.appendChild(document.createTextNode(text.slice(lastIndex)))
+
+        return element
     }
 
     function summonArticle(art) {
@@ -69,9 +167,9 @@ script.
         const children = [
             createCustomElement("h1", name),
             createCustomElement("h2", "Description"),
-            createCustomElement("p", description),
+            createLinkedTextElement("p", description, art),
             createCustomElement("h2", "Context"),
-            createCustomElement("p", context),
+            createLinkedTextElement("p", context, art),
             createCustomElement("p", `Made in ${year || new Date().getFullYear()}${year ? "" : " (year not confirmed)"}`),
             (()=>{
                 const img = document.createElement("img");
@@ -83,8 +181,8 @@ script.
 
         for(const child of children) article.appendChild(child)
 
-        article.addEventListener("blur", event => {
-            article.setAttribute("visible", "false")
+        article.addEventListener("click", event => {
+            event.stopPropagation()
         })
 
         document.body.appendChild(article)
@@ -92,19 +190,52 @@ script.
         return article
     }
 
-    for (const art of document.getElementsByClassName("art")) {
-        art.addEventListener("click", async (event) => {
-            const article = summonArticle(art);
+    function initializeArtElements() {
+        for (const art of document.getElementsByClassName("art")) {
+            const name = getArtName(art)
+            if (name) {
+                art.setAttribute("id", name)
+            }
 
-            // this is for not setting the visibility to "true" instantaneously
-            // if that happens, it would appear without a clean transition
-            article.setAttribute("visible", "false")
-            await new Promise(res => setTimeout(res, 0))
-            
-            article.setAttribute("visible", "true")
-            article.focus()
-        })
+            art.addEventListener("click", (event) => {
+                event.stopPropagation()
+                openArticle(art)
+            })
+        }
     }
+
+    initializeArtElements()
+
+    document.addEventListener("click", (event) => {
+        if (event.target.closest(".art") || event.target.closest("article")) return
+        closeActiveArticle()
+    })
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeActiveArticle()
+        }
+    })
+
+    function openArtFromHash(hashValue) {
+        const targetName = decodeURIComponent((hashValue || "").replace(/^#/, "")).trim()
+
+        if (!targetName) {
+            closeActiveArticle()
+            return
+        }
+
+        const targetArt = findArtByName(targetName)
+        if (targetArt) {
+            openArticle(targetArt, { updateHash: false })
+        }
+    }
+
+    window.addEventListener("hashchange", () => {
+        openArtFromHash(window.location.hash)
+    })
+
+    openArtFromHash(window.location.hash)
 
 style.
     #bg {
@@ -200,6 +331,15 @@ style.
 
     article h1 {
         font-size: 2.5em;
+    }
+
+    article a {
+        color: #40FFFF;
+        text-decoration: underline;
+    }
+
+    article a:hover {
+        color: #80FFFF;
     }
 
     article[visible="true"] {
