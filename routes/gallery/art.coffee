@@ -437,6 +437,10 @@ all_art = [
     name: "Party"
     year: 2021
 ,
+    filename: "patoreless.png"
+    name: "Patoreless"
+    year: 2026
+,
     filename: "pretty star.png"
     name: "Pretty Star"
     year: 2020
