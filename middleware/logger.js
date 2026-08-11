@@ -33,6 +33,9 @@ function createRequestLogger(options = {}) {
         }
     }
 
+    // DISABLED LOGGER DUE TO EXTREMELY BAD PERFORMANCE
+    return (req, res, next) => next();
+
     return function requestLogger(req, res, next) {
         const start = process.hrtime.bigint();
         const ip = (req.headers['x-forwarded-for'] || req.ip || req.connection?.remoteAddress || '').toString().split(',')[0].trim();

@@ -108,7 +108,7 @@ function scaleDimensions(width, height) {
         .path(path.join(process.cwd(), "public"))
         .depth(Infinity)
         .ext(['.png', '.jpeg', '.jpg', '.gif'])
-        .discard("media")
+        // .discard("media") // pre-load media
         .findSync();
 
     for(const imagePath of images) {
