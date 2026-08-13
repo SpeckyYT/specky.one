@@ -44,11 +44,23 @@ else
 
         input#file-input.hidden(type="file")
     br
-    // show selected filename
+
     div#selected-file Upload a file to enable the button
     input#send(type="button" value="Upload" disabled)
 
     progress#upload-progress(value="0" max="100" hidden)
+
+    br
+
+    input#file-to-clipboard(type="checkbox" checked)
+    label Copy link of file to clipboard automatically
+
+    br
+
+    input#scroll-to-file(type="checkbox" checked)
+    label Scroll to file when uploaded/renamed
+
+    br
 
     if req.discord.powerLevel() >= 2
         div#users
@@ -204,6 +216,9 @@ script.
     const progressBar = document.getElementById('upload-progress');
     const selectedDisplay = document.getElementById('selected-file');
 
+    const fileToClipboardCheckbox = document.getElementById('file-to-clipboard');
+    const scrollToFileCheckbox = document.getElementById('scroll-to-file');
+
     // initially disable upload
     const defaultFileSelect = 'Select a file to upload';
     saveButton.disabled = true;
@@ -322,17 +337,21 @@ script.
 
     function addMedia(grid, file) {
         // Clone the template
-        let fileItem = fileTemplate.content.cloneNode(true);
+        let fileEntry = fileTemplate.content.cloneNode(true);
         // Get the preview image and file name elements
-        let preview = fileItem.getElementById("file-preview");
-        let name = fileItem.getElementById("file-name");
+        let preview = fileEntry.getElementById("file-preview");
+        let name = fileEntry.getElementById("file-name");
         // Set the preview image src and file name text
         preview.src = `/preview/media/${file}`;
         preview.imageLink = `${window.location.origin}/media/${file}`;
         name.textContent = file.split("/").slice(-1);
         // Append the file item to the grid
-        grid.appendChild(fileItem);
-        return preview.imageLink
+        const child = grid.appendChild(fileEntry);
+        return {
+            child,
+            name,
+            preview,
+        }
     }
 
     function fixFilename(filename) {
@@ -352,10 +371,16 @@ script.
 
         // Iterate through the files array
         for (const file of files) {
-            const mediaUrl = addMedia(grid, file);
+            const mediaObject = addMedia(grid, file);
 
             if(previousFiles.length && !previousFiles.includes(file)) {
-                copyToClipboard(mediaUrl)
+                if(fileToClipboardCheckbox.checked) {
+                    copyToClipboard(mediaObject.preview.imageLink)
+                }
+
+                if(scrollToFileCheckbox.checked) {
+                    grid.children[grid.children.length - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                }
             }
         }
 
