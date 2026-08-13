@@ -332,11 +332,14 @@ script.
         name.textContent = file.split("/").slice(-1);
         // Append the file item to the grid
         grid.appendChild(fileItem);
+        return preview.imageLink
     }
 
     function fixFilename(filename) {
         return filename.replace(/ +/g, "_").replace(/[^a-zA-Z0-9-_.]/g, "");
     }
+
+    let previousFiles = [];
 
     async function updateFiles() {
         const files = await fetch('/media/files').then(res => res.json());
@@ -349,8 +352,14 @@ script.
 
         // Iterate through the files array
         for (const file of files) {
-            addMedia(grid, file);
+            const mediaUrl = addMedia(grid, file);
+
+            if(previousFiles.length && !previousFiles.includes(file)) {
+                copyToClipboard(mediaUrl)
+            }
         }
+
+        previousFiles = files;
 
         updateContextMenu("#file-grid #file-item")
     }
@@ -403,6 +412,16 @@ script.
         }
     }
 
+    function copyToClipboard(text, popupText) {
+        return navigator.clipboard.writeText(text)
+        .then(() => {
+            popup(popupText || "Copied to clipboard!", "info");
+        })
+        .catch(() => {
+            popup("Failed to copy to clipboard.");
+        })
+    }
+
     document.addEventListener("click", function(e) {
         hideContextMenu(e)
     });
@@ -421,13 +440,7 @@ script.
     document.querySelector("#copy").addEventListener("click", function(event) {
         if(!currentTarget) return;
 
-        return navigator.clipboard.writeText(currentTarget.querySelector('img').imageLink)
-        .then(() => {
-            popup("Copied to clipboard!", "info");
-        })
-        .catch(() => {
-            popup("Failed to load to clipboard.");
-        })
+        copyToClipboard(currentTarget.querySelector('img').imageLink)
     });
 
     document.querySelector("#rename").addEventListener("click", function(event) {
